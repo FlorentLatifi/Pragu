@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- No INTERNET permission, on purpose: the agent talks to the CLI only through adb. -->
+    <application
+        android:allowBackup="false"
+        android:label="Pragu agent" />
+
+    <instrumentation
+        android:name=".PraguInstrumentation"
+        android:label="Pragu capture agent"
+        android:targetPackage="dev.pragu.agent" />
+</manifest>
