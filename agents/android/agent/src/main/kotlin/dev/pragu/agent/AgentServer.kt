@@ -24,7 +24,9 @@ fun isTrustedPeer(uid: Int): Boolean = uid == ROOT_UID || uid == SHELL_UID
  */
 class AgentServer(private val socketName: String, private val handler: RequestHandler) {
     fun serve() {
-        LocalServerSocket(socketName).use { server ->
+        // LocalServerSocket only implements Closeable from API 28, so `use {}` would crash on API 26–27.
+        val server = LocalServerSocket(socketName)
+        try {
             Log.i(TAG, "Listening on @$socketName")
             while (true) {
                 val client = server.accept()
@@ -36,6 +38,8 @@ class AgentServer(private val socketName: String, private val handler: RequestHa
                 }
                 if (!keepServing) return
             }
+        } finally {
+            server.close()
         }
     }
 

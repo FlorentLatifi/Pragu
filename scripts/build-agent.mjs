@@ -7,8 +7,13 @@ import { fileURLToPath } from 'node:url';
 const agentDir = fileURLToPath(new URL('../agents/android/', import.meta.url));
 const isWindows = process.platform === 'win32';
 const gradlew = join(agentDir, isWindows ? 'gradlew.bat' : 'gradlew');
-// AGP 9 creates JVM unit tests for the debug build type only.
-const tasks = [':agent:assembleRelease', ':agent:testDebugUnitTest', ':agent:verifyReleaseNoInternetPermission'];
+// AGP 9 creates JVM unit tests for the debug build type only. Lint catches API-level crashes (NewApi).
+const tasks = [
+  ':agent:assembleRelease',
+  ':agent:testDebugUnitTest',
+  ':agent:lintRelease',
+  ':agent:verifyReleaseNoInternetPermission',
+];
 
 // See build-fixture.mjs: one dropped DNS lookup otherwise disables a whole Maven repository.
 const env = {
