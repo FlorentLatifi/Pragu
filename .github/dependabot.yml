@@ -4,6 +4,13 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    ignore:
+      # Node types follow the oldest supported Node (22); see docs/adr/002-tooling.md.
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
+      # typescript-eslint supports TypeScript < 6.1 only; revisit when it supports 7.
+      - dependency-name: typescript
+        versions: ['>=6.1.0']
     groups:
       development:
         dependency-type: development
