@@ -1,6 +1,15 @@
 import { estimateTextColors, formatRatio, toHex } from '../color.js';
-import type { Confidence } from '../model.js';
+import type { Confidence, PamNode } from '../model.js';
 import type { Finding, Rule } from './types.js';
+
+/** WCAG 1.4.3 sets no contrast requirement for text that is part of an inactive (disabled) component. */
+function isInsideInactiveComponent(node: PamNode, byId: ReadonlyMap<string, PamNode>): boolean {
+  for (let current: PamNode | undefined = node; current !== undefined;) {
+    if (!current.enabled) return true;
+    current = current.parentId === null ? undefined : byId.get(current.parentId);
+  }
+  return false;
+}
 
 const NORMAL_TEXT_RATIO = 4.5;
 const LARGE_TEXT_RATIO = 3;
@@ -42,8 +51,9 @@ export const textContrast: Rule = {
   check({ screen, raster }) {
     if (raster === null) return [];
     const findings: Finding[] = [];
+    const byId = new Map(screen.nodes.map((node) => [node.id, node]));
     for (const node of screen.nodes) {
-      if (!node.visible || node.text === null) continue;
+      if (!node.visible || node.text === null || isInsideInactiveComponent(node, byId)) continue;
       const colors = estimateTextColors(raster, node.boundsPx);
       if (colors === null) continue;
       const { required, confidence } = requiredTextRatio(node.textSizeDp);

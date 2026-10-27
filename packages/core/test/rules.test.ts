@@ -112,6 +112,15 @@ describe('contrast/text', () => {
     const blank = createRaster(200, 60, 0xffffff);
     expect(textContrast.check({ screen: screenOf([textNode()]), device, raster: blank })).toEqual([]);
   });
+
+  it('exempts text inside a disabled control, as WCAG 1.4.3 does, but still checks enabled ones', () => {
+    const raster = rasterWithText(0xa3a3a3);
+    const button = (enabled: boolean) =>
+      pamNode({ id: '0', role: 'button', enabled, childIds: ['0.0'], boundsDp: rect(0, 0, 200, 60) });
+    const label = textNode({ id: '0.0', parentId: '0' });
+    expect(textContrast.check({ screen: screenOf([button(false), label]), device, raster })).toEqual([]);
+    expect(textContrast.check({ screen: screenOf([button(true), label]), device, raster })).toHaveLength(1);
+  });
 });
 
 describe('target/size', () => {
