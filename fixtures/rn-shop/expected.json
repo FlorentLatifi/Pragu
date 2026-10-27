@@ -1,0 +1,20 @@
+{
+  "$comment": "Ground truth for Pragu Bench. Each entry names a rule and the element's testID (exposed on Android as the view's resource id). 'barriers' must be reported; 'correctTwins' must not be.",
+  "fixture": "rn-shop",
+  "appId": "dev.pragu.fixtures.rnshop",
+  "screens": [
+    {
+      "name": "Cart",
+      "barriers": [
+        { "rule": "name/interactive-missing", "testID": "seed-unlabeled-remove" },
+        { "rule": "contrast/text", "testID": "seed-low-contrast" },
+        { "rule": "target/size", "testID": "seed-tiny-dismiss" }
+      ],
+      "correctTwins": [
+        { "rule": "name/interactive-missing", "testID": "twin-labeled-remove" },
+        { "rule": "contrast/text", "testID": "twin-good-contrast" },
+        { "rule": "target/size", "testID": "twin-close-cart" }
+      ]
+    }
+  ]
+}

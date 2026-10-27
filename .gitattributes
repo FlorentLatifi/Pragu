@@ -1,0 +1,10 @@
+# LF everywhere so golden files and snapshots match between Windows and Linux CI.
+* text=auto eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.png binary
+*.webp binary
+*.jpg binary
+*.jar binary
+*.apk binary
+*.keystore binary
