@@ -1,5 +1,6 @@
-# Prettier formats code only. Markdown is written by hand, and the founding brief must stay unchanged.
+# Prettier formats code only. Docs (Markdown, design pages) are written by hand, and the founding brief must stay unchanged.
 *.md
+docs/
 pnpm-lock.yaml
 **/dist/
 **/coverage/
