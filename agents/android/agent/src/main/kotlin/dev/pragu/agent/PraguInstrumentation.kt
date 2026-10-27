@@ -17,10 +17,12 @@ const val TAG = "PraguAgent"
  */
 class PraguInstrumentation : Instrumentation() {
     private var socketName = DEFAULT_SOCKET
+    private var idleTimeoutMs = DEFAULT_IDLE_TIMEOUT_MS
 
     override fun onCreate(arguments: Bundle?) {
         super.onCreate(arguments)
         socketName = arguments?.getString("socket") ?: DEFAULT_SOCKET
+        idleTimeoutMs = arguments?.getString("idleTimeoutMs")?.toLongOrNull()?.takeIf { it > 0 } ?: DEFAULT_IDLE_TIMEOUT_MS
         start()
     }
 
@@ -31,7 +33,7 @@ class PraguInstrumentation : Instrumentation() {
             // Keep TalkBack and other accessibility services running while Pragu reads the screen.
             val uiAutomation = getUiAutomation(UiAutomation.FLAG_DONT_SUPPRESS_ACCESSIBILITY_SERVICES)
             val handler = RequestHandler(UiAutomationCapturer(uiAutomation, context), agentVersion())
-            AgentServer(socketName, handler).serve()
+            AgentServer(socketName, handler, idleTimeoutMs).serve()
             results.putString("pragu", "stopped")
             finish(Activity.RESULT_OK, results)
         } catch (t: Throwable) {

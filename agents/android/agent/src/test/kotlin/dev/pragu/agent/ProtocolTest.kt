@@ -128,3 +128,18 @@ class PeerTest {
         assertFalse(isTrustedPeer(10_123))
     }
 }
+
+class IdleTimerTest {
+    @Test
+    fun expiresOnlyAfterTheTimeoutWithoutActivity() {
+        var now = 1_000L
+        val timer = IdleTimer(timeoutMs = 500) { now }
+        now += 499
+        assertFalse(timer.isExpired())
+        timer.touch()
+        now += 499
+        assertFalse(timer.isExpired())
+        now += 1
+        assertTrue(timer.isExpired())
+    }
+}
