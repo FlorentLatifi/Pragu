@@ -1,0 +1,23 @@
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+
+# Scan outputs
+reports/
+
+# Android agent
+agents/android/.gradle/
+agents/android/.kotlin/
+agents/android/**/build/
+agents/android/local.properties
+
+# Editors and OS
+.idea/
+*.iml
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Personal, machine-specific notes for Claude Code
+CLAUDE.local.md

@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Pragu report · dev.pragu.fixtures.rnshop</title>
+    <style>
+      :root {
+        --paper: #f6f5f1;
+        --surface: #ffffff;
+        --ink: #17181a;
+        --muted: #55585e;
+        --line: #d9d7d0;
+        --mark: #c2410c;
+        --mark-ink: #ffffff;
+        --error: #b42318;
+        --warning: #8a5a00;
+        --info: #3a5a8c;
+        --focus: #1d4ed8;
+        --font-sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
+        --font-mono: ui-monospace, 'Cascadia Mono', 'SF Mono', Consolas, monospace;
+        color-scheme: light;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme='light']) {
+          --paper: #121314;
+          --surface: #1b1c1e;
+          --ink: #ecebe6;
+          --muted: #a9aaa5;
+          --line: #34363a;
+          --mark: #fb923c;
+          --mark-ink: #121314;
+          --error: #f97066;
+          --warning: #f5c04a;
+          --info: #93b4e8;
+          --focus: #93c5fd;
+          color-scheme: dark;
+        }
+      }
+      :root[data-theme='dark'] {
+        --paper: #121314;
+        --surface: #1b1c1e;
+        --ink: #ecebe6;
+        --muted: #a9aaa5;
+        --line: #34363a;
+        --mark: #fb923c;
+        --mark-ink: #121314;
+        --error: #f97066;
+        --warning: #f5c04a;
+        --info: #93b4e8;
+        --focus: #93c5fd;
+        color-scheme: dark;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font: 16px/1.6 var(--font-sans);
+      }
+      a {
+        color: inherit;
+      }
+      :focus-visible {
+        outline: 3px solid var(--focus);
+        outline-offset: 2px;
+      }
+      code {
+        font: 0.875em var(--font-mono);
+      }
+      .skip {
+        position: absolute;
+        left: 16px;
+        top: -48px;
+        padding: 8px 12px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+      }
+      .skip:focus {
+        top: 16px;
+      }
+      .visually-hidden {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+        white-space: nowrap;
+      }
+      .masthead,
+      main,
+      .footer {
+        max-width: 1120px;
+        margin: 0 auto;
+        padding: 0 16px;
+      }
+      .masthead {
+        padding-top: 32px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid var(--line);
+      }
+      .masthead-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+      }
+      .eyebrow {
+        margin: 0;
+        font: 600 12px/1.4 var(--font-mono);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      h1 {
+        margin: 12px 0 8px;
+        font-size: 28px;
+        line-height: 1.25;
+        font-weight: 650;
+      }
+      h2 {
+        font-size: 20px;
+        line-height: 1.3;
+        margin: 0 0 16px;
+      }
+      h3 {
+        font-size: 16px;
+        line-height: 1.4;
+        margin: 0;
+        display: flex;
+        gap: 12px;
+        align-items: baseline;
+      }
+      .meta,
+      .rules,
+      .where,
+      figcaption {
+        color: var(--muted);
+        font-size: 14px;
+        margin: 0;
+      }
+      .toggle {
+        min-height: 44px;
+        padding: 0 16px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        background: var(--surface);
+        color: var(--ink);
+        font: inherit;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      .toggle[aria-pressed='true'] {
+        border-color: var(--ink);
+      }
+      .summary {
+        padding: 24px 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .counts {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 16px;
+        margin: 0 0 12px;
+      }
+      .counts div {
+        border-left: 2px solid var(--ink);
+        padding-left: 12px;
+      }
+      .counts dt {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+      }
+      .counts dd {
+        margin: 0;
+        font: 600 40px/1.1 var(--font-mono);
+      }
+      .screen {
+        padding: 32px 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .screen-app {
+        font: 400 14px var(--font-mono);
+        color: var(--muted);
+        margin-left: 8px;
+      }
+      .screen-grid {
+        display: grid;
+        gap: 32px;
+        grid-template-columns: minmax(0, 1fr);
+      }
+      @media (min-width: 900px) {
+        .screen-grid {
+          grid-template-columns: 360px minmax(0, 1fr);
+          align-items: start;
+        }
+        .shot {
+          position: sticky;
+          top: 16px;
+        }
+      }
+      .shot {
+        margin: 0;
+      }
+      .shot-frame {
+        position: relative;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        line-height: 0;
+      }
+      .shot-frame img {
+        width: 100%;
+        height: auto;
+        display: block;
+      }
+      .marker {
+        position: absolute;
+        border: 2px solid var(--mark);
+        outline: 1px solid var(--surface);
+      }
+      .marker-number {
+        position: absolute;
+        left: -2px;
+        top: -26px;
+        min-width: 24px;
+        height: 24px;
+        padding: 0 6px;
+        background: var(--mark);
+        color: var(--mark-ink);
+        font: 700 14px/24px var(--font-mono);
+        text-align: center;
+      }
+      .no-shot,
+      .empty {
+        margin: 0;
+        padding: 16px;
+        border: 1px dashed var(--line);
+        color: var(--muted);
+      }
+      .issues {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 16px;
+      }
+      .issue {
+        padding: 16px;
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+      }
+      .issue:target {
+        border-color: var(--mark);
+      }
+      .issue-number {
+        flex: none;
+        min-width: 28px;
+        height: 28px;
+        background: var(--mark);
+        color: var(--mark-ink);
+        font: 700 14px/28px var(--font-mono);
+        text-align: center;
+      }
+      .tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 12px 0;
+        font-size: 12px;
+      }
+      .tags span {
+        padding: 2px 8px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--muted);
+      }
+      .tags .severity {
+        font-weight: 700;
+        border-color: currentColor;
+      }
+      .severity-error {
+        color: var(--error) !important;
+      }
+      .severity-warning {
+        color: var(--warning) !important;
+      }
+      .severity-info {
+        color: var(--info) !important;
+      }
+      .message {
+        margin: 0 0 12px;
+      }
+      .details {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr);
+        gap: 4px;
+        margin: 0 0 12px;
+        font-size: 14px;
+      }
+      .details dt {
+        font-weight: 600;
+        margin-top: 8px;
+      }
+      .details dd {
+        margin: 0;
+      }
+      .details code {
+        display: inline-block;
+        margin: 0 8px 4px 0;
+      }
+      .limits {
+        padding: 32px 0;
+      }
+      .limits p {
+        max-width: 70ch;
+        margin: 0;
+      }
+      .footer {
+        padding-top: 24px;
+        padding-bottom: 48px;
+        border-top: 1px solid var(--line);
+      }
+      .footer p {
+        color: var(--muted);
+        font-size: 14px;
+        margin: 0;
+      }
+      @media print {
+        .toggle,
+        .skip {
+          display: none;
+        }
+        body {
+          background: #fff;
+          color: #000;
+        }
+        .shot {
+          position: static;
+        }
+        .issue {
+          break-inside: avoid;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to results</a>
+    <header class="masthead">
+      <div class="masthead-row">
+        <p class="eyebrow">Pragu · automated accessibility checks</p>
+        <button type="button" id="theme-toggle" class="toggle" aria-pressed="false">Dark theme</button>
+      </div>
+      <h1>2 barriers found in dev.pragu.fixtures.rnshop</h1>
+      <p class="meta">
+        Google sdk_gphone64_x86_64 · Android 16 (API 36) · 420 dpi · font scale 1 · 2026-10-27T12:00:00.000Z
+      </p>
+    </header>
+    <main id="main">
+      <section class="summary" aria-labelledby="summary-heading">
+        <h2 id="summary-heading" class="visually-hidden">Summary</h2>
+        <dl class="counts">
+          <div>
+            <dt>Errors</dt>
+            <dd>1</dd>
+          </div>
+          <div>
+            <dt>Warnings</dt>
+            <dd>1</dd>
+          </div>
+          <div>
+            <dt>Info</dt>
+            <dd>0</dd>
+          </div>
+          <div>
+            <dt>Screens</dt>
+            <dd>1</dd>
+          </div>
+        </dl>
+        <p class="rules">
+          Rules run: <code>name/interactive-missing</code>, <code>contrast/text</code>, <code>target/size</code>
+        </p>
+      </section>
+      <section class="screen" aria-labelledby="screen-1-heading">
+        <h2 id="screen-1-heading">Cart <span class="screen-app">dev.pragu.fixtures.rnshop</span></h2>
+        <div class="screen-grid">
+          <figure class="shot">
+            <div class="shot-frame">
+              <img
+                src="data:image/png;base64,iVBORw0KGgo="
+                alt="Screenshot of the Cart screen, with 2 numbered markers."
+              />
+              <a
+                class="marker"
+                href="#issue-1"
+                style="left: 10%; top: 10%; width: 10%; height: 10%"
+                aria-label="Issue 1: Interactive element has no accessible name"
+                ><span class="marker-number" aria-hidden="true">1</span></a
+              ><a
+                class="marker"
+                href="#issue-2"
+                style="left: 10%; top: 10%; width: 10%; height: 10%"
+                aria-label="Issue 2: Touch target is too small"
+                ><span class="marker-number" aria-hidden="true">2</span></a
+              >
+            </div>
+            <figcaption>Numbers on the screenshot match the list.</figcaption>
+          </figure>
+          <ol class="issues">
+            <li class="issue" id="issue-1" tabindex="-1">
+              <h3><span class="issue-number" aria-hidden="true">1</span>Interactive element has no accessible name</h3>
+              <p class="tags">
+                <span class="severity severity-error">Error</span><span>WCAG 4.1.2</span><span>EN 301 549 11.4.1.2</span
+                ><span>Confidence: high</span>
+              </p>
+              <p class="message">
+                This button has no accessible name. A screen reader can only announce &quot;Button&quot;.
+              </p>
+              <dl class="details">
+                <dt>Who it affects</dt>
+                <dd>People who use a screen reader.</dd>
+                <dt>What they experience</dt>
+                <dd>They cannot tell what it does.</dd>
+                <dt>Evidence</dt>
+                <dd><code>role: button</code></dd>
+                <dt>Fix in React Native</dt>
+                <dd>Add accessibilityLabel.</dd>
+              </dl>
+              <p class="where">
+                Element <code>seed-unlabeled-remove</code> · Rule <code>name/interactive-missing</code>
+              </p>
+            </li>
+            <li class="issue" id="issue-2" tabindex="-1">
+              <h3><span class="issue-number" aria-hidden="true">2</span>Touch target is too small</h3>
+              <p class="tags">
+                <span class="severity severity-warning">Warning</span><span>WCAG 2.5.8</span
+                ><span>Confidence: medium</span>
+              </p>
+              <p class="message">
+                This button has no accessible name. A screen reader can only announce &quot;Button&quot;.
+              </p>
+              <dl class="details">
+                <dt>Who it affects</dt>
+                <dd>People who use a screen reader.</dd>
+                <dt>What they experience</dt>
+                <dd>They cannot tell what it does.</dd>
+                <dt>Evidence</dt>
+                <dd><code>role: button</code></dd>
+                <dt>Fix in React Native</dt>
+                <dd>Add accessibilityLabel.</dd>
+              </dl>
+              <p class="where">Rule <code>target/size</code></p>
+            </li>
+          </ol>
+        </div>
+      </section>
+      <section class="limits" aria-labelledby="limits-heading">
+        <h2 id="limits-heading">What these checks cannot tell you</h2>
+        <p>
+          Automated checks find some barriers, not all, and this report is not a compliance statement. Still check by
+          hand: whether names are meaningful in context, the reading order across the whole screen, behaviour at 200%
+          text size, gestures and timing, and the full journey with TalkBack switched on.
+        </p>
+      </section>
+    </main>
+    <footer class="footer">
+      <p>Pragu 0.0.0 · result schema 0.1.0 · Generated on this machine; nothing was uploaded.</p>
+    </footer>
+    <script>
+      (function () {
+        var root = document.documentElement;
+        var button = document.getElementById('theme-toggle');
+        var media = window.matchMedia('(prefers-color-scheme: dark)');
+        try {
+          var saved = localStorage.getItem('pragu-theme');
+          if (saved) root.setAttribute('data-theme', saved);
+        } catch (e) {}
+        function isDark() {
+          var t = root.getAttribute('data-theme');
+          return t ? t === 'dark' : media.matches;
+        }
+        function sync() {
+          button.setAttribute('aria-pressed', String(isDark()));
+        }
+        button.addEventListener('click', function () {
+          var next = isDark() ? 'light' : 'dark';
+          root.setAttribute('data-theme', next);
+          try {
+            localStorage.setItem('pragu-theme', next);
+          } catch (e) {}
+          sync();
+        });
+        media.addEventListener('change', sync);
+        sync();
+      })();
+    </script>
+  </body>
+</html>

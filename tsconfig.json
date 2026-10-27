@@ -1,0 +1,12 @@
+{
+  "//": "Type-checks every package, its tests and the root configs in one program, straight from source. Each package's tsconfig.build.json emits its dist/.",
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "paths": {
+      "@pragu/core": ["./packages/core/src/index.ts"],
+      "@pragu/report": ["./packages/report/src/index.ts"]
+    }
+  },
+  "include": ["packages/*/src", "packages/*/test", "vitest.config.ts"]
+}

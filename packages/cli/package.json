@@ -1,0 +1,24 @@
+{
+  "name": "pragu",
+  "version": "0.0.0",
+  "description": "Find the accessibility barriers in your mobile app before your users hit them.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "bin": {
+    "pragu": "./dist/bin.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "dependencies": {
+    "@pragu/core": "workspace:*",
+    "@pragu/report": "workspace:*",
+    "pngjs": "7.0.0"
+  },
+  "engines": {
+    "node": ">=22.13"
+  }
+}
