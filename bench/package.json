@@ -1,0 +1,18 @@
+{
+  "name": "@pragu/bench",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Pragu Bench: labelled ground truth and the harness that measures precision, recall, F1 and MCC per rule.",
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "dependencies": {
+    "@pragu/core": "workspace:*",
+    "pngjs": "7.0.0"
+  },
+  "engines": {
+    "node": ">=22.13"
+  }
+}

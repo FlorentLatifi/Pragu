@@ -9,11 +9,13 @@ pnpm install            # Node >= 22.13, pnpm 12 (pinned in package.json)
 pnpm lint               # ESLint (strict, type-aware) + Prettier check
 pnpm typecheck          # tsc over every package and test, from source
 pnpm test               # Vitest with coverage; packages/core must stay >= 90%
-pnpm build              # emit packages/*/dist (needed before running the CLI)
-pnpm agent:build        # Android agent APK + JVM tests + no-INTERNET check (JDK 17+, ANDROID_HOME)
+pnpm build              # emit packages/*/dist and bench/dist (needed before the CLI or the bench)
+pnpm bench              # Pragu Bench: re-score rules on recorded fixture screens; fails if results differ (CI)
+pnpm bench:update       # accept new bench results (rewrites bench/results.json and docs/bench/results.md)
+pnpm bench:record       # re-record fixture screens on the emulator (after pnpm fixture:build)
+pnpm agent:build        # Android agent APK + JVM tests + Android Lint + no-INTERNET check (JDK 17+, ANDROID_HOME)
 pnpm fixture:build      # rn-shop release APK (JDK 17 required, about 9 min the first time)
-pnpm fixture:scan       # scan rn-shop on the running emulator or phone; exit 1 = barriers found
-pnpm fixture:verify     # compare that scan with fixtures/rn-shop/expected.json
+pnpm fixture:scan       # scan the rn-shop cart screen on the running emulator; exit 1 = barriers found
 node scripts/serve-reports.mjs   # view reports/ at http://127.0.0.1:4173
 ```
 
@@ -27,7 +29,8 @@ Android SDK tools: always pass `--no-metrics` to the `android` CLI (cmdline-tool
 | `packages/report` | One self-contained offline HTML report. No dependencies. |
 | `packages/cli` | `pragu` command: adb orchestration, agent protocol client, scan pipeline. |
 | `agents/android` | Kotlin agent APK: Instrumentation + UiAutomation, abstract-socket server (protocol 1). |
-| `fixtures/rn-shop` | Expo app with seeded barriers and correct twins. Standalone npm project, not in the workspace. |
+| `fixtures/rn-shop` | Expo app with seeded barriers and correct twins on deep-linked screens (`rnshop://cart|product|form`). Standalone npm project, not in the workspace. |
+| `bench` | Pragu Bench: ground-truth evaluation (precision, recall, F1, MCC per rule) on recorded fixture screens. |
 | `docs/` | Brief, PRD, technical design, ADRs, threat model, test strategy, plans, research notes. |
 
 The agent's JSON field names (`agents/android/.../Snapshot.kt`) must match `AndroidRawNode` in `packages/core/src/android.ts`. `SnapshotTest` locks the field list. Change both together and bump `PROTOCOL_VERSION`.

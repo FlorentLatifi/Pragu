@@ -1,0 +1,68 @@
+{
+  "benchVersion": 1,
+  "fixtures": [
+    "rn-shop"
+  ],
+  "screens": 3,
+  "rules": [
+    {
+      "rule": "name/interactive-missing",
+      "severity": "error",
+      "tp": 4,
+      "fp": 0,
+      "fn": 0,
+      "tn": 7,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "mcc": 1
+    },
+    {
+      "rule": "contrast/text",
+      "severity": "error",
+      "tp": 4,
+      "fp": 0,
+      "fn": 0,
+      "tn": 6,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "mcc": 1
+    },
+    {
+      "rule": "target/size",
+      "severity": "error",
+      "tp": 3,
+      "fp": 1,
+      "fn": 0,
+      "tn": 3,
+      "precision": 0.75,
+      "recall": 1,
+      "f1": 0.8571,
+      "mcc": 0.75
+    }
+  ],
+  "falsePositives": [
+    {
+      "fixture": "rn-shop",
+      "screen": "product",
+      "rule": "target/size",
+      "element": "twin-hitslop-remove",
+      "message": "This target is 16×16 dp and another target is 2.3 dp away. It needs to be at least 24×24 dp, or have that much space around it.",
+      "note": "16 dp view, but hitSlop makes the touch area 48 dp; invisible in the accessibility tree"
+    }
+  ],
+  "falseNegatives": [],
+  "awaiting": [
+    {
+      "rule": "input/missing-label",
+      "barriers": 1,
+      "correctTwins": 1
+    },
+    {
+      "rule": "state/not-exposed",
+      "barriers": 1,
+      "correctTwins": 1
+    }
+  ]
+}

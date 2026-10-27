@@ -8,5 +8,5 @@
       "@pragu/report": ["./packages/report/src/index.ts"]
     }
   },
-  "include": ["packages/*/src", "packages/*/test", "vitest.config.ts"]
+  "include": ["packages/*/src", "packages/*/test", "bench/src", "bench/test", "vitest.config.ts"]
 }
