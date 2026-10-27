@@ -1,10 +1,13 @@
 {
-  "$comment": "Ground truth for Pragu Bench. Each entry names a rule and the element's testID (exposed on Android as the view's resource id). 'barriers' must be reported; 'correctTwins' must not be.",
+  "$comment": "Ground truth for Pragu Bench. Each entry names a rule and an element's testID (exposed on Android as the view's resource id). 'barriers' must be reported; 'correctTwins' must not be. Rules not implemented yet are kept and skipped until they exist.",
   "fixture": "rn-shop",
   "appId": "dev.pragu.fixtures.rnshop",
   "screens": [
     {
+      "id": "cart",
       "name": "Cart",
+      "url": "rnshop://cart",
+      "marker": "screen-cart",
       "barriers": [
         { "rule": "name/interactive-missing", "testID": "seed-unlabeled-remove" },
         { "rule": "contrast/text", "testID": "seed-low-contrast" },
@@ -14,6 +17,52 @@
         { "rule": "name/interactive-missing", "testID": "twin-labeled-remove" },
         { "rule": "contrast/text", "testID": "twin-good-contrast" },
         { "rule": "target/size", "testID": "twin-close-cart" }
+      ]
+    },
+    {
+      "id": "product",
+      "name": "Product",
+      "url": "rnshop://product",
+      "marker": "screen-product",
+      "barriers": [
+        { "rule": "name/interactive-missing", "testID": "seed-unlabeled-favorite" },
+        { "rule": "name/interactive-missing", "testID": "seed-unlabeled-share" },
+        { "rule": "contrast/text", "testID": "seed-low-contrast-badge" },
+        { "rule": "contrast/text", "testID": "seed-low-contrast-sku" },
+        { "rule": "target/size", "testID": "seed-tiny-minus" },
+        { "rule": "target/size", "testID": "seed-tiny-plus" }
+      ],
+      "correctTwins": [
+        { "rule": "name/interactive-missing", "testID": "twin-labeled-back" },
+        { "rule": "name/interactive-missing", "testID": "twin-text-button" },
+        { "rule": "name/interactive-missing", "testID": "twin-isolated-info" },
+        { "rule": "contrast/text", "testID": "screen-product", "note": "26 dp large text at 3.4:1 passes (needs 3:1)" },
+        { "rule": "contrast/text", "testID": "twin-price" },
+        { "rule": "contrast/text", "testID": "twin-text-on-photo", "note": "white on dark stripes; a busy background must not produce a guess" },
+        { "rule": "target/size", "testID": "twin-isolated-info", "note": "20 dp but isolated: WCAG spacing exception" },
+        { "rule": "target/size", "testID": "twin-hitslop-remove", "note": "16 dp view, but hitSlop makes the touch area 48 dp; invisible in the accessibility tree" },
+        { "rule": "target/size", "testID": "twin-text-button" }
+      ]
+    },
+    {
+      "id": "form",
+      "name": "Delivery form",
+      "url": "rnshop://form",
+      "marker": "screen-form",
+      "barriers": [
+        { "rule": "name/interactive-missing", "testID": "seed-unlabeled-checkbox" },
+        { "rule": "contrast/text", "testID": "seed-placeholder-only", "note": "placeholder #B0B0B0 on white is 2.1:1" },
+        { "rule": "input/missing-label", "testID": "seed-placeholder-only" },
+        { "rule": "state/not-exposed", "testID": "seed-unlabeled-checkbox" }
+      ],
+      "correctTwins": [
+        { "rule": "name/interactive-missing", "testID": "twin-labeled-switch" },
+        { "rule": "name/interactive-missing", "testID": "twin-continue" },
+        { "rule": "name/interactive-missing", "testID": "twin-disabled-labeled" },
+        { "rule": "contrast/text", "testID": "twin-labelled-name", "note": "placeholder #6B6963 on white is 5.5:1" },
+        { "rule": "contrast/text", "testID": "twin-disabled-text", "note": "inactive components have no contrast requirement (WCAG 1.4.3)" },
+        { "rule": "input/missing-label", "testID": "twin-labelled-name" },
+        { "rule": "state/not-exposed", "testID": "twin-labeled-switch" }
       ]
     }
   ]
