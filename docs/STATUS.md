@@ -1,59 +1,55 @@
 # Pragu status
 
-Last updated: 2026-10-28, end of M0 session 2. **M0 is complete and waiting for Florent's approval.**
+Last updated: 2026-10-28, M1 session 1. **M0 approved. M1 in progress:** Pragu Bench v1 done, agent hardening started.
 
-## Decisions made (Florent delegated "take the decisions you think are best")
+## Decisions made
 
-- Repo: `FlorentLatifi/Pragu` (the `pragu` GitHub name is taken). No Mac, so iOS waits for a Mac or macOS CI.
-- Free options only: no domain; docs will go on GitHub Pages.
-- Apache-2.0 with DCO sign-off (ADR-005). pnpm 12, TypeScript 6.0.3, Vitest 5, ESLint 10 + Prettier, Node >= 22.13 (ADR-002).
+- Repo `FlorentLatifi/Pragu`; free options only; Apache-2.0 with DCO; pnpm 12, TypeScript 6.0.3, Node >= 22.13 (ADR-002, ADR-005).
 - Capture via Instrumentation + UiAutomation; the agent talks only through adb (ADR-001, ADR-006).
-- Label suggestions (M4): local by default, own API key only as an opt-in.
-- Design is done together: three directions are ready to choose from.
+- Label suggestions (M4): local by default, own API key only as an opt-in. No Mac, so iOS waits.
+- M1 plan approved (`docs/plans/m1.md`).
 
-## Done (verified)
+## Decisions needed (Florent)
 
-- **M0 exit criterion met on Florent's laptop.** `pnpm fixture:scan` scans `fixtures/rn-shop` on the `medium_phone` emulator (API 36), and the report shows the 3 seeded barriers on the screenshot. `pnpm fixture:verify`: 3 true positives, 0 false positives, 0 false negatives, 3 true negatives. That is a walking-skeleton check on six labelled elements, not a precision claim.
-- **CI** on every push and PR: TypeScript job (lint, typecheck, tests, build on Node 22 and 24) and Android job (build, JVM tests, Android Lint, no-INTERNET check). Result of the last run: see "CI" below.
-- Agent (657 KB APK): Instrumentation + UiAutomation, wait-until-settled capture, abstract socket with uid 0/2000 allowlist, protocol 1, 20 JVM tests. CI's lint caught a crash on API 26–27 (`LocalServerSocket` is not `Closeable` there); fixed.
-- Core, report, CLI: 105 tests; `packages/core` at 100% line coverage.
-- Docs: PRD, technical design, ADR-001 to ADR-006, STRIDE threat model with privacy review, test and evaluation strategy, M1 plan, design process with three directions.
-- Project files: CLAUDE.md, README, LICENSE, CONTRIBUTING (DCO), SECURITY, ROADMAP, Dependabot.
+1. **`target/size` and `hitSlop`.** React Native's `hitSlop` enlarges the touch area in JavaScript, so the accessibility tree never shows it. Pragu then flags small icons that WCAG would pass: precision 0.75 on the bench, below the 0.90 bar for error rules. Options: (a) report it as a warning until M4 source mapping can read `hitSlop`; (b) keep it an error and accept that it misses the M1 bar. Recommendation: (a).
+2. **Report design direction:** A, B, C or a mix (`docs/design/directions.html`).
 
-## First measurements
+## Done
 
-One machine (HP laptop, Ryzen 7 5825U), emulator `medium_phone`, single runs. M1 sets budgets from repeated runs.
+### M0 (approved)
 
-| Measure | Value |
-|---|---|
-| Scan with the app already installed, warm | 4.5 s (first run after install: 9.9 s) |
-| Scan including the 22.8 MB fixture APK install | 33.5 s |
-| CLI cold start (`pragu --version`) | 167 ms |
-| Report for one screen | 117 KB, of which the PNG is 78 KB |
-| Nodes on the cart screen | 32; 10 carry `testID`s; 12 of 12 text nodes report a rendered size |
+Walking skeleton on the emulator, CI, docs (PRD, technical design, ADR-001 to 006, threat model, test strategy), design directions. Details in git history.
 
-## CI
+### M1 so far
 
-Green on `main` at `3788a59` (run 40602524926): TypeScript on Node 22 and 24, and the Android agent job, all pass.
+- **Pragu Bench v1** (`bench/`): 3 deep-linked rn-shop screens (cart, product, form) with labelled barriers and correct twins; real recordings committed; precision, recall, F1 and MCC per rule; CI re-scores every rule on every PR without an emulator and fails when results differ from `bench/results.json`.
+- **First bench catch, fixed:** `contrast/text` flagged a disabled button's grey text, which WCAG 1.4.3 exempts. Now skipped.
+- **Agent idle timeout:** the agent stops after 5 idle minutes (configurable). Verified on the emulator: with a 3 s timeout it logged "Idle for 3 s; stopping" and exited cleanly.
+- Checks: 121 TypeScript tests, 21 JVM tests, lint, typecheck, bench gate.
 
-## In progress
+## Bench results (3 screens, rn-shop)
 
-Nothing. Waiting for Florent.
+| Rule | TP | FP | FN | TN | Precision | Recall |
+|---|---|---|---|---|---|---|
+| `name/interactive-missing` | 4 | 0 | 0 | 7 | 1.00 | 1.00 |
+| `contrast/text` | 4 | 0 | 0 | 6 | 1.00 | 1.00 |
+| `target/size` | 3 | 1 | 0 | 3 | 0.75 | 1.00 |
+
+Small sample: early signals, not final quality figures. Full page: `docs/bench/results.md`.
 
 ## Next
 
-1. Florent picks a report direction: open `docs/design/directions.html` and reply with A, B, C or a mix.
-2. Florent approves the M1 plan (`docs/plans/m1.md`). M1 starts with Pragu Bench v1 and agent hardening.
-3. First owner-implements task: the `target/size` warning tier (below 48 dp), with Claude reviewing.
+1. Agent hardening, rest of work package 1: all windows (dialogs, keyboard) via `getWindows()`, WebView detection, instrumented tests on the emulator.
+2. `fixtures/android-compose` for the bench, so it is not React Native only.
+3. Then the M1 rules, each landing with fixtures and bench labels.
+4. Owner-implements for Florent: the `target/size` 48 dp warning tier.
 
 ## Notes and risks
 
-- Disk: 19 GB free on `C:`.
-- Agent lint warnings to clear in M1: compile and target SDK 37 are available; `dataExtractionRules`; app icon.
-- Dependabot PR #1 proposes TypeScript 7 and `@types/node` 26, which ADR-002 rules out; Dependabot now ignores both. Florent can close #1.
-- For SECURITY.md to work, Florent enables private vulnerability reporting: repo Settings → Security → Private vulnerability reporting.
-- The home network drops DNS lookups under load; the build scripts cache lookups per JVM.
+- Disk: about 15 GB free on `C:`.
+- Agent lint warnings to clear: compile and target SDK 37 available; `dataExtractionRules`; app icon.
+- Dependabot PR #1 (TypeScript 7, `@types/node` 26) is ruled out by ADR-002; Florent can close it.
+- For SECURITY.md to work, Florent enables private vulnerability reporting in the repo settings.
+- The home network drops DNS lookups under load; build scripts cache lookups per JVM.
 - The Android CLI collects metrics by default: always `--no-metrics`.
-- pnpm's release-age guard stays on; pin older versions instead of adding exclusions.
-- The old folder `C:\Users\flore\OneDrive\Desktop\Pragu` holds an outdated copy of the first three docs and can be deleted.
-- Local toolchain: JDK 17 in `C:\dev\tools\jdk-17` (needed for fixture builds); Android SDK in `%LOCALAPPDATA%\Android\Sdk`.
+- Local toolchain: JDK 17 in `C:\dev\tools\jdk-17` (fixture builds); Android SDK in `%LOCALAPPDATA%\Android\Sdk`; emulator `medium_phone`.
