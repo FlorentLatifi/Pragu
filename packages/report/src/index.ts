@@ -223,7 +223,7 @@ h3 { font-size: 16px; line-height: 1.4; margin: 0; display: flex; gap: 12px; ali
 .screen-app { font: 400 14px var(--font-mono); color: var(--muted); margin-left: 8px; }
 .screen-grid { display: grid; gap: 32px; grid-template-columns: minmax(0, 1fr); }
 @media (min-width: 900px) { .screen-grid { grid-template-columns: 360px minmax(0, 1fr); align-items: start; } .shot { position: sticky; top: 16px; } }
-.shot { margin: 0; }
+.shot { margin: 0; max-width: 360px; }
 .shot-frame { position: relative; border: 1px solid var(--line); background: var(--surface); line-height: 0; }
 .shot-frame img { width: 100%; height: auto; display: block; }
 .marker { position: absolute; border: 2px solid var(--mark); outline: 1px solid var(--surface); }

@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "reports",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["scripts/serve-reports.mjs"],
+      "port": 4173
+    }
+  ]
+}

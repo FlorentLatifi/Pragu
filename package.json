@@ -17,7 +17,7 @@
     "pragu": "node packages/cli/dist/bin.js",
     "agent:build": "node scripts/build-agent.mjs",
     "fixture:build": "node scripts/build-fixture.mjs",
-    "fixture:scan": "node packages/cli/dist/bin.js scan --install fixtures/rn-shop/android/app/build/outputs/apk/release/app-release.apk --app dev.pragu.fixtures.rnshop --out reports/rn-shop",
+    "fixture:scan": "node packages/cli/dist/bin.js scan --install fixtures/rn-shop/android/app/build/outputs/apk/release/app-release.apk --app dev.pragu.fixtures.rnshop --screen-name Cart --out reports/rn-shop",
     "fixture:verify": "node scripts/verify-fixture.mjs reports/rn-shop/pragu-result.json fixtures/rn-shop/expected.json"
   },
   "devDependencies": {
