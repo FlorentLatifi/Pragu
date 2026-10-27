@@ -8,7 +8,7 @@ Date: 2026-10-27. Evidence for M0 steps 2 and 4 of the [founding brief](../00-fo
 |---|---|---|
 | OS | Windows 11 Pro, build 26300, x64 | None |
 | CPU, RAM | AMD Ryzen 7 5825U (8 cores, 16 threads), 15.3 GB | None |
-| Virtualisation | SVM enabled in firmware. A hypervisor is running because Virtual Machine Platform (WSL2) is on. Windows Hypervisor Platform is disabled. | Enable Windows Hypervisor Platform and reboot. The emulator needs WHPX here: AEHD cannot run while the Hyper-V hypervisor is active, and AEHD is sunset on 2026-12-31. |
+| Virtualisation | SVM enabled in firmware. A hypervisor is running because Virtual Machine Platform (WSL2) is on. The "Windows Hypervisor Platform" feature reports as disabled. | None needed. Corrected after testing: `emulator -accel-check` reports "WHPX(10.0.26300) is installed and usable", and the API 36 emulator boots accelerated on this build without enabling the feature. |
 | Disk | 29.9 GB free of 476 GB on `C:`. Docker Desktop's data disk is 37.8 GB. | Free space to at least 50 GB. The Android toolchain needs roughly 25–30 GB (estimate). |
 | Long paths | `LongPathsEnabled = 0`; git `core.longpaths` unset | Enable both |
 | Project folder | `C:\Users\flore\OneDrive\Desktop\Pragu`, synced by OneDrive (running) | Move to `C:\dev\pragu`. Reports hold app screenshots that OneDrive would upload, sync locks break installs and builds, and React Native's native (C++) builds on Windows are known to break on long paths. |
