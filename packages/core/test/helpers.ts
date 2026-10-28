@@ -108,6 +108,7 @@ export function pamNode(overrides: Partial<PamNode> & { id: string }): PamNode {
     resourceId: null,
     boundsPx: boundsDp,
     boundsDp,
+    boundsAreTouchArea: false,
     interactive: true,
     exposedToAssistiveTech: true,
     visible: true,

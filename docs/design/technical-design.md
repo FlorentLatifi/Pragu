@@ -36,7 +36,7 @@ Device / emulator                         Developer machine or CI
 
 Defined in `packages/core/src/model.ts`. It is platform-neutral, so rules never see Android types.
 
-- **Node:** normalised `role` plus `platformRole`, accessible `name`, `text`, `hint`, `resourceId`, bounds in px and dp, `interactive`, `exposedToAssistiveTech`, `visible`, `obscured`, `inWebView`, `window`, `enabled`, `textSizeDp`. Ids are tree paths whose first segment numbers the app's windows from the bottom (`0.3.1`, `1.0`).
+- **Node:** normalised `role` plus `platformRole`, accessible `name`, `text`, `hint`, `resourceId`, bounds in px and dp, `boundsAreTouchArea` (Compose reports touch areas, ADR-009), `interactive`, `exposedToAssistiveTech`, `visible`, `obscured`, `inWebView`, `window`, `enabled`, `textSizeDp`. Ids are tree paths whose first segment numbers the app's windows from the bottom (`0.3.1`, `1.0`).
 - **Window:** kind (`app`, `keyboard`, `system`, `other-app`, `overlay`), title, bounds, and whether it is the app's topmost (`foreground`) window.
 - **Screen:** app id, name, screenshot reference, windows bottom first, nodes depth-first per app window.
 - **What rules judge** (ADR-008): visible elements of the app's topmost window, not fully covered by another window, and not web content. Contrast also skips partly covered (`obscured`) elements.
@@ -57,7 +57,7 @@ Defined in `packages/core/src/model.ts`. It is platform-neutral, so rules never 
 |---|---|---|
 | `name/interactive-missing` | Interactive, visible, exposed, not a text field, and no accessible name | Text fields belong to `input/missing-label` (M1) |
 | `contrast/text` | Per visible text node, estimate text and background colours from the screenshot. 4.5:1 for normal text, 3:1 for large | Background is the dominant colour. Text is the frequent colour with the highest contrast against it, so anti-aliased edges never win. A busy background returns nothing, to avoid false alarms. Text size from `ExtraRenderingInfo` (API 30+). Unknown size gives medium confidence. |
-| `target/size` | Interactive targets under 24×24 dp, unless WCAG's spacing exception applies | The exception: a 24 dp circle around the target touches no other target and no other undersized target's circle. Parent and child targets are not counted as neighbours. Medium confidence, and a warning rather than an error, because `hitSlop` and `TouchDelegate` are invisible to the tree (ADR-007). |
+| `target/size` | Interactive targets under 24×24 dp, unless WCAG's spacing exception applies | The exception: a 24 dp circle around the target touches no other target and no other undersized target's circle. Parent and child targets are not counted as neighbours. Silent where two Compose touch areas meet, because the real split is invisible (ADR-009). Medium confidence, and a warning rather than an error, because `hitSlop` and `TouchDelegate` are invisible to the tree (ADR-007). |
 
 ### WCAG CSS pixels in dp and pt
 

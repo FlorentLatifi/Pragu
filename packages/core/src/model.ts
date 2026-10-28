@@ -2,8 +2,11 @@
 // screen exposes to assistive technology. Platform adapters (android.ts today,
 // iOS later) translate native captures into it; rules only ever see PAM.
 
-/** Version of the JSON result contract written to pragu-result.json. 0.2.0 added windows. */
-export const RESULT_SCHEMA_VERSION = '0.2.0';
+/**
+ * Version of the JSON result contract written to pragu-result.json.
+ * 0.2.0 added windows; 0.3.0 added `PamNode.boundsAreTouchArea`.
+ */
+export const RESULT_SCHEMA_VERSION = '0.3.0';
 
 export type Platform = 'android' | 'ios';
 export type Severity = 'error' | 'warning' | 'info';
@@ -49,6 +52,12 @@ export interface PamNode {
   resourceId: string | null;
   boundsPx: Rect;
   boundsDp: Rect;
+  /**
+   * The bounds are the element's touch area, not its drawn area. Compose reports each
+   * clickable's touch area enlarged to 48 dp, and gives the overlap of two such areas to
+   * the element drawn later, although a touch there goes to the nearer element.
+   */
+  boundsAreTouchArea: boolean;
   /** Responds to activation: tap, long press, toggle or text entry. */
   interactive: boolean;
   /** False when the app hides the element from assistive technology. */

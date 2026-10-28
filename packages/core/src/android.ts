@@ -168,8 +168,33 @@ function isInteractive(raw: AndroidRawNode, role: Role): boolean {
     raw.editable ||
     raw.actions.includes(ACTION_CLICK) ||
     raw.actions.includes(ACTION_LONG_CLICK) ||
-    INTERACTIVE_ROLES.has(role)
+    // A control role alone counts only where TalkBack stops. Compose puts a Button's or
+    // Switch's role on a child that TalkBack reads as part of the clickable parent.
+    (INTERACTIVE_ROLES.has(role) && isActionable(raw))
   );
+}
+
+/**
+ * TalkBack reads a focus stop together with the children that have no focus stop of
+ * their own, roles included. Compose relies on this: Button, Checkbox and Switch put
+ * their role on a child under the clickable node. A clickable container therefore
+ * takes the first control role it reads out.
+ */
+function announcedRole(raw: AndroidRawNode): Role {
+  const role = androidRole(raw);
+  if (role !== 'container' || !isActionable(raw)) return role;
+  return readOutControlRole(raw) ?? role;
+}
+
+function readOutControlRole(raw: AndroidRawNode): Role | null {
+  for (const child of raw.children) {
+    if (!child.visibleToUser || (child.importantForAccessibility && isActionable(child))) continue;
+    const role = androidRole(child);
+    if (child.importantForAccessibility && INTERACTIVE_ROLES.has(role)) return role;
+    const nested = readOutControlRole(child);
+    if (nested !== null) return nested;
+  }
+  return null;
 }
 
 /**
@@ -234,10 +259,16 @@ function isWebView(raw: AndroidRawNode): boolean {
   return className.slice(className.lastIndexOf('.') + 1).includes('WebView');
 }
 
+/** Everything under a ComposeView is a Compose semantics node rather than a View. */
+function isComposeHost(raw: AndroidRawNode): boolean {
+  return (raw.className ?? '').endsWith('ComposeView');
+}
+
 interface VisitContext {
   windowIndex: number;
   inForeground: boolean;
   inWebView: boolean;
+  inCompose: boolean;
 }
 
 /**
@@ -268,7 +299,8 @@ export function normalizeAndroidCapture(
   const nodes: PamNode[] = [];
 
   const visit = (raw: AndroidRawNode, id: string, parentId: string | null, context: VisitContext): void => {
-    const role = androidRole(raw);
+    const role = announcedRole(raw);
+    const interactive = isInteractive(raw, role);
     const boundsPx = rectFrom(raw.bounds);
     const onScreen = raw.visibleToUser && boundsPx.right > boundsPx.left && boundsPx.bottom > boundsPx.top;
     const covered = !context.inForeground || coverers.some((cover) => containsRect(cover, boundsPx));
@@ -285,7 +317,9 @@ export function normalizeAndroidCapture(
       resourceId: shortResourceId(raw.resourceId),
       boundsPx,
       boundsDp: roundRect(scaleRect(boundsPx, 1 / density)),
-      interactive: isInteractive(raw, role),
+      // Compose reports a clickable's touch area (enlarged to 48 dp) as its bounds.
+      boundsAreTouchArea: context.inCompose && interactive,
+      interactive,
       exposedToAssistiveTech: raw.importantForAccessibility,
       visible: onScreen && !covered,
       obscured: !covered && coverers.some((cover) => rectsOverlap(cover, boundsPx)),
@@ -298,7 +332,7 @@ export function normalizeAndroidCapture(
     raw.children.forEach((child, index) => {
       const childId = `${id}.${String(index)}`;
       node.childIds.push(childId);
-      visit(child, childId, id, { ...context, inWebView });
+      visit(child, childId, id, { ...context, inWebView, inCompose: context.inCompose || isComposeHost(raw) });
     });
   };
 
@@ -310,6 +344,7 @@ export function normalizeAndroidCapture(
       windowIndex,
       inForeground: windowIndex === foregroundIndex,
       inWebView: false,
+      inCompose: false,
     });
   });
 

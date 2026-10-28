@@ -1,4 +1,5 @@
 import { estimateTextColors, formatRatio, toHex } from '../color.js';
+import { rectHeight } from '../geometry.js';
 import type { Confidence, PamNode } from '../model.js';
 import { inScope } from './scope.js';
 import type { Finding, Rule } from './types.js';
@@ -18,16 +19,35 @@ const LARGE_TEXT_RATIO = 3;
 const LARGE_TEXT_DP = 24;
 const LARGE_BOLD_TEXT_DP = 18.66;
 
+interface Requirement {
+  required: number;
+  confidence: Confidence;
+}
+
 /**
  * The required ratio depends on text size, and the weight is invisible to us.
  * Text between the two thresholds might be bold, so only the lenient large-text
  * ratio is certain there and confidence drops.
  */
-export function requiredTextRatio(textSizeDp: number | null): { required: number; confidence: Confidence } {
-  if (textSizeDp === null) return { required: NORMAL_TEXT_RATIO, confidence: 'medium' };
+function requirementForSize(textSizeDp: number): Requirement {
   if (textSizeDp >= LARGE_TEXT_DP) return { required: LARGE_TEXT_RATIO, confidence: 'high' };
   if (textSizeDp >= LARGE_BOLD_TEXT_DP) return { required: LARGE_TEXT_RATIO, confidence: 'medium' };
   return { required: NORMAL_TEXT_RATIO, confidence: 'high' };
+}
+
+/**
+ * Compose does not report text size. Text is never taller than the element that holds
+ * it, so the element's height is the largest the text can be: only text too short to
+ * be large is held to 4.5:1, and the answer is inferred, so confidence is medium.
+ */
+export function requiredTextRatio(textSizeDp: number | null, elementHeightDp: number): Requirement {
+  if (textSizeDp !== null) return requirementForSize(textSizeDp);
+  return { required: requirementForSize(elementHeightDp).required, confidence: 'medium' };
+}
+
+function requirementPhrase(textSizeDp: number | null, required: number): string {
+  if (textSizeDp === null && required === LARGE_TEXT_RATIO) return 'even large text needs 3:1';
+  return `text this size needs ${String(required)}:1`;
 }
 
 export const textContrast: Rule = {
@@ -58,13 +78,13 @@ export const textContrast: Rule = {
       if (!inScope(node) || node.obscured || node.text === null || isInsideInactiveComponent(node, byId)) continue;
       const colors = estimateTextColors(raster, node.boundsPx);
       if (colors === null) continue;
-      const { required, confidence } = requiredTextRatio(node.textSizeDp);
+      const { required, confidence } = requiredTextRatio(node.textSizeDp, rectHeight(node.boundsDp));
       if (colors.ratio >= required) continue;
       const foreground = toHex(colors.foreground);
       const background = toHex(colors.background);
       findings.push({
         node,
-        message: `"${node.text}" has a contrast of ${formatRatio(colors.ratio)}:1 (${foreground} on ${background}); text this size needs ${String(required)}:1.`,
+        message: `"${node.text}" has a contrast of ${formatRatio(colors.ratio)}:1 (${foreground} on ${background}); ${requirementPhrase(node.textSizeDp, required)}.`,
         evidence: {
           ratio: Number(formatRatio(colors.ratio)),
           required,

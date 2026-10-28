@@ -15,6 +15,15 @@ function isAncestorOf(ancestor: PamNode, node: PamNode): boolean {
   return node.id.startsWith(`${ancestor.id}.`);
 }
 
+/**
+ * Compose gives the overlap of two enlarged touch areas to the element drawn later,
+ * although a touch there goes to the nearer element. Where two touch areas meet, the
+ * reported sizes are bookkeeping, not the real touch areas.
+ */
+function touchAreasMeet(a: PamNode, b: PamNode): boolean {
+  return a.boundsAreTouchArea && b.boundsAreTouchArea && rectGap(a.boundsPx, b.boundsPx) === 0;
+}
+
 function formatDp(value: number): string {
   return String(Math.round(value * 10) / 10);
 }
@@ -62,6 +71,8 @@ export const targetSize: Rule = {
         return circleIntersectsRect(center.x, center.y, SPACING_RADIUS_DP, other.boundsDp);
       });
       if (conflicts.length === 0) continue;
+      // Pragu cannot see how Compose really splits the area, so it stays silent rather than guess.
+      if (conflicts.some((other) => touchAreasMeet(target, other))) continue;
 
       const gap = Math.min(...conflicts.map((other) => rectGap(target.boundsDp, other.boundsDp)));
       const width = rectWidth(target.boundsDp);

@@ -156,20 +156,80 @@ describe('normalizeAndroidCapture', () => {
     expect(device).toMatchObject({ platform: 'android', apiLevel: 36, osVersion: '16', densityDpi: 320 });
   });
 
-  it('marks nodes interactive from click actions and interactive roles', () => {
-    const viaAction = normalizeAndroidCapture(captureOf(rawNode({ actions: [16] })), {
-      screenId: 's',
-      screenName: 's',
-      screenshotFile: null,
-    });
-    const viaRole = normalizeAndroidCapture(captureOf(rawNode({ roleDescription: 'link' })), {
-      screenId: 's',
-      screenName: 's',
-      screenshotFile: null,
-    });
+  it('marks nodes interactive from click actions, and from control roles where TalkBack stops', () => {
+    const normalize = (raw: AndroidRawNode) =>
+      normalizeAndroidCapture(captureOf(raw), { screenId: 's', screenName: 's', screenshotFile: null });
+    const viaAction = normalize(rawNode({ actions: [16] }));
+    const viaRole = normalize(rawNode({ roleDescription: 'link', focusable: true }));
+    const roleOnly = normalize(rawNode({ roleDescription: 'link' }));
     expect(viaAction.screen.nodes[0]?.interactive).toBe(true);
     expect(viaRole.screen.nodes[0]?.interactive).toBe(true);
+    expect(roleOnly.screen.nodes[0]?.interactive).toBe(false);
     expect(viaRole.screen.screenshot).toBeNull();
+  });
+});
+
+// Shapes recorded from Compose 1.12 on Android 16 (fixtures/android-compose).
+describe('Compose', () => {
+  const normalize = (content: AndroidRawNode) => {
+    const host = rawNode({
+      className: 'androidx.compose.ui.platform.ComposeView',
+      bounds: [0, 0, 1080, 2400],
+      children: [content],
+    });
+    return normalizeAndroidCapture(captureOf(host), { screenId: 's', screenName: 'S', screenshotFile: null }).screen;
+  };
+
+  it('reads a Material IconButton as one button: its role child is not a control of its own', () => {
+    const iconButton = rawNode({
+      className: 'android.view.View',
+      resourceId: 'back',
+      clickable: true,
+      focusable: true,
+      actions: [16],
+      bounds: [0, 0, 96, 96],
+      children: [
+        rawNode({ className: 'android.view.View', contentDescription: 'Back', bounds: [24, 24, 72, 72] }),
+        rawNode({ className: 'android.widget.Button', bounds: [8, 8, 88, 88] }),
+      ],
+    });
+    const screen = normalize(iconButton);
+    expect(screen.nodes[1]).toMatchObject({ resourceId: 'back', role: 'button', name: 'Back', interactive: true });
+    expect(screen.nodes[3]).toMatchObject({ role: 'button', interactive: false });
+  });
+
+  it('takes a switch’s role from the child Compose puts it on', () => {
+    const unlabelledSwitch = rawNode({
+      className: 'android.view.View',
+      clickable: true,
+      focusable: true,
+      checkable: true,
+      stateDescription: 'Off',
+      children: [
+        rawNode({ className: 'android.view.View', importantForAccessibility: false }),
+        rawNode({ className: 'android.view.View', roleDescription: 'Switch' }),
+      ],
+    });
+    expect(normalize(unlabelledSwitch).nodes[1]).toMatchObject({ role: 'switch', name: null, interactive: true });
+  });
+
+  it('marks the bounds of Compose controls as touch areas, and nothing else', () => {
+    const screen = normalize(
+      rawNode({
+        className: 'android.view.View',
+        children: [
+          rawNode({ className: 'android.view.View', clickable: true, contentDescription: 'Clear cache' }),
+          rawNode({ className: 'android.widget.TextView', text: 'Cache' }),
+        ],
+      }),
+    );
+    expect(screen.nodes.map((node) => node.boundsAreTouchArea)).toEqual([false, false, true, false]);
+    const views = normalizeAndroidCapture(captureOf(rawNode({ clickable: true })), {
+      screenId: 's',
+      screenName: 'S',
+      screenshotFile: null,
+    });
+    expect(views.screen.nodes[0]?.boundsAreTouchArea).toBe(false);
   });
 });
 
