@@ -17,6 +17,9 @@ Not in any milestone yet; noted so they don't creep into code early.
 
 - Warn when `--out` is inside a cloud-synced folder (OneDrive, Dropbox, iCloud), since reports contain screenshots.
 - Capture native `TouchDelegate` areas (`getTouchDelegateInfo()`, API 29+), so `target/size` can size native targets correctly before M4 (ADR-007).
+- `input/placeholder-label`: type into each field during a crawl (M3) and report fields whose only label disappears. Labelled in both fixtures already (ADR-010).
+- Tell which toolkit built the app (Compose host views, React Native libraries in the APK), so reports lead with that toolkit's fix.
+- Per-role fixes in `name/interactive-missing`: for a switch or checkbox, a toggleable row that its text names beats a content description.
 - WebP screenshots in reports (decided against the report-size budget in M1).
 - An `AccessibilityService` capture mode for live exploration (M3 RFC).
 - iOS runner on macOS CI runners, when there is no local Mac.

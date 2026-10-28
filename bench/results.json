@@ -19,6 +19,18 @@
       "mcc": 1
     },
     {
+      "rule": "input/missing-label",
+      "severity": "error",
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "tn": 4,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "mcc": 1
+    },
+    {
       "rule": "contrast/text",
       "severity": "error",
       "tp": 6,
@@ -77,11 +89,6 @@
     }
   ],
   "awaiting": [
-    {
-      "rule": "input/missing-label",
-      "barriers": 2,
-      "correctTwins": 4
-    },
     {
       "rule": "input/placeholder-label",
       "barriers": 2,

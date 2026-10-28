@@ -22,6 +22,7 @@ export { fnv1a64, issueFingerprint } from './fingerprint.js';
 export {
   defaultRules,
   inScope,
+  inputMissingLabel,
   interactiveMissingName,
   requiredTextRatio,
   targetSize,

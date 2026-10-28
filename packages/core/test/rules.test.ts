@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { interactiveMissingName, requiredTextRatio, targetSize, textContrast } from '../src/index.js';
+import {
+  inputMissingLabel,
+  interactiveMissingName,
+  requiredTextRatio,
+  targetSize,
+  textContrast,
+} from '../src/index.js';
 import { createRaster, device, paintText, pamNode, rect, screenOf } from './helpers.js';
 
 describe('name/interactive-missing', () => {
@@ -32,6 +38,56 @@ describe('name/interactive-missing', () => {
 
   it('leaves text fields to the input/missing-label rule', () => {
     expect(check([pamNode({ id: '0', name: null, role: 'textfield' })])).toEqual([]);
+  });
+});
+
+describe('input/missing-label', () => {
+  const check = (nodes: Parameters<typeof screenOf>[0]) =>
+    inputMissingLabel.check({ screen: screenOf(nodes), device, raster: null });
+  const field = (overrides: Partial<Parameters<typeof pamNode>[0]> = {}) =>
+    pamNode({
+      id: 'f',
+      role: 'textfield',
+      platformRole: 'android.widget.EditText',
+      name: null,
+      boundsDp: rect(16, 100, 396, 148),
+      ...overrides,
+    });
+  const text = (id: string, words: string, boundsDp: ReturnType<typeof rect>) =>
+    pamNode({ id, role: 'text', interactive: false, text: words, name: words, boundsDp });
+
+  it('flags a field without a label and names the text a sighted person reads as its label', () => {
+    const findings = check([
+      text('0', 'Delivery details', rect(16, 20, 300, 56)),
+      text('1', 'Promo code', rect(16, 76, 120, 96)),
+      field(),
+    ]);
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.message).toBe(
+      'This text field has no label. A screen reader announces only "Edit box": the text "Promo code" next to it is not connected to it.',
+    );
+    expect(findings[0]?.evidence).toEqual({ platformRole: 'android.widget.EditText', visibleText: 'Promo code' });
+  });
+
+  it('finds a label to the left of the field, and says so plainly when there is none', () => {
+    const beside = check([text('0', 'Code', rect(0, 110, 12, 130)), field()]);
+    expect(beside[0]?.evidence.visibleText).toBe('Code');
+    const alone = check([text('0', 'Far away', rect(16, 0, 120, 20)), field()]);
+    expect(alone[0]?.message).toBe(
+      'This text field has no label. A screen reader announces only "Edit box", so people have to guess what to enter.',
+    );
+    expect(alone[0]?.evidence).toEqual({ platformRole: 'android.widget.EditText' });
+  });
+
+  it('leaves labelled, hidden, off-screen and web fields alone', () => {
+    expect(
+      check([
+        field({ id: '0', name: 'Email' }),
+        field({ id: '1', exposedToAssistiveTech: false }),
+        field({ id: '2', visible: false }),
+        field({ id: '3', inWebView: true }),
+      ]),
+    ).toEqual([]);
   });
 });
 

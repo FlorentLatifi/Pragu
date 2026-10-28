@@ -55,8 +55,9 @@ Defined in `packages/core/src/model.ts`. It is platform-neutral, so rules never 
 
 | Rule | Check | Notes |
 |---|---|---|
-| `name/interactive-missing` | Interactive, visible, exposed, not a text field, and no accessible name | Text fields belong to `input/missing-label` (M1) |
-| `contrast/text` | Per visible text node, estimate text and background colours from the screenshot. 4.5:1 for normal text, 3:1 for large | Background is the dominant colour. Text is the frequent colour with the highest contrast against it, so anti-aliased edges never win. A busy background returns nothing, to avoid false alarms. Text size from `ExtraRenderingInfo` (API 30+). Unknown size gives medium confidence. |
+| `name/interactive-missing` | Interactive, visible, exposed, not a text field, and no accessible name | Text fields belong to `input/missing-label` |
+| `input/missing-label` | Visible text field with no name: no content description, no `labeledBy` label, no hint, no label text inside (Compose) | The message names the visible text just above or beside the field. Placeholder-only labels need typing to see, so they wait for `input/placeholder-label` (ADR-010). |
+| `contrast/text` | Per visible text node, estimate text and background colours from the screenshot. 4.5:1 for normal text, 3:1 for large | Background is the dominant colour. Text is the frequent colour with the highest contrast against it, so anti-aliased edges never win. A busy background returns nothing, to avoid false alarms. Text size from `ExtraRenderingInfo` (API 30+). Compose reports none: the element's height then bounds the size, with medium confidence (ADR-009). |
 | `target/size` | Interactive targets under 24×24 dp, unless WCAG's spacing exception applies | The exception: a 24 dp circle around the target touches no other target and no other undersized target's circle. Parent and child targets are not counted as neighbours. Silent where two Compose touch areas meet, because the real split is invisible (ADR-009). Medium confidence, and a warning rather than an error, because `hitSlop` and `TouchDelegate` are invisible to the tree (ADR-007). |
 
 ### WCAG CSS pixels in dp and pt
