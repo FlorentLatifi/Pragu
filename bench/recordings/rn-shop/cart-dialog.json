@@ -1,7 +1,7 @@
 {
-  "protocol": 2,
-  "agentVersion": "0.0.2",
-  "capturedAt": "2026-10-28T11:35:51.110987Z",
+  "protocol": 3,
+  "agentVersion": "0.0.3",
+  "capturedAt": "2026-10-28T13:02:07.693651Z",
   "packageName": "dev.pragu.fixtures.rnshop",
   "windowTitle": null,
   "screenWidthPx": 1080,
@@ -36,6 +36,7 @@
         "text": null,
         "contentDescription": null,
         "hintText": null,
+        "labeledBy": null,
         "stateDescription": null,
         "roleDescription": null,
         "bounds": [
@@ -70,6 +71,7 @@
             "text": null,
             "contentDescription": null,
             "hintText": null,
+            "labeledBy": null,
             "stateDescription": null,
             "roleDescription": null,
             "bounds": [
@@ -104,6 +106,7 @@
                 "text": null,
                 "contentDescription": null,
                 "hintText": null,
+                "labeledBy": null,
                 "stateDescription": null,
                 "roleDescription": null,
                 "bounds": [
@@ -138,6 +141,7 @@
                     "text": null,
                     "contentDescription": null,
                     "hintText": null,
+                    "labeledBy": null,
                     "stateDescription": null,
                     "roleDescription": null,
                     "bounds": [
@@ -172,6 +176,7 @@
                         "text": null,
                         "contentDescription": null,
                         "hintText": null,
+                        "labeledBy": null,
                         "stateDescription": null,
                         "roleDescription": null,
                         "bounds": [
@@ -206,6 +211,7 @@
                             "text": null,
                             "contentDescription": null,
                             "hintText": null,
+                            "labeledBy": null,
                             "stateDescription": null,
                             "roleDescription": null,
                             "bounds": [
@@ -240,6 +246,7 @@
                                 "text": null,
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -275,6 +282,7 @@
                                 "text": null,
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -310,6 +318,7 @@
                                 "text": "Remove Ceramic mug?",
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -348,6 +357,7 @@
                                 "text": null,
                                 "contentDescription": "",
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -384,6 +394,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -419,6 +430,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -456,6 +468,7 @@
                                 "text": "You can add it again later.",
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -494,6 +507,7 @@
                                 "text": null,
                                 "contentDescription": "Keep it",
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -530,6 +544,7 @@
                                     "text": "Keep it",
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -570,6 +585,7 @@
                                 "text": null,
                                 "contentDescription": "Remove",
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -606,6 +622,7 @@
                                     "text": "Remove",
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [

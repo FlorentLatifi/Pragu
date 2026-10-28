@@ -80,6 +80,11 @@
     {
       "rule": "input/missing-label",
       "barriers": 2,
+      "correctTwins": 4
+    },
+    {
+      "rule": "input/placeholder-label",
+      "barriers": 2,
       "correctTwins": 2
     },
     {

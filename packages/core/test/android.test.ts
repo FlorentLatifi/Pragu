@@ -58,6 +58,20 @@ describe('accessibleName', () => {
     expect(accessibleName(rawNode({ editable: true, text: 'typed' }))).toBeNull();
   });
 
+  it('names a field by the element that labels it (labelFor, aria-labelledby)', () => {
+    expect(accessibleName(rawNode({ editable: true, labeledBy: 'Gift card number' }))).toBe('Gift card number');
+    expect(accessibleName(rawNode({ editable: true, labeledBy: '  ' }))).toBeNull();
+  });
+
+  it('names a Compose text field by the label text inside it', () => {
+    const field = (children: AndroidRawNode[]) =>
+      rawNode({ className: 'android.widget.EditText', editable: true, focusable: true, text: '', children });
+    expect(accessibleName(field([rawNode({ importantForAccessibility: false }), rawNode({ text: 'Full name' })]))).toBe(
+      'Full name',
+    );
+    expect(accessibleName(field([rawNode({ importantForAccessibility: false })]))).toBeNull();
+  });
+
   it('lets a focusable container borrow its children’s text, like TalkBack', () => {
     const button = rawNode({
       clickable: true,
@@ -333,7 +347,7 @@ describe('parseAndroidCapture', () => {
   });
 
   it('rejects another protocol version with advice', () => {
-    expect(() => parseAndroidCapture({ ...valid(), protocol: 1 })).toThrow(/protocol 1.*protocol 2/);
+    expect(() => parseAndroidCapture({ ...valid(), protocol: 2 })).toThrow(/protocol 2.*protocol 3/);
   });
 
   it('rejects values that are not objects', () => {

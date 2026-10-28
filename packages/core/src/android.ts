@@ -5,8 +5,8 @@
 import { containsRect, rectsOverlap, scaleRect } from './geometry.js';
 import type { DeviceInfo, PamNode, PamScreen, PamWindow, Rect, Role } from './model.js';
 
-/** The agent protocol version this adapter understands. 2 added windows. */
-export const ANDROID_AGENT_PROTOCOL = 2;
+/** The agent protocol version this adapter understands. 2 added windows; 3 added labeledBy. */
+export const ANDROID_AGENT_PROTOCOL = 3;
 
 /** AccessibilityWindowInfo types, as the agent names them. */
 export type AndroidWindowType =
@@ -36,6 +36,8 @@ export interface AndroidRawNode {
   text: string | null;
   contentDescription: string | null;
   hintText: string | null;
+  /** Words of the element that labels this one (android:labelFor, React Native aria-labelledby). */
+  labeledBy: string | null;
   stateDescription: string | null;
   roleDescription: string | null;
   /** left, top, right, bottom in screen pixels. */
@@ -198,18 +200,23 @@ function readOutControlRole(raw: AndroidRawNode): Role | null {
 }
 
 /**
- * Approximates the label TalkBack speaks for a node: its content description,
- * then its own text, then (for a focusable container) the text of descendants
- * that do not get a focus stop of their own. Text fields use their hint because
- * their text is the value, not the label.
+ * Approximates the label TalkBack speaks for a node: its content description, the
+ * element that labels it, then its own text, then (for a focusable container) the
+ * text of descendants that do not get a focus stop of their own. A text field's
+ * text is its value, not its label, so it is named by its hint or, in Compose, by
+ * the label text inside it.
  */
 export function accessibleName(raw: AndroidRawNode): string | null {
-  const description = nonBlank(raw.contentDescription);
+  const description = nonBlank(raw.contentDescription) ?? nonBlank(raw.labeledBy);
   if (description !== null) return description;
-  if (raw.editable) return nonBlank(raw.hintText);
+  if (raw.editable) return nonBlank(raw.hintText) ?? descendantLabel(raw);
   const text = nonBlank(raw.text);
   if (text !== null) return text;
   if (!isActionable(raw)) return null;
+  return descendantLabel(raw);
+}
+
+function descendantLabel(raw: AndroidRawNode): string | null {
   const parts: string[] = [];
   collectDescendantLabels(raw, parts);
   return parts.length > 0 ? parts.join(', ') : null;
@@ -445,6 +452,7 @@ const NODE_STRINGS = [
   'text',
   'contentDescription',
   'hintText',
+  'labeledBy',
   'stateDescription',
   'roleDescription',
 ];

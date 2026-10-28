@@ -37,13 +37,15 @@
       "barriers": [
         { "rule": "name/interactive-missing", "testID": "seed-custom-checkbox", "note": "clickable Box drawn as a checkbox" },
         { "rule": "state/not-exposed", "testID": "seed-custom-checkbox", "note": "no role and no checked state" },
-        { "rule": "input/missing-label", "testID": "seed-placeholder-field", "note": "placeholder only: it disappears as soon as someone types" }
+        { "rule": "input/missing-label", "testID": "seed-unlabeled-field", "note": "the \"Promo code\" text above is not connected to it; TalkBack says only \"Edit box\"" },
+        { "rule": "input/placeholder-label", "testID": "seed-placeholder-field", "note": "placeholder only: once someone types, it disappears from view and from the accessibility tree. A scan of the empty field cannot tell it from a label" }
       ],
       "correctTwins": [
         { "rule": "name/interactive-missing", "testID": "twin-checkbox-row", "note": "toggleable Row: the Checkbox is named by the row's text" },
         { "rule": "name/interactive-missing", "testID": "twin-pay-button" },
         { "rule": "state/not-exposed", "testID": "twin-checkbox-row" },
         { "rule": "input/missing-label", "testID": "twin-labelled-field", "note": "OutlinedTextField with a label" },
+        { "rule": "input/placeholder-label", "testID": "twin-labelled-field" },
         { "rule": "contrast/text", "testID": "twin-disabled-text", "note": "inactive components have no contrast requirement (WCAG 1.4.3)" },
         { "rule": "target/size", "testID": "twin-pay-button" }
       ]

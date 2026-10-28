@@ -9,6 +9,7 @@ import org.junit.Test
 fun snapshot(
     text: String? = null,
     contentDescription: String? = null,
+    labeledBy: String? = null,
     clickable: Boolean = false,
     children: List<NodeSnapshot> = emptyList(),
 ) = NodeSnapshot(
@@ -18,6 +19,7 @@ fun snapshot(
     text = text,
     contentDescription = contentDescription,
     hintText = null,
+    labeledBy = labeledBy,
     stateDescription = null,
     roleDescription = null,
     left = 0,
@@ -43,8 +45,8 @@ fun snapshot(
 class SnapshotTest {
     // The contract with AndroidRawNode in packages/core/src/android.ts. Changing it means bumping PROTOCOL_VERSION.
     private val protocolKeys = setOf(
-        "className", "packageName", "resourceId", "text", "contentDescription", "hintText", "stateDescription",
-        "roleDescription", "bounds", "clickable", "longClickable", "focusable", "checkable", "checked", "enabled",
+        "className", "packageName", "resourceId", "text", "contentDescription", "hintText", "labeledBy",
+        "stateDescription", "roleDescription", "bounds", "clickable", "longClickable", "focusable", "checkable", "checked", "enabled",
         "editable", "visibleToUser", "importantForAccessibility", "heading", "screenReaderFocusable", "actions",
         "textSizePx", "children",
     )
@@ -60,6 +62,12 @@ class SnapshotTest {
         assertEquals("Checkout", json.getString("text"))
         assertTrue(json.has("contentDescription"))
         assertTrue(json.isNull("contentDescription"))
+        assertTrue(json.isNull("labeledBy"))
+    }
+
+    @Test
+    fun aFieldCarriesTheWordsOfTheElementThatLabelsIt() {
+        assertEquals("Gift card number", snapshot(labeledBy = "Gift card number").toJson().getString("labeledBy"))
     }
 
     @Test
@@ -102,7 +110,7 @@ class SnapshotTest {
         val windows = listOf(window("application", 0, snapshot()), window("input_method", 1, null))
         val capture = Capture("com.example.shop", null, "2026-10-27T12:00:00Z", 1080, 2400, windows, byteArrayOf())
         val json = capture.toJson(device, "0.0.2")
-        assertEquals(2, PROTOCOL_VERSION)
+        assertEquals(3, PROTOCOL_VERSION)
         assertEquals(PROTOCOL_VERSION, json.getInt("protocol"))
         assertFalse(json.has("root"))
         assertTrue(json.isNull("windowTitle"))

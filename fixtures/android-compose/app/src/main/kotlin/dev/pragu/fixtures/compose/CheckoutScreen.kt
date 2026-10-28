@@ -35,13 +35,15 @@ import androidx.compose.ui.unit.dp
 private val Ink = Color(0xFF1A1A18)
 private val Green = Color(0xFF1F5E4B)
 
-// Seeds: a field labelled only by its placeholder, and a home-made checkbox with no
-// name, role or state. Twins: a field with a real label, a toggleable checkbox row,
-// a text button, and a disabled button (WCAG sets no contrast requirement for it).
+// Seeds: a field labelled only by its placeholder, a field whose visible label is not
+// connected to it, and a home-made checkbox with no name, role or state. Twins: a field
+// with a real label, a toggleable checkbox row, a text button, and a disabled button
+// (WCAG sets no contrast requirement for it).
 @Composable
 fun CheckoutScreen() {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
+    var promo by remember { mutableStateOf("") }
     var terms by remember { mutableStateOf(false) }
     var saveCard by remember { mutableStateOf(false) }
     Column(Modifier.fillMaxSize().padding(start = 16.dp, end = 16.dp, top = 48.dp)) {
@@ -63,6 +65,14 @@ fun CheckoutScreen() {
             onValueChange = { email = it },
             placeholder = { Text("Email address") },
             modifier = Modifier.fillMaxWidth().padding(top = 8.dp).testTag("seed-placeholder-field"),
+        )
+        // Seeded barrier: the text above is not connected to the field, which has no label of
+        // its own, so TalkBack says only "Edit box".
+        Text("Promo code", color = Ink, modifier = Modifier.padding(top = 12.dp, bottom = 4.dp))
+        OutlinedTextField(
+            value = promo,
+            onValueChange = { promo = it },
+            modifier = Modifier.fillMaxWidth().testTag("seed-unlabeled-field"),
         )
 
         Row(

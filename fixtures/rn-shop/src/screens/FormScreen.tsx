@@ -3,9 +3,10 @@ import { Pressable, StyleSheet, Switch, Text, TextInput, View } from 'react-nati
 
 const noop = () => {};
 
-// Seeds: a field labelled only by a pale placeholder, and a home-made checkbox with no
-// name, no role and no state. Twins: a labelled field, a labelled switch, and a disabled
-// button whose grey text WCAG exempts from contrast (inactive components have no requirement).
+// Seeds: a field labelled only by a pale placeholder, a field whose visible label is not
+// connected to it, and a home-made checkbox with no name, no role and no state. Twins: a
+// labelled field, a field connected to its visible label with aria-labelledby, a labelled
+// switch, and a disabled button whose grey text WCAG exempts from contrast.
 export function FormScreen() {
   const [subscribed, setSubscribed] = useState(false);
   const [saveDetails, setSaveDetails] = useState(true);
@@ -29,6 +30,14 @@ export function FormScreen() {
         placeholderTextColor="#B0B0B0"
         style={styles.input}
       />
+
+      <Text style={styles.label}>Promo code</Text>
+      <TextInput testID="seed-unlabeled-input" style={styles.input} />
+
+      <Text nativeID="gift-card-label" style={styles.label}>
+        Gift card number
+      </Text>
+      <TextInput testID="twin-labelledby-input" aria-labelledby="gift-card-label" style={styles.input} />
 
       <View style={styles.row}>
         <Pressable testID="seed-unlabeled-checkbox" onPress={() => setSubscribed(!subscribed)} style={styles.checkbox}>

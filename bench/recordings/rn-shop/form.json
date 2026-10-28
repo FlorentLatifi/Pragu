@@ -1,7 +1,7 @@
 {
-  "protocol": 2,
-  "agentVersion": "0.0.2",
-  "capturedAt": "2026-10-28T11:36:08.477418Z",
+  "protocol": 3,
+  "agentVersion": "0.0.3",
+  "capturedAt": "2026-10-28T13:02:16.116459Z",
   "packageName": "dev.pragu.fixtures.rnshop",
   "windowTitle": "rn-shop",
   "screenWidthPx": 1080,
@@ -36,6 +36,7 @@
         "text": null,
         "contentDescription": null,
         "hintText": null,
+        "labeledBy": null,
         "stateDescription": null,
         "roleDescription": null,
         "bounds": [
@@ -70,6 +71,7 @@
             "text": null,
             "contentDescription": null,
             "hintText": null,
+            "labeledBy": null,
             "stateDescription": null,
             "roleDescription": null,
             "bounds": [
@@ -104,6 +106,7 @@
                 "text": null,
                 "contentDescription": null,
                 "hintText": null,
+                "labeledBy": null,
                 "stateDescription": null,
                 "roleDescription": null,
                 "bounds": [
@@ -138,6 +141,7 @@
                     "text": null,
                     "contentDescription": null,
                     "hintText": null,
+                    "labeledBy": null,
                     "stateDescription": null,
                     "roleDescription": null,
                     "bounds": [
@@ -172,6 +176,7 @@
                         "text": null,
                         "contentDescription": null,
                         "hintText": null,
+                        "labeledBy": null,
                         "stateDescription": null,
                         "roleDescription": null,
                         "bounds": [
@@ -206,6 +211,7 @@
                             "text": null,
                             "contentDescription": null,
                             "hintText": null,
+                            "labeledBy": null,
                             "stateDescription": null,
                             "roleDescription": null,
                             "bounds": [
@@ -240,6 +246,7 @@
                                 "text": null,
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -275,6 +282,7 @@
                                 "text": "Delivery details",
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -313,6 +321,7 @@
                                 "text": "Full name",
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -351,6 +360,7 @@
                                 "text": "Florent Latifi",
                                 "contentDescription": "Full name",
                                 "hintText": "Florent Latifi",
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -390,6 +400,7 @@
                                 "text": "Email address",
                                 "contentDescription": null,
                                 "hintText": "Email address",
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -423,19 +434,178 @@
                                 "children": []
                               },
                               {
+                                "className": "android.widget.TextView",
+                                "packageName": "dev.pragu.fixtures.rnshop",
+                                "resourceId": null,
+                                "text": "Promo code",
+                                "contentDescription": null,
+                                "hintText": null,
+                                "labeledBy": null,
+                                "stateDescription": null,
+                                "roleDescription": null,
+                                "bounds": [
+                                  52,
+                                  718,
+                                  1027,
+                                  769
+                                ],
+                                "clickable": false,
+                                "longClickable": false,
+                                "focusable": false,
+                                "checkable": false,
+                                "checked": false,
+                                "enabled": true,
+                                "editable": false,
+                                "visibleToUser": true,
+                                "importantForAccessibility": true,
+                                "heading": false,
+                                "screenReaderFocusable": false,
+                                "actions": [
+                                  4,
+                                  8,
+                                  64,
+                                  256,
+                                  512,
+                                  131072,
+                                  16908342
+                                ],
+                                "textSizePx": 37,
+                                "children": []
+                              },
+                              {
+                                "className": "android.widget.EditText",
+                                "packageName": "dev.pragu.fixtures.rnshop",
+                                "resourceId": "seed-unlabeled-input",
+                                "text": "",
+                                "contentDescription": null,
+                                "hintText": "",
+                                "labeledBy": null,
+                                "stateDescription": null,
+                                "roleDescription": null,
+                                "bounds": [
+                                  52,
+                                  779,
+                                  1027,
+                                  905
+                                ],
+                                "clickable": true,
+                                "longClickable": true,
+                                "focusable": true,
+                                "checkable": false,
+                                "checked": false,
+                                "enabled": true,
+                                "editable": true,
+                                "visibleToUser": true,
+                                "importantForAccessibility": true,
+                                "heading": false,
+                                "screenReaderFocusable": false,
+                                "actions": [
+                                  1,
+                                  4,
+                                  8,
+                                  16,
+                                  32,
+                                  64,
+                                  2097152,
+                                  16908342
+                                ],
+                                "textSizePx": null,
+                                "children": []
+                              },
+                              {
+                                "className": "android.widget.TextView",
+                                "packageName": "dev.pragu.fixtures.rnshop",
+                                "resourceId": null,
+                                "text": "Gift card number",
+                                "contentDescription": null,
+                                "hintText": null,
+                                "labeledBy": null,
+                                "stateDescription": null,
+                                "roleDescription": null,
+                                "bounds": [
+                                  52,
+                                  947,
+                                  1027,
+                                  998
+                                ],
+                                "clickable": false,
+                                "longClickable": false,
+                                "focusable": false,
+                                "checkable": false,
+                                "checked": false,
+                                "enabled": true,
+                                "editable": false,
+                                "visibleToUser": true,
+                                "importantForAccessibility": true,
+                                "heading": false,
+                                "screenReaderFocusable": false,
+                                "actions": [
+                                  4,
+                                  8,
+                                  64,
+                                  256,
+                                  512,
+                                  131072,
+                                  16908342
+                                ],
+                                "textSizePx": 37,
+                                "children": []
+                              },
+                              {
+                                "className": "android.widget.EditText",
+                                "packageName": "dev.pragu.fixtures.rnshop",
+                                "resourceId": "twin-labelledby-input",
+                                "text": "",
+                                "contentDescription": null,
+                                "hintText": "",
+                                "labeledBy": "Gift card number",
+                                "stateDescription": null,
+                                "roleDescription": null,
+                                "bounds": [
+                                  52,
+                                  1009,
+                                  1027,
+                                  1135
+                                ],
+                                "clickable": true,
+                                "longClickable": true,
+                                "focusable": true,
+                                "checkable": false,
+                                "checked": false,
+                                "enabled": true,
+                                "editable": true,
+                                "visibleToUser": true,
+                                "importantForAccessibility": true,
+                                "heading": false,
+                                "screenReaderFocusable": false,
+                                "actions": [
+                                  1,
+                                  4,
+                                  8,
+                                  16,
+                                  32,
+                                  64,
+                                  2097152,
+                                  16908342
+                                ],
+                                "textSizePx": null,
+                                "children": []
+                              },
+                              {
                                 "className": "android.view.ViewGroup",
                                 "packageName": "dev.pragu.fixtures.rnshop",
                                 "resourceId": "seed-unlabeled-checkbox",
                                 "text": null,
                                 "contentDescription": "",
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
                                   53,
-                                  750,
+                                  1209,
                                   116,
-                                  813
+                                  1272
                                 ],
                                 "clickable": true,
                                 "longClickable": false,
@@ -466,13 +636,14 @@
                                 "text": "Email me about new pieces",
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
                                   147,
-                                  752,
+                                  1211,
                                   1028,
-                                  809
+                                  1268
                                 ],
                                 "clickable": false,
                                 "longClickable": false,
@@ -504,13 +675,14 @@
                                 "text": "Save my details",
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
                                   84,
-                                  899,
+                                  1358,
                                   906,
-                                  956
+                                  1415
                                 ],
                                 "clickable": false,
                                 "longClickable": false,
@@ -542,13 +714,14 @@
                                 "text": null,
                                 "contentDescription": "Save my details",
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": "ON",
                                 "roleDescription": null,
                                 "bounds": [
                                   906,
-                                  892,
+                                  1351,
                                   1028,
-                                  963
+                                  1422
                                 ],
                                 "clickable": true,
                                 "longClickable": false,
@@ -579,13 +752,14 @@
                                 "text": null,
                                 "contentDescription": "Use saved address",
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
                                   53,
-                                  1054,
+                                  1513,
                                   1028,
-                                  1191
+                                  1650
                                 ],
                                 "clickable": true,
                                 "longClickable": false,
@@ -614,13 +788,14 @@
                                     "text": "Use saved address",
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
                                       364,
-                                      1093,
+                                      1552,
                                       717,
-                                      1150
+                                      1609
                                     ],
                                     "clickable": false,
                                     "longClickable": false,
@@ -654,13 +829,14 @@
                                 "text": null,
                                 "contentDescription": "Continue",
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
                                   53,
-                                  1222,
+                                  1681,
                                   1028,
-                                  1359
+                                  1818
                                 ],
                                 "clickable": true,
                                 "longClickable": false,
@@ -690,13 +866,14 @@
                                     "text": "Continue",
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
                                       455,
-                                      1261,
+                                      1720,
                                       625,
-                                      1318
+                                      1777
                                     ],
                                     "clickable": false,
                                     "longClickable": false,

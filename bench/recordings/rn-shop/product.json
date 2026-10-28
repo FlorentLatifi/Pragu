@@ -1,7 +1,7 @@
 {
-  "protocol": 2,
-  "agentVersion": "0.0.2",
-  "capturedAt": "2026-10-28T11:35:57.407704Z",
+  "protocol": 3,
+  "agentVersion": "0.0.3",
+  "capturedAt": "2026-10-28T13:02:12.124928Z",
   "packageName": "dev.pragu.fixtures.rnshop",
   "windowTitle": "rn-shop",
   "screenWidthPx": 1080,
@@ -36,6 +36,7 @@
         "text": null,
         "contentDescription": null,
         "hintText": null,
+        "labeledBy": null,
         "stateDescription": null,
         "roleDescription": null,
         "bounds": [
@@ -70,6 +71,7 @@
             "text": null,
             "contentDescription": null,
             "hintText": null,
+            "labeledBy": null,
             "stateDescription": null,
             "roleDescription": null,
             "bounds": [
@@ -104,6 +106,7 @@
                 "text": null,
                 "contentDescription": null,
                 "hintText": null,
+                "labeledBy": null,
                 "stateDescription": null,
                 "roleDescription": null,
                 "bounds": [
@@ -138,6 +141,7 @@
                     "text": null,
                     "contentDescription": null,
                     "hintText": null,
+                    "labeledBy": null,
                     "stateDescription": null,
                     "roleDescription": null,
                     "bounds": [
@@ -172,6 +176,7 @@
                         "text": null,
                         "contentDescription": null,
                         "hintText": null,
+                        "labeledBy": null,
                         "stateDescription": null,
                         "roleDescription": null,
                         "bounds": [
@@ -206,6 +211,7 @@
                             "text": null,
                             "contentDescription": null,
                             "hintText": null,
+                            "labeledBy": null,
                             "stateDescription": null,
                             "roleDescription": null,
                             "bounds": [
@@ -240,6 +246,7 @@
                                 "text": null,
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -275,6 +282,7 @@
                                 "text": null,
                                 "contentDescription": "Back",
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -314,6 +322,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -351,6 +360,7 @@
                                 "text": null,
                                 "contentDescription": "",
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -387,6 +397,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -424,6 +435,7 @@
                                 "text": null,
                                 "contentDescription": "",
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -460,6 +472,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -495,6 +508,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -530,6 +544,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -567,6 +582,7 @@
                                 "text": null,
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -601,6 +617,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -636,6 +653,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -671,6 +689,7 @@
                                     "text": "Hand-thrown in Prishtina",
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -709,6 +728,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -744,6 +764,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -779,6 +800,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -814,6 +836,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -849,6 +872,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -884,6 +908,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -919,6 +944,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -954,6 +980,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -989,6 +1016,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -1024,6 +1052,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -1059,6 +1088,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -1094,6 +1124,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -1129,6 +1160,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -1164,6 +1196,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -1199,6 +1232,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -1234,6 +1268,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -1269,6 +1304,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -1304,6 +1340,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -1339,6 +1376,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -1374,6 +1412,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -1409,6 +1448,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -1444,6 +1484,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -1479,6 +1520,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -1514,6 +1556,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -1549,6 +1592,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -1584,6 +1628,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -1619,6 +1664,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -1654,6 +1700,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -1691,6 +1738,7 @@
                                 "text": null,
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -1726,6 +1774,7 @@
                                 "text": "NEW",
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -1764,6 +1813,7 @@
                                 "text": "Ceramic mug, speckled",
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -1802,6 +1852,7 @@
                                 "text": "SKU 4521-MG",
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -1840,6 +1891,7 @@
                                 "text": "€14.00",
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -1878,6 +1930,7 @@
                                 "text": "Quantity",
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -1916,6 +1969,7 @@
                                 "text": "1",
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -1954,6 +2008,7 @@
                                 "text": null,
                                 "contentDescription": "Decrease quantity",
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -1993,6 +2048,7 @@
                                     "text": "−",
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -2033,6 +2089,7 @@
                                 "text": null,
                                 "contentDescription": "Increase quantity",
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -2072,6 +2129,7 @@
                                     "text": "+",
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -2112,6 +2170,7 @@
                                 "text": "Holds 350 ml",
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -2150,6 +2209,7 @@
                                 "text": null,
                                 "contentDescription": "Size guide",
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -2189,6 +2249,7 @@
                                     "text": "i",
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -2229,6 +2290,7 @@
                                 "text": null,
                                 "contentDescription": "In your wishlist",
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -2265,6 +2327,7 @@
                                     "text": "In your wishlist",
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -2305,6 +2368,7 @@
                                 "text": null,
                                 "contentDescription": "Remove from wishlist",
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -2344,6 +2408,7 @@
                                     "text": "×",
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -2384,6 +2449,7 @@
                                 "text": null,
                                 "contentDescription": "Add to cart · €14.00",
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -2420,6 +2486,7 @@
                                     "text": "Add to cart · €14.00",
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [

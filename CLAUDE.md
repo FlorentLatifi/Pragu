@@ -28,7 +28,7 @@ Android SDK tools: always pass `--no-metrics` to the `android` CLI (cmdline-tool
 | `packages/core` | Pragu Accessibility Model (`model.ts`), Android adapter (`android.ts`), rules (`rules/`), engine, fingerprints. No runtime dependencies. |
 | `packages/report` | One self-contained offline HTML report. No dependencies. |
 | `packages/cli` | `pragu` command: adb orchestration, agent protocol client, scan pipeline. |
-| `agents/android` | Kotlin agent APK: Instrumentation + UiAutomation, abstract-socket server (protocol 2: every window, trees for the app's own). |
+| `agents/android` | Kotlin agent APK: Instrumentation + UiAutomation, abstract-socket server (protocol 3: every window, trees for the app's own, `labeledBy`). |
 | `fixtures/rn-shop` | Expo app with seeded barriers and correct twins on deep-linked screens (`rnshop://cart|product|form`). Standalone npm project, not in the workspace. |
 | `fixtures/android-compose` | Jetpack Compose app, same idea (`composeshop://settings|checkout`). Standalone Gradle project. How Pragu reads Compose: ADR-009. |
 | `bench` | Pragu Bench: ground-truth evaluation (precision, recall, F1, MCC per rule) on recorded fixture screens. |

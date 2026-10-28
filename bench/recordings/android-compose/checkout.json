@@ -1,7 +1,7 @@
 {
-  "protocol": 2,
-  "agentVersion": "0.0.2",
-  "capturedAt": "2026-10-28T12:13:30.537350Z",
+  "protocol": 3,
+  "agentVersion": "0.0.3",
+  "capturedAt": "2026-10-28T13:01:53.736273Z",
   "packageName": "dev.pragu.fixtures.compose",
   "windowTitle": "Compose shop",
   "screenWidthPx": 1080,
@@ -36,6 +36,7 @@
         "text": null,
         "contentDescription": null,
         "hintText": null,
+        "labeledBy": null,
         "stateDescription": null,
         "roleDescription": null,
         "bounds": [
@@ -70,6 +71,7 @@
             "text": null,
             "contentDescription": null,
             "hintText": null,
+            "labeledBy": null,
             "stateDescription": null,
             "roleDescription": null,
             "bounds": [
@@ -104,6 +106,7 @@
                 "text": null,
                 "contentDescription": null,
                 "hintText": null,
+                "labeledBy": null,
                 "stateDescription": null,
                 "roleDescription": null,
                 "bounds": [
@@ -138,6 +141,7 @@
                     "text": null,
                     "contentDescription": null,
                     "hintText": null,
+                    "labeledBy": null,
                     "stateDescription": null,
                     "roleDescription": null,
                     "bounds": [
@@ -172,6 +176,7 @@
                         "text": null,
                         "contentDescription": null,
                         "hintText": null,
+                        "labeledBy": null,
                         "stateDescription": null,
                         "roleDescription": null,
                         "bounds": [
@@ -203,6 +208,7 @@
                             "text": null,
                             "contentDescription": null,
                             "hintText": null,
+                            "labeledBy": null,
                             "stateDescription": null,
                             "roleDescription": null,
                             "bounds": [
@@ -234,6 +240,7 @@
                                 "text": "Checkout",
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -269,6 +276,7 @@
                                 "text": "",
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -305,6 +313,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -337,6 +346,7 @@
                                     "text": "Full name",
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -372,6 +382,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -406,6 +417,7 @@
                                 "text": "",
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -442,6 +454,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -474,6 +487,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -506,6 +520,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -537,6 +552,7 @@
                                         "text": "Email address",
                                         "contentDescription": null,
                                         "hintText": null,
+                                        "labeledBy": null,
                                         "stateDescription": null,
                                         "roleDescription": null,
                                         "bounds": [
@@ -570,19 +586,161 @@
                                 ]
                               },
                               {
+                                "className": "android.widget.TextView",
+                                "packageName": "dev.pragu.fixtures.compose",
+                                "resourceId": null,
+                                "text": "Promo code",
+                                "contentDescription": null,
+                                "hintText": null,
+                                "labeledBy": null,
+                                "stateDescription": null,
+                                "roleDescription": null,
+                                "bounds": [
+                                  42,
+                                  620,
+                                  283,
+                                  683
+                                ],
+                                "clickable": false,
+                                "longClickable": false,
+                                "focusable": false,
+                                "checkable": false,
+                                "checked": false,
+                                "enabled": true,
+                                "editable": false,
+                                "visibleToUser": true,
+                                "importantForAccessibility": true,
+                                "heading": false,
+                                "screenReaderFocusable": true,
+                                "actions": [
+                                  256,
+                                  512,
+                                  64,
+                                  131072
+                                ],
+                                "textSizePx": null,
+                                "children": []
+                              },
+                              {
+                                "className": "android.widget.EditText",
+                                "packageName": "dev.pragu.fixtures.compose",
+                                "resourceId": "seed-unlabeled-field",
+                                "text": "",
+                                "contentDescription": null,
+                                "hintText": null,
+                                "labeledBy": null,
+                                "stateDescription": "Empty",
+                                "roleDescription": null,
+                                "bounds": [
+                                  42,
+                                  694,
+                                  1038,
+                                  841
+                                ],
+                                "clickable": true,
+                                "longClickable": true,
+                                "focusable": true,
+                                "checkable": false,
+                                "checked": false,
+                                "enabled": true,
+                                "editable": true,
+                                "visibleToUser": true,
+                                "importantForAccessibility": true,
+                                "heading": false,
+                                "screenReaderFocusable": true,
+                                "actions": [
+                                  1,
+                                  64,
+                                  16,
+                                  32,
+                                  2097152,
+                                  16908372
+                                ],
+                                "textSizePx": null,
+                                "children": [
+                                  {
+                                    "className": "android.view.View",
+                                    "packageName": "dev.pragu.fixtures.compose",
+                                    "resourceId": null,
+                                    "text": null,
+                                    "contentDescription": null,
+                                    "hintText": null,
+                                    "labeledBy": null,
+                                    "stateDescription": null,
+                                    "roleDescription": null,
+                                    "bounds": [
+                                      42,
+                                      694,
+                                      1038,
+                                      841
+                                    ],
+                                    "clickable": false,
+                                    "longClickable": false,
+                                    "focusable": false,
+                                    "checkable": false,
+                                    "checked": false,
+                                    "enabled": true,
+                                    "editable": false,
+                                    "visibleToUser": true,
+                                    "importantForAccessibility": false,
+                                    "heading": false,
+                                    "screenReaderFocusable": false,
+                                    "actions": [
+                                      64
+                                    ],
+                                    "textSizePx": null,
+                                    "children": []
+                                  },
+                                  {
+                                    "className": "android.view.View",
+                                    "packageName": "dev.pragu.fixtures.compose",
+                                    "resourceId": null,
+                                    "text": null,
+                                    "contentDescription": null,
+                                    "hintText": null,
+                                    "labeledBy": null,
+                                    "stateDescription": null,
+                                    "roleDescription": null,
+                                    "bounds": [
+                                      84,
+                                      705,
+                                      996,
+                                      831
+                                    ],
+                                    "clickable": false,
+                                    "longClickable": false,
+                                    "focusable": false,
+                                    "checkable": false,
+                                    "checked": false,
+                                    "enabled": true,
+                                    "editable": false,
+                                    "visibleToUser": true,
+                                    "importantForAccessibility": false,
+                                    "heading": false,
+                                    "screenReaderFocusable": false,
+                                    "actions": [
+                                      64
+                                    ],
+                                    "textSizePx": null,
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
                                 "className": "android.view.View",
                                 "packageName": "dev.pragu.fixtures.compose",
                                 "resourceId": "twin-checkbox-row",
                                 "text": null,
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
                                   42,
-                                  588,
+                                  841,
                                   1038,
-                                  735
+                                  988
                                 ],
                                 "clickable": true,
                                 "longClickable": false,
@@ -609,13 +767,14 @@
                                     "text": "I accept the terms",
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
                                       126,
-                                      630,
+                                      883,
                                       486,
-                                      693
+                                      946
                                     ],
                                     "clickable": false,
                                     "longClickable": false,
@@ -644,13 +803,14 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
                                       42,
-                                      588,
+                                      841,
                                       1038,
-                                      735
+                                      988
                                     ],
                                     "clickable": false,
                                     "longClickable": false,
@@ -678,13 +838,14 @@
                                 "text": null,
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
                                   42,
-                                  735,
+                                  988,
                                   168,
-                                  861
+                                  1114
                                 ],
                                 "clickable": true,
                                 "longClickable": false,
@@ -711,13 +872,14 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
                                       43,
-                                      736,
+                                      989,
                                       169,
-                                      862
+                                      1115
                                     ],
                                     "clickable": false,
                                     "longClickable": false,
@@ -745,13 +907,14 @@
                                 "text": "Save this card",
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
                                   168,
-                                  767,
+                                  1020,
                                   448,
-                                  830
+                                  1083
                                 ],
                                 "clickable": false,
                                 "longClickable": false,
@@ -780,13 +943,14 @@
                                 "text": null,
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
                                   42,
-                                  904,
+                                  1157,
                                   1038,
-                                  1030
+                                  1283
                                 ],
                                 "clickable": true,
                                 "longClickable": false,
@@ -813,13 +977,14 @@
                                     "text": "Pay €36.00",
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
                                       449,
-                                      940,
+                                      1193,
                                       631,
-                                      993
+                                      1246
                                     ],
                                     "clickable": false,
                                     "longClickable": false,
@@ -848,13 +1013,14 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
                                       42,
-                                      914,
+                                      1167,
                                       1038,
-                                      1019
+                                      1272
                                     ],
                                     "clickable": false,
                                     "longClickable": false,
@@ -882,13 +1048,14 @@
                                 "text": null,
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
                                   42,
-                                  1051,
+                                  1304,
                                   1038,
-                                  1177
+                                  1430
                                 ],
                                 "clickable": true,
                                 "longClickable": false,
@@ -913,13 +1080,14 @@
                                     "text": "Use saved card",
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
                                       415,
-                                      1087,
+                                      1340,
                                       665,
-                                      1140
+                                      1393
                                     ],
                                     "clickable": false,
                                     "longClickable": false,
@@ -948,13 +1116,14 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
                                       42,
-                                      1061,
+                                      1314,
                                       1038,
-                                      1166
+                                      1419
                                     ],
                                     "clickable": false,
                                     "longClickable": false,

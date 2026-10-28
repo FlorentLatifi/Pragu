@@ -15,6 +15,8 @@ data class NodeSnapshot(
     val text: String?,
     val contentDescription: String?,
     val hintText: String?,
+    /** Text of the element that labels this one: android:labelFor, React Native aria-labelledby. */
+    val labeledBy: String?,
     val stateDescription: String?,
     val roleDescription: String?,
     val left: Int,
@@ -44,6 +46,7 @@ data class NodeSnapshot(
         json.putNullable("text", text)
         json.putNullable("contentDescription", contentDescription)
         json.putNullable("hintText", hintText)
+        json.putNullable("labeledBy", labeledBy)
         json.putNullable("stateDescription", stateDescription)
         json.putNullable("roleDescription", roleDescription)
         json.put("bounds", JSONArray(listOf(left, top, right, bottom)))

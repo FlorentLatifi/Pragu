@@ -17,6 +17,7 @@ export function rawNode(overrides: Partial<AndroidRawNode> = {}): AndroidRawNode
     text: null,
     contentDescription: null,
     hintText: null,
+    labeledBy: null,
     stateDescription: null,
     roleDescription: null,
     bounds: [0, 0, 100, 100],
@@ -59,8 +60,8 @@ export function captureOf(
   windows: AndroidRawWindow[] = [windowOf(root)],
 ): AndroidCapture {
   return {
-    protocol: 2,
-    agentVersion: '0.0.2',
+    protocol: 3,
+    agentVersion: '0.0.3',
     capturedAt: '2026-10-27T12:00:00.000Z',
     packageName: 'com.example.shop',
     windowTitle: 'Shop',

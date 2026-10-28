@@ -25,7 +25,7 @@ Device / emulator                         Developer machine or CI
 3. Launch the app with `monkey -p <id> -c android.intent.category.LAUNCHER 1`.
 4. `am instrument -w -e socket pragu-<random> dev.pragu.agent/.PraguInstrumentation`, then `adb forward tcp:0 localabstract:pragu-<random>`.
 5. Connect, and retry `hello` until it answers. adb accepts the connection before the agent listens.
-6. `capture {packageName, timeoutMs}`. The agent polls until the app's topmost window is on screen and every window is the same twice, with content in the app. It returns all windows as JSON (protocol 2: trees only for the app's own windows) and the screenshot as PNG.
+6. `capture {packageName, timeoutMs}`. The agent polls until the app's topmost window is on screen and every window is the same twice, with content in the app. It returns all windows as JSON (protocol 3: trees only for the app's own windows, and each node's `labeledBy` label) and the screenshot as PNG.
 7. `shutdown`, then remove the forward.
 8. Validate the capture (`parseAndroidCapture`), normalise it to PAM, decode the PNG, run the rules, and write `pragu-result.json`, `pragu-report.html` and the raw capture.
 9. Exit 0, or 1 when issues reach `--fail-on` (default: error).

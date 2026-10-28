@@ -1,7 +1,7 @@
 {
-  "protocol": 2,
-  "agentVersion": "0.0.2",
-  "capturedAt": "2026-10-28T11:35:42.011635Z",
+  "protocol": 3,
+  "agentVersion": "0.0.3",
+  "capturedAt": "2026-10-28T13:02:02.519969Z",
   "packageName": "dev.pragu.fixtures.rnshop",
   "windowTitle": "rn-shop",
   "screenWidthPx": 1080,
@@ -36,6 +36,7 @@
         "text": null,
         "contentDescription": null,
         "hintText": null,
+        "labeledBy": null,
         "stateDescription": null,
         "roleDescription": null,
         "bounds": [
@@ -70,6 +71,7 @@
             "text": null,
             "contentDescription": null,
             "hintText": null,
+            "labeledBy": null,
             "stateDescription": null,
             "roleDescription": null,
             "bounds": [
@@ -104,6 +106,7 @@
                 "text": null,
                 "contentDescription": null,
                 "hintText": null,
+                "labeledBy": null,
                 "stateDescription": null,
                 "roleDescription": null,
                 "bounds": [
@@ -138,6 +141,7 @@
                     "text": null,
                     "contentDescription": null,
                     "hintText": null,
+                    "labeledBy": null,
                     "stateDescription": null,
                     "roleDescription": null,
                     "bounds": [
@@ -172,6 +176,7 @@
                         "text": null,
                         "contentDescription": null,
                         "hintText": null,
+                        "labeledBy": null,
                         "stateDescription": null,
                         "roleDescription": null,
                         "bounds": [
@@ -206,6 +211,7 @@
                             "text": null,
                             "contentDescription": null,
                             "hintText": null,
+                            "labeledBy": null,
                             "stateDescription": null,
                             "roleDescription": null,
                             "bounds": [
@@ -240,6 +246,7 @@
                                 "text": null,
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -275,6 +282,7 @@
                                 "text": "Your cart",
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -313,6 +321,7 @@
                                 "text": null,
                                 "contentDescription": "Close cart",
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -352,6 +361,7 @@
                                     "text": "×",
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -392,6 +402,7 @@
                                 "text": null,
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -427,6 +438,7 @@
                                 "text": "Spring sale: 20% off mugs",
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -465,6 +477,7 @@
                                 "text": null,
                                 "contentDescription": "Apply code",
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -501,6 +514,7 @@
                                     "text": "Apply code",
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -541,6 +555,7 @@
                                 "text": null,
                                 "contentDescription": "Dismiss promotion",
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -580,6 +595,7 @@
                                     "text": "×",
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -620,6 +636,7 @@
                                 "text": null,
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -655,6 +672,7 @@
                                 "text": "Ceramic mug",
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -693,6 +711,7 @@
                                 "text": "€14.00",
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -731,6 +750,7 @@
                                 "text": null,
                                 "contentDescription": "",
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -767,6 +787,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -802,6 +823,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -839,6 +861,7 @@
                                 "text": null,
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -874,6 +897,7 @@
                                 "text": "Linen tote bag",
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -912,6 +936,7 @@
                                 "text": "€22.00",
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -950,6 +975,7 @@
                                 "text": null,
                                 "contentDescription": "Remove Linen tote bag",
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -989,6 +1015,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -1024,6 +1051,7 @@
                                     "text": null,
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
@@ -1061,6 +1089,7 @@
                                 "text": "Free shipping on orders over €50",
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -1099,6 +1128,7 @@
                                 "text": "Delivery in 2–4 working days",
                                 "contentDescription": null,
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -1137,6 +1167,7 @@
                                 "text": null,
                                 "contentDescription": "Checkout · €36.00",
                                 "hintText": null,
+                                "labeledBy": null,
                                 "stateDescription": null,
                                 "roleDescription": null,
                                 "bounds": [
@@ -1173,6 +1204,7 @@
                                     "text": "Checkout · €36.00",
                                     "contentDescription": null,
                                     "hintText": null,
+                                    "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [

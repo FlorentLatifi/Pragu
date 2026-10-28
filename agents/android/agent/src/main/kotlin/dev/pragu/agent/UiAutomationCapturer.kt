@@ -145,6 +145,7 @@ class UiAutomationCapturer(private val ui: UiAutomation, private val context: Co
             text = node.text?.toString(),
             contentDescription = node.contentDescription?.toString(),
             hintText = node.hintText?.toString(),
+            labeledBy = labelText(node),
             stateDescription = if (Build.VERSION.SDK_INT >= 30) node.stateDescription?.toString() else null,
             roleDescription = node.extras?.getCharSequence(ROLE_DESCRIPTION_KEY)?.toString(),
             left = bounds.left,
@@ -171,6 +172,12 @@ class UiAutomationCapturer(private val ui: UiAutomation, private val context: Co
     // isChecked is deprecated on API 36 in favour of a tri-state getChecked(); the boolean is all protocol 1 needs.
     @Suppress("DEPRECATION")
     private fun isChecked(node: AccessibilityNodeInfo): Boolean = node.isChecked
+
+    /** A field named by another element (labelFor, aria-labelledby) gets that element's words. */
+    private fun labelText(node: AccessibilityNodeInfo): String? {
+        val label = node.labeledBy ?: return null
+        return (label.text ?: label.contentDescription)?.toString()
+    }
 
     /** Rendered text size (API 30+), which decides between WCAG's normal and large text thresholds. */
     private fun textSizePx(node: AccessibilityNodeInfo): Float? {

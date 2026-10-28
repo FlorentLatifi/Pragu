@@ -71,7 +71,8 @@
       "barriers": [
         { "rule": "name/interactive-missing", "testID": "seed-unlabeled-checkbox" },
         { "rule": "contrast/text", "testID": "seed-placeholder-only", "note": "placeholder #B0B0B0 on white is 2.1:1" },
-        { "rule": "input/missing-label", "testID": "seed-placeholder-only" },
+        { "rule": "input/missing-label", "testID": "seed-unlabeled-input", "note": "the \"Promo code\" text above is not connected to it; TalkBack says only \"Edit box\"" },
+        { "rule": "input/placeholder-label", "testID": "seed-placeholder-only", "note": "placeholder only: it disappears from view as soon as someone types" },
         { "rule": "state/not-exposed", "testID": "seed-unlabeled-checkbox" }
       ],
       "correctTwins": [
@@ -81,6 +82,9 @@
         { "rule": "contrast/text", "testID": "twin-labelled-name", "note": "placeholder #6B6963 on white is 5.5:1" },
         { "rule": "contrast/text", "testID": "twin-disabled-text", "note": "inactive components have no contrast requirement (WCAG 1.4.3)" },
         { "rule": "input/missing-label", "testID": "twin-labelled-name" },
+        { "rule": "input/missing-label", "testID": "twin-labelledby-input", "note": "aria-labelledby connects the visible label" },
+        { "rule": "input/missing-label", "testID": "seed-placeholder-only", "note": "its placeholder is the hint, which TalkBack keeps reading after typing; what it lacks is a label that stays in view (input/placeholder-label)" },
+        { "rule": "input/placeholder-label", "testID": "twin-labelled-name" },
         { "rule": "state/not-exposed", "testID": "twin-labeled-switch" }
       ]
     }
