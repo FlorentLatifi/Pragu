@@ -1,3 +1,4 @@
+import { focusUnreachable } from './focus-unreachable.js';
 import { imageMissingName } from './image-missing-name.js';
 import { inputMissingLabel } from './input-missing-label.js';
 import { interactiveMissingName } from './interactive-missing-name.js';
@@ -6,7 +7,15 @@ import { targetSize } from './target-size.js';
 import { textContrast } from './text-contrast.js';
 import type { Rule } from './types.js';
 
-export { imageMissingName, inputMissingLabel, interactiveMissingName, stateNotExposed, targetSize, textContrast };
+export {
+  focusUnreachable,
+  imageMissingName,
+  inputMissingLabel,
+  interactiveMissingName,
+  stateNotExposed,
+  targetSize,
+  textContrast,
+};
 export { requiredTextRatio } from './text-contrast.js';
 export { inScope } from './scope.js';
 export type { Finding, Rule, RuleContext, RuleMeta } from './types.js';
@@ -17,6 +26,7 @@ export const defaultRules: readonly Rule[] = [
   imageMissingName,
   inputMissingLabel,
   stateNotExposed,
+  focusUnreachable,
   textContrast,
   targetSize,
 ];

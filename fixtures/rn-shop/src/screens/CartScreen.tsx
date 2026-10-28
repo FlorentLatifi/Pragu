@@ -142,6 +142,30 @@ export function CartScreen({ confirmRemove = false }: { confirmRemove?: boolean 
         <Text style={styles.optionText}>Add a gift receipt</Text>
       </Pressable>
 
+      {/* Twin: the row is one accessible control that offers the action, so the hidden inner button is fine. */}
+      <Pressable
+        testID="twin-reachable-row"
+        accessibilityRole="button"
+        accessibilityLabel="Delivery on Thursday. Change delivery day"
+        onPress={noop}
+        style={styles.option}
+      >
+        <Text style={styles.optionText}>Delivery on Thursday</Text>
+        <Pressable testID="twin-hidden-inner" importantForAccessibility="no" onPress={noop} style={styles.inlineAction}>
+          <Text style={styles.inlineActionText}>Change</Text>
+        </Pressable>
+      </Pressable>
+      {/* Seeded barrier: hidden from assistive technology, so only touch reaches it (WCAG 2.1.1). */}
+      <Pressable
+        testID="seed-hidden-button"
+        importantForAccessibility="no-hide-descendants"
+        accessibilityRole="button"
+        onPress={noop}
+        style={styles.option}
+      >
+        <Text style={styles.inlineActionText}>Save cart for later</Text>
+      </Pressable>
+
       <Pressable testID="checkout" accessibilityRole="button" onPress={noop} style={styles.checkout}>
         <Text style={styles.checkoutText}>Checkout · €36.00</Text>
       </Pressable>
@@ -206,6 +230,8 @@ const styles = StyleSheet.create({
   },
   boxMark: { width: 12, height: 12, borderRadius: 2, backgroundColor: '#1F5E4B' },
   optionText: { flex: 1, fontSize: 16, color: '#1A1A18', marginLeft: 12 },
+  inlineAction: { minHeight: 48, paddingHorizontal: 12, justifyContent: 'center' },
+  inlineActionText: { fontSize: 16, fontWeight: '600', color: '#1F5E4B' },
   checkout: {
     marginTop: 28,
     height: 52,

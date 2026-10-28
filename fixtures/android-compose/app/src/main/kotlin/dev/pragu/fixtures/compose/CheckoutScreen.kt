@@ -18,6 +18,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,6 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 
@@ -123,6 +125,11 @@ fun CheckoutScreen() {
                     .background(if (giftWrap) Green else Color.Transparent, RoundedCornerShape(4.dp)),
             )
             Text("Gift wrap this order", color = Ink, modifier = Modifier.padding(start = 22.dp))
+        }
+
+        // Seeded barrier: hideFromAccessibility() keeps the button working by touch only.
+        TextButton(onClick = {}, modifier = Modifier.semantics { hideFromAccessibility() }.testTag("seed-hidden-button")) {
+            Text("Save cart for later")
         }
 
         Button(onClick = {}, modifier = Modifier.fillMaxWidth().padding(top = 16.dp).testTag("twin-pay-button")) {

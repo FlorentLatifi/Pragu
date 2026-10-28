@@ -142,6 +142,7 @@ describe('summarize', () => {
         'name/image-missing',
         'input/missing-label',
         'state/not-exposed',
+        'focus/unreachable',
         'contrast/text',
         'target/size',
       ],

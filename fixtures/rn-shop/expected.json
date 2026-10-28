@@ -10,12 +10,15 @@
       "url": "rnshop://cart",
       "marker": "screen-cart",
       "barriers": [
+        { "rule": "focus/unreachable", "testID": "seed-hidden-button", "note": "importantForAccessibility=\"no-hide-descendants\": works by touch only" },
         { "rule": "name/interactive-missing", "testID": "seed-unlabeled-remove" },
         { "rule": "contrast/text", "testID": "seed-low-contrast" },
         { "rule": "target/size", "testID": "seed-tiny-dismiss" },
         { "rule": "state/not-exposed", "testID": "seed-stateless-checkbox", "note": "accessibilityRole=\"checkbox\" without a checked state: TalkBack says \"Checkbox\" but never \"checked\"" }
       ],
       "correctTwins": [
+        { "rule": "focus/unreachable", "testID": "twin-hidden-inner", "note": "hidden inside a row that is one accessible control offering the same action" },
+        { "rule": "focus/unreachable", "testID": "twin-reachable-row" },
         { "rule": "name/interactive-missing", "testID": "twin-labeled-remove" },
         { "rule": "name/interactive-missing", "testID": "twin-stateful-checkbox" },
         { "rule": "name/interactive-missing", "testID": "seed-stateless-checkbox", "note": "named by its text; only its state is missing" },

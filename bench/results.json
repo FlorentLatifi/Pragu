@@ -55,6 +55,18 @@
       "mcc": 0.5976
     },
     {
+      "rule": "focus/unreachable",
+      "severity": "error",
+      "tp": 1,
+      "fp": 0,
+      "fn": 1,
+      "tn": 3,
+      "precision": 1,
+      "recall": 0.5,
+      "f1": 0.6666,
+      "mcc": 0.6123
+    },
+    {
       "rule": "contrast/text",
       "severity": "error",
       "tp": 6,
@@ -90,6 +102,13 @@
     }
   ],
   "falseNegatives": [
+    {
+      "fixture": "android-compose",
+      "screen": "checkout",
+      "rule": "focus/unreachable",
+      "element": "seed-hidden-button",
+      "note": "hideFromAccessibility(): Compose reports the node as not visible to the user, the same signal as off-screen content, so Pragu stays silent rather than guess. Its text stays readable but cannot be activated"
+    },
     {
       "fixture": "android-compose",
       "screen": "checkout",

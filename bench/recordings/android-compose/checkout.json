@@ -1,7 +1,7 @@
 {
   "protocol": 3,
   "agentVersion": "0.0.3",
-  "capturedAt": "2026-10-28T14:18:53.964411Z",
+  "capturedAt": "2026-10-28T14:53:38.918240Z",
   "packageName": "dev.pragu.fixtures.compose",
   "windowTitle": "Compose shop",
   "screenWidthPx": 1080,
@@ -1077,7 +1077,7 @@
                               {
                                 "className": "android.view.View",
                                 "packageName": "dev.pragu.fixtures.compose",
-                                "resourceId": "twin-pay-button",
+                                "resourceId": "seed-hidden-button",
                                 "text": null,
                                 "contentDescription": null,
                                 "hintText": null,
@@ -1086,9 +1086,9 @@
                                 "roleDescription": null,
                                 "bounds": [
                                   42,
-                                  1283,
-                                  1038,
-                                  1409
+                                  1241,
+                                  399,
+                                  1367
                                 ],
                                 "clickable": true,
                                 "longClickable": false,
@@ -1097,10 +1097,10 @@
                                 "checked": false,
                                 "enabled": true,
                                 "editable": false,
-                                "visibleToUser": true,
-                                "importantForAccessibility": true,
+                                "visibleToUser": false,
+                                "importantForAccessibility": false,
                                 "heading": false,
-                                "screenReaderFocusable": true,
+                                "screenReaderFocusable": false,
                                 "actions": [
                                   1,
                                   64,
@@ -1112,17 +1112,17 @@
                                     "className": "android.widget.TextView",
                                     "packageName": "dev.pragu.fixtures.compose",
                                     "resourceId": null,
-                                    "text": "Pay €36.00",
+                                    "text": "Save cart for later",
                                     "contentDescription": null,
                                     "hintText": null,
                                     "labeledBy": null,
                                     "stateDescription": null,
                                     "roleDescription": null,
                                     "bounds": [
-                                      449,
-                                      1319,
-                                      631,
-                                      1372
+                                      74,
+                                      1277,
+                                      367,
+                                      1330
                                     ],
                                     "clickable": false,
                                     "longClickable": false,
@@ -1156,9 +1156,114 @@
                                     "roleDescription": null,
                                     "bounds": [
                                       42,
-                                      1293,
+                                      1251,
+                                      399,
+                                      1356
+                                    ],
+                                    "clickable": false,
+                                    "longClickable": false,
+                                    "focusable": false,
+                                    "checkable": false,
+                                    "checked": false,
+                                    "enabled": true,
+                                    "editable": false,
+                                    "visibleToUser": true,
+                                    "importantForAccessibility": true,
+                                    "heading": false,
+                                    "screenReaderFocusable": false,
+                                    "actions": [
+                                      64
+                                    ],
+                                    "textSizePx": null,
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "className": "android.view.View",
+                                "packageName": "dev.pragu.fixtures.compose",
+                                "resourceId": "twin-pay-button",
+                                "text": null,
+                                "contentDescription": null,
+                                "hintText": null,
+                                "labeledBy": null,
+                                "stateDescription": null,
+                                "roleDescription": null,
+                                "bounds": [
+                                  42,
+                                  1409,
+                                  1038,
+                                  1535
+                                ],
+                                "clickable": true,
+                                "longClickable": false,
+                                "focusable": true,
+                                "checkable": false,
+                                "checked": false,
+                                "enabled": true,
+                                "editable": false,
+                                "visibleToUser": true,
+                                "importantForAccessibility": true,
+                                "heading": false,
+                                "screenReaderFocusable": true,
+                                "actions": [
+                                  1,
+                                  64,
+                                  16
+                                ],
+                                "textSizePx": null,
+                                "children": [
+                                  {
+                                    "className": "android.widget.TextView",
+                                    "packageName": "dev.pragu.fixtures.compose",
+                                    "resourceId": null,
+                                    "text": "Pay €36.00",
+                                    "contentDescription": null,
+                                    "hintText": null,
+                                    "labeledBy": null,
+                                    "stateDescription": null,
+                                    "roleDescription": null,
+                                    "bounds": [
+                                      449,
+                                      1445,
+                                      631,
+                                      1498
+                                    ],
+                                    "clickable": false,
+                                    "longClickable": false,
+                                    "focusable": false,
+                                    "checkable": false,
+                                    "checked": false,
+                                    "enabled": true,
+                                    "editable": false,
+                                    "visibleToUser": true,
+                                    "importantForAccessibility": true,
+                                    "heading": false,
+                                    "screenReaderFocusable": false,
+                                    "actions": [
+                                      256,
+                                      512,
+                                      64,
+                                      131072
+                                    ],
+                                    "textSizePx": null,
+                                    "children": []
+                                  },
+                                  {
+                                    "className": "android.widget.Button",
+                                    "packageName": "dev.pragu.fixtures.compose",
+                                    "resourceId": null,
+                                    "text": null,
+                                    "contentDescription": null,
+                                    "hintText": null,
+                                    "labeledBy": null,
+                                    "stateDescription": null,
+                                    "roleDescription": null,
+                                    "bounds": [
+                                      42,
+                                      1419,
                                       1038,
-                                      1398
+                                      1524
                                     ],
                                     "clickable": false,
                                     "longClickable": false,
@@ -1191,9 +1296,9 @@
                                 "roleDescription": null,
                                 "bounds": [
                                   42,
-                                  1430,
+                                  1556,
                                   1038,
-                                  1556
+                                  1682
                                 ],
                                 "clickable": true,
                                 "longClickable": false,
@@ -1223,9 +1328,9 @@
                                     "roleDescription": null,
                                     "bounds": [
                                       415,
-                                      1466,
+                                      1592,
                                       665,
-                                      1519
+                                      1645
                                     ],
                                     "clickable": false,
                                     "longClickable": false,
@@ -1259,9 +1364,9 @@
                                     "roleDescription": null,
                                     "bounds": [
                                       42,
-                                      1440,
+                                      1566,
                                       1038,
-                                      1545
+                                      1671
                                     ],
                                     "clickable": false,
                                     "longClickable": false,

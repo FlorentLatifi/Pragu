@@ -37,6 +37,7 @@
       "url": "composeshop://checkout",
       "marker": "screen-checkout",
       "barriers": [
+        { "rule": "focus/unreachable", "testID": "seed-hidden-button", "note": "hideFromAccessibility(): Compose reports the node as not visible to the user, the same signal as off-screen content, so Pragu stays silent rather than guess. Its text stays readable but cannot be activated" },
         { "rule": "name/interactive-missing", "testID": "seed-custom-checkbox", "note": "clickable Box drawn as a checkbox" },
         { "rule": "state/not-exposed", "testID": "seed-custom-checkbox", "note": "no role either: nothing in the tree says it is a checkbox, so a scan cannot tell it from a button. Seeing it needs a tap (crawler, M3)" },
         { "rule": "state/not-exposed", "testID": "seed-stateless-checkbox", "note": "clickable(role = Role.Checkbox): a checkbox role with no state" },
@@ -44,6 +45,7 @@
         { "rule": "input/placeholder-label", "testID": "seed-placeholder-field", "note": "placeholder only: once someone types, it disappears from view and from the accessibility tree. A scan of the empty field cannot tell it from a label" }
       ],
       "correctTwins": [
+        { "rule": "focus/unreachable", "testID": "twin-pay-button" },
         { "rule": "name/interactive-missing", "testID": "twin-checkbox-row", "note": "toggleable Row: the Checkbox is named by the row's text" },
         { "rule": "name/interactive-missing", "testID": "twin-pay-button" },
         { "rule": "state/not-exposed", "testID": "twin-checkbox-row" },

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  focusUnreachable,
   imageMissingName,
   inputMissingLabel,
   interactiveMissingName,
@@ -88,6 +89,40 @@ describe('input/missing-label', () => {
         field({ id: '1', exposedToAssistiveTech: false }),
         field({ id: '2', visible: false }),
         field({ id: '3', inWebView: true }),
+      ]),
+    ).toEqual([]);
+  });
+});
+
+describe('focus/unreachable', () => {
+  const check = (nodes: Parameters<typeof screenOf>[0]) =>
+    focusUnreachable.check({ screen: screenOf(nodes), device, raster: null });
+
+  it('flags a control that responds to touch but is hidden from assistive technology', () => {
+    const findings = check([pamNode({ id: '0', name: 'Save for later', exposedToAssistiveTech: false })]);
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.message).toBe(
+      'This control responds to touch but is hidden from assistive technology, so screen readers, Switch Access and keyboards never reach it.',
+    );
+    expect(findings[0]?.evidence).toEqual({ role: 'button', platformRole: 'android.widget.Button' });
+  });
+
+  it('accepts a hidden control inside a row that is itself one accessible control', () => {
+    const row = pamNode({ id: '0', childIds: ['0.0'], name: 'Ceramic mug, €14.00' });
+    const inner = pamNode({ id: '0.0', parentId: '0', exposedToAssistiveTech: false });
+    expect(check([row, inner])).toEqual([]);
+    const hiddenRow = pamNode({ id: '0', childIds: ['0.0'], exposedToAssistiveTech: false });
+    expect(check([hiddenRow, inner]).map((finding) => finding.node.id)).toEqual(['0', '0.0']);
+  });
+
+  it('leaves exposed, disabled, static, off-screen and web controls alone', () => {
+    expect(
+      check([
+        pamNode({ id: '0' }),
+        pamNode({ id: '1', exposedToAssistiveTech: false, enabled: false }),
+        pamNode({ id: '2', exposedToAssistiveTech: false, interactive: false }),
+        pamNode({ id: '3', exposedToAssistiveTech: false, visible: false }),
+        pamNode({ id: '4', exposedToAssistiveTech: false, inWebView: true }),
       ]),
     ).toEqual([]);
   });
