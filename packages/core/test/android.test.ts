@@ -160,6 +160,15 @@ describe('normalizeAndroidCapture', () => {
     expect(screen.nodes[2]).toMatchObject({ role: 'text', interactive: false, name: 'Free shipping' });
   });
 
+  it('exposes a checked state only for checkable nodes, and keeps the state text', () => {
+    const normalize = (raw: AndroidRawNode) =>
+      normalizeAndroidCapture(captureOf(raw), { screenId: 's', screenName: 's', screenshotFile: null }).screen.nodes[0];
+    expect(normalize(rawNode({ checkable: true, checked: true }))).toMatchObject({ checked: true });
+    expect(normalize(rawNode({ checkable: true }))).toMatchObject({ checked: false });
+    expect(normalize(rawNode({ checked: true }))).toMatchObject({ checked: null, stateDescription: null });
+    expect(normalize(rawNode({ stateDescription: ' On ' }))?.stateDescription).toBe('On');
+  });
+
   it('treats zero-size nodes as invisible', () => {
     expect(screen.nodes[3]?.visible).toBe(false);
   });
@@ -225,6 +234,24 @@ describe('Compose', () => {
       ],
     });
     expect(normalize(unlabelledSwitch).nodes[1]).toMatchObject({ role: 'switch', name: null, interactive: true });
+  });
+
+  it('sees a checkbox role but no state on clickable(role = Role.Checkbox)', () => {
+    const giftWrap = rawNode({
+      className: 'android.view.View',
+      clickable: true,
+      focusable: true,
+      children: [
+        rawNode({ className: 'android.widget.CheckBox' }),
+        rawNode({ className: 'android.widget.TextView', text: 'Gift wrap this order' }),
+      ],
+    });
+    expect(normalize(giftWrap).nodes[1]).toMatchObject({
+      role: 'checkbox',
+      name: 'Gift wrap this order',
+      checked: null,
+      stateDescription: null,
+    });
   });
 
   it('marks the bounds of Compose controls as touch areas, and nothing else', () => {

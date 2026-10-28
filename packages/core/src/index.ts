@@ -25,6 +25,7 @@ export {
   inputMissingLabel,
   interactiveMissingName,
   requiredTextRatio,
+  stateNotExposed,
   targetSize,
   textContrast,
 } from './rules/index.js';

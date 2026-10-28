@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
 import { CloseIcon, TrashIcon } from '../components/icons';
 
@@ -47,8 +48,10 @@ function RemoveDialog() {
   );
 }
 
-// Three seeded barriers, each next to a correct twin (see expected.json).
+// Seeded barriers, each next to a correct twin (see expected.json).
 export function CartScreen({ confirmRemove = false }: { confirmRemove?: boolean }) {
+  const [giftWrap, setGiftWrap] = useState(true);
+  const [giftReceipt, setGiftReceipt] = useState(false);
   return (
     <View style={styles.screen}>
       <View style={styles.header}>
@@ -118,6 +121,27 @@ export function CartScreen({ confirmRemove = false }: { confirmRemove?: boolean 
         Delivery in 2–4 working days
       </Text>
 
+      {/* Seeded barrier: it says it is a checkbox but never whether it is checked (WCAG 4.1.2). */}
+      <Pressable
+        testID="seed-stateless-checkbox"
+        accessibilityRole="checkbox"
+        onPress={() => setGiftWrap(!giftWrap)}
+        style={styles.option}
+      >
+        <View style={styles.box}>{giftWrap ? <View style={styles.boxMark} /> : null}</View>
+        <Text style={styles.optionText}>Gift wrap this order</Text>
+      </Pressable>
+      <Pressable
+        testID="twin-stateful-checkbox"
+        accessibilityRole="checkbox"
+        aria-checked={giftReceipt}
+        onPress={() => setGiftReceipt(!giftReceipt)}
+        style={styles.option}
+      >
+        <View style={styles.box}>{giftReceipt ? <View style={styles.boxMark} /> : null}</View>
+        <Text style={styles.optionText}>Add a gift receipt</Text>
+      </Pressable>
+
       <Pressable testID="checkout" accessibilityRole="button" onPress={noop} style={styles.checkout}>
         <Text style={styles.checkoutText}>Checkout · €36.00</Text>
       </Pressable>
@@ -170,6 +194,18 @@ const styles = StyleSheet.create({
   iconButton: { width: 48, height: 48, alignItems: 'center', justifyContent: 'center' },
   lowContrast: { fontSize: 14, color: '#A3A3A3', marginTop: 20 },
   goodContrast: { fontSize: 14, color: '#595959', marginTop: 8 },
+  option: { flexDirection: 'row', alignItems: 'center', minHeight: 48, marginTop: 8 },
+  box: {
+    width: 24,
+    height: 24,
+    borderRadius: 4,
+    borderWidth: 2,
+    borderColor: '#1A1A18',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  boxMark: { width: 12, height: 12, borderRadius: 2, backgroundColor: '#1F5E4B' },
+  optionText: { flex: 1, fontSize: 16, color: '#1A1A18', marginLeft: 12 },
   checkout: {
     marginTop: 28,
     height: 52,

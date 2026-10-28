@@ -4,7 +4,7 @@ An Expo app whose screens seed accessibility barriers next to correct twins. Pra
 
 | Screen | Deep link | Seeded barriers | Tricky correct twins |
 |---|---|---|---|
-| Cart | `rnshop://cart` | Unlabelled icon button; `#A3A3A3` text (2.5:1); 16 dp button 2 dp from another | Labelled icon button; 7:1 text; 48 dp button |
+| Cart | `rnshop://cart` | Unlabelled icon button; `#A3A3A3` text (2.5:1); 16 dp button 2 dp from another; checkbox role with no checked state | Labelled icon button; 7:1 text; 48 dp button; checkbox with `aria-checked` |
 | Cart with dialog | `rnshop://cart?dialog=remove` | Unlabelled close button and `#AAAAAA` text (2.3:1) inside a React Native `Modal` (its own window) | The cart's three barriers, now behind the dialog: nobody can act on them while it is open, so they must not be reported |
 | Product | `rnshop://product` | Two unlabelled icon buttons; white on yellow badge (1.5:1); pale SKU (2.3:1); 20 dp stepper buttons crowded together | 26 dp title at 3.4:1 (large text needs only 3:1); text over a busy "photo"; isolated 20 dp icon (WCAG spacing exception); 16 dp icon with `hitSlop` making its real touch area 48 dp |
 | Delivery form | `rnshop://form` | Home-made checkbox with no name, role or state; field labelled only by a pale placeholder (2.1:1); field whose visible label is not connected to it | Labelled field; field connected to its label with `aria-labelledby`; labelled switch; disabled button with grey text (WCAG exempts inactive components) |

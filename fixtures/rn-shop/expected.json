@@ -12,12 +12,16 @@
       "barriers": [
         { "rule": "name/interactive-missing", "testID": "seed-unlabeled-remove" },
         { "rule": "contrast/text", "testID": "seed-low-contrast" },
-        { "rule": "target/size", "testID": "seed-tiny-dismiss" }
+        { "rule": "target/size", "testID": "seed-tiny-dismiss" },
+        { "rule": "state/not-exposed", "testID": "seed-stateless-checkbox", "note": "accessibilityRole=\"checkbox\" without a checked state: TalkBack says \"Checkbox\" but never \"checked\"" }
       ],
       "correctTwins": [
         { "rule": "name/interactive-missing", "testID": "twin-labeled-remove" },
+        { "rule": "name/interactive-missing", "testID": "twin-stateful-checkbox" },
+        { "rule": "name/interactive-missing", "testID": "seed-stateless-checkbox", "note": "named by its text; only its state is missing" },
         { "rule": "contrast/text", "testID": "twin-good-contrast" },
-        { "rule": "target/size", "testID": "twin-close-cart" }
+        { "rule": "target/size", "testID": "twin-close-cart" },
+        { "rule": "state/not-exposed", "testID": "twin-stateful-checkbox", "note": "aria-checked exposes the state" }
       ]
     },
     {
@@ -73,7 +77,7 @@
         { "rule": "contrast/text", "testID": "seed-placeholder-only", "note": "placeholder #B0B0B0 on white is 2.1:1" },
         { "rule": "input/missing-label", "testID": "seed-unlabeled-input", "note": "the \"Promo code\" text above is not connected to it; TalkBack says only \"Edit box\"" },
         { "rule": "input/placeholder-label", "testID": "seed-placeholder-only", "note": "placeholder only: it disappears from view as soon as someone types" },
-        { "rule": "state/not-exposed", "testID": "seed-unlabeled-checkbox" }
+        { "rule": "state/not-exposed", "testID": "seed-unlabeled-checkbox", "note": "no role either: nothing in the tree says it is a checkbox, so a scan cannot tell it from a button. Seeing it needs a tap (crawler, M3)" }
       ],
       "correctTwins": [
         { "rule": "name/interactive-missing", "testID": "twin-labeled-switch" },

@@ -4,9 +4,10 @@
 
 /**
  * Version of the JSON result contract written to pragu-result.json.
- * 0.2.0 added windows; 0.3.0 added `PamNode.boundsAreTouchArea`.
+ * 0.2.0 added windows; 0.3.0 added `PamNode.boundsAreTouchArea`; 0.4.0 added
+ * `PamNode.checked` and `stateDescription`.
  */
-export const RESULT_SCHEMA_VERSION = '0.3.0';
+export const RESULT_SCHEMA_VERSION = '0.4.0';
 
 export type Platform = 'android' | 'ios';
 export type Severity = 'error' | 'warning' | 'info';
@@ -71,6 +72,10 @@ export interface PamNode {
   /** Index into PamScreen.windows of the window this element belongs to. */
   window: number;
   enabled: boolean;
+  /** Checked or not, as a screen reader announces it; null when the element exposes no checked state. */
+  checked: boolean | null;
+  /** The platform's own state text, e.g. "On" or "Expanded". */
+  stateDescription: string | null;
   /** Rendered text size, when the platform reports it. */
   textSizeDp: number | null;
 }

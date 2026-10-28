@@ -36,7 +36,8 @@ private val Ink = Color(0xFF1A1A18)
 private val Green = Color(0xFF1F5E4B)
 
 // Seeds: a field labelled only by its placeholder, a field whose visible label is not
-// connected to it, and a home-made checkbox with no name, role or state. Twins: a field
+// connected to it, a home-made checkbox with no name, role or state, and a checkbox role
+// with no state. Twins: a field
 // with a real label, a toggleable checkbox row, a text button, and a disabled button
 // (WCAG sets no contrast requirement for it).
 @Composable
@@ -46,6 +47,7 @@ fun CheckoutScreen() {
     var promo by remember { mutableStateOf("") }
     var terms by remember { mutableStateOf(false) }
     var saveCard by remember { mutableStateOf(false) }
+    var giftWrap by remember { mutableStateOf(true) }
     Column(Modifier.fillMaxSize().padding(start = 16.dp, end = 16.dp, top = 48.dp)) {
         Text(
             "Checkout",
@@ -101,6 +103,26 @@ fun CheckoutScreen() {
                 )
             }
             Text("Save this card", color = Ink)
+        }
+
+        // Seeded barrier: clickable(role = Role.Checkbox) gives a checkbox role but no state, so
+        // TalkBack never says "checked". toggleable exposes both.
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .heightIn(min = 48.dp)
+                .clickable(role = Role.Checkbox) { giftWrap = !giftWrap }
+                .testTag("seed-stateless-checkbox"),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Box(
+                Modifier
+                    .padding(start = 14.dp)
+                    .size(20.dp)
+                    .border(2.dp, Ink, RoundedCornerShape(4.dp))
+                    .background(if (giftWrap) Green else Color.Transparent, RoundedCornerShape(4.dp)),
+            )
+            Text("Gift wrap this order", color = Ink, modifier = Modifier.padding(start = 22.dp))
         }
 
         Button(onClick = {}, modifier = Modifier.fillMaxWidth().padding(top = 16.dp).testTag("twin-pay-button")) {

@@ -333,6 +333,8 @@ export function normalizeAndroidCapture(
       inWebView,
       window: context.windowIndex,
       enabled: raw.enabled,
+      checked: raw.checkable ? raw.checked : null,
+      stateDescription: nonBlank(raw.stateDescription),
       textSizeDp: raw.textSizePx === null ? null : round1(raw.textSizePx / density),
     };
     nodes.push(node);

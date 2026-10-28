@@ -12,7 +12,7 @@
       "tp": 8,
       "fp": 0,
       "fn": 0,
-      "tn": 13,
+      "tn": 16,
       "precision": 1,
       "recall": 1,
       "f1": 1,
@@ -29,6 +29,18 @@
       "recall": 1,
       "f1": 1,
       "mcc": 1
+    },
+    {
+      "rule": "state/not-exposed",
+      "severity": "error",
+      "tp": 2,
+      "fp": 0,
+      "fn": 2,
+      "tn": 5,
+      "precision": 1,
+      "recall": 0.5,
+      "f1": 0.6666,
+      "mcc": 0.5976
     },
     {
       "rule": "contrast/text",
@@ -68,6 +80,13 @@
   "falseNegatives": [
     {
       "fixture": "android-compose",
+      "screen": "checkout",
+      "rule": "state/not-exposed",
+      "element": "seed-custom-checkbox",
+      "note": "no role either: nothing in the tree says it is a checkbox, so a scan cannot tell it from a button. Seeing it needs a tap (crawler, M3)"
+    },
+    {
+      "fixture": "android-compose",
       "screen": "settings",
       "rule": "target/size",
       "element": "seed-crowded-star-2",
@@ -86,16 +105,18 @@
       "rule": "target/size",
       "element": "seed-crowded-star-4",
       "note": "as star 2"
+    },
+    {
+      "fixture": "rn-shop",
+      "screen": "form",
+      "rule": "state/not-exposed",
+      "element": "seed-unlabeled-checkbox",
+      "note": "no role either: nothing in the tree says it is a checkbox, so a scan cannot tell it from a button. Seeing it needs a tap (crawler, M3)"
     }
   ],
   "awaiting": [
     {
       "rule": "input/placeholder-label",
-      "barriers": 2,
-      "correctTwins": 2
-    },
-    {
-      "rule": "state/not-exposed",
       "barriers": 2,
       "correctTwins": 2
     }

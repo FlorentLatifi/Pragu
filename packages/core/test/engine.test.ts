@@ -137,7 +137,13 @@ describe('summarize', () => {
       errors: 2,
       warnings: 1,
       infos: 0,
-      rulesRun: ['name/interactive-missing', 'input/missing-label', 'contrast/text', 'target/size'],
+      rulesRun: [
+        'name/interactive-missing',
+        'input/missing-label',
+        'state/not-exposed',
+        'contrast/text',
+        'target/size',
+      ],
     });
   });
 });

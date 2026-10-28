@@ -1,7 +1,7 @@
 {
   "protocol": 3,
   "agentVersion": "0.0.3",
-  "capturedAt": "2026-10-28T13:01:53.736273Z",
+  "capturedAt": "2026-10-28T14:18:53.964411Z",
   "packageName": "dev.pragu.fixtures.compose",
   "windowTitle": "Compose shop",
   "screenWidthPx": 1080,
@@ -879,7 +879,7 @@
                                       43,
                                       989,
                                       169,
-                                      1115
+                                      1114
                                     ],
                                     "clickable": false,
                                     "longClickable": false,
@@ -939,6 +939,144 @@
                               {
                                 "className": "android.view.View",
                                 "packageName": "dev.pragu.fixtures.compose",
+                                "resourceId": "seed-stateless-checkbox",
+                                "text": null,
+                                "contentDescription": null,
+                                "hintText": null,
+                                "labeledBy": null,
+                                "stateDescription": null,
+                                "roleDescription": null,
+                                "bounds": [
+                                  42,
+                                  1114,
+                                  1038,
+                                  1240
+                                ],
+                                "clickable": true,
+                                "longClickable": false,
+                                "focusable": true,
+                                "checkable": false,
+                                "checked": false,
+                                "enabled": true,
+                                "editable": false,
+                                "visibleToUser": true,
+                                "importantForAccessibility": true,
+                                "heading": false,
+                                "screenReaderFocusable": true,
+                                "actions": [
+                                  1,
+                                  64,
+                                  16
+                                ],
+                                "textSizePx": null,
+                                "children": [
+                                  {
+                                    "className": "android.view.View",
+                                    "packageName": "dev.pragu.fixtures.compose",
+                                    "resourceId": null,
+                                    "text": null,
+                                    "contentDescription": null,
+                                    "hintText": null,
+                                    "labeledBy": null,
+                                    "stateDescription": null,
+                                    "roleDescription": null,
+                                    "bounds": [
+                                      43,
+                                      1115,
+                                      169,
+                                      1241
+                                    ],
+                                    "clickable": false,
+                                    "longClickable": false,
+                                    "focusable": false,
+                                    "checkable": false,
+                                    "checked": false,
+                                    "enabled": true,
+                                    "editable": false,
+                                    "visibleToUser": true,
+                                    "importantForAccessibility": false,
+                                    "heading": false,
+                                    "screenReaderFocusable": false,
+                                    "actions": [
+                                      64
+                                    ],
+                                    "textSizePx": null,
+                                    "children": []
+                                  },
+                                  {
+                                    "className": "android.widget.TextView",
+                                    "packageName": "dev.pragu.fixtures.compose",
+                                    "resourceId": null,
+                                    "text": "Gift wrap this order",
+                                    "contentDescription": null,
+                                    "hintText": null,
+                                    "labeledBy": null,
+                                    "stateDescription": null,
+                                    "roleDescription": null,
+                                    "bounds": [
+                                      190,
+                                      1146,
+                                      573,
+                                      1209
+                                    ],
+                                    "clickable": false,
+                                    "longClickable": false,
+                                    "focusable": false,
+                                    "checkable": false,
+                                    "checked": false,
+                                    "enabled": true,
+                                    "editable": false,
+                                    "visibleToUser": true,
+                                    "importantForAccessibility": true,
+                                    "heading": false,
+                                    "screenReaderFocusable": false,
+                                    "actions": [
+                                      256,
+                                      512,
+                                      64,
+                                      131072
+                                    ],
+                                    "textSizePx": null,
+                                    "children": []
+                                  },
+                                  {
+                                    "className": "android.widget.CheckBox",
+                                    "packageName": "dev.pragu.fixtures.compose",
+                                    "resourceId": null,
+                                    "text": null,
+                                    "contentDescription": null,
+                                    "hintText": null,
+                                    "labeledBy": null,
+                                    "stateDescription": null,
+                                    "roleDescription": null,
+                                    "bounds": [
+                                      42,
+                                      1114,
+                                      1038,
+                                      1240
+                                    ],
+                                    "clickable": false,
+                                    "longClickable": false,
+                                    "focusable": false,
+                                    "checkable": false,
+                                    "checked": false,
+                                    "enabled": true,
+                                    "editable": false,
+                                    "visibleToUser": true,
+                                    "importantForAccessibility": true,
+                                    "heading": false,
+                                    "screenReaderFocusable": false,
+                                    "actions": [
+                                      64
+                                    ],
+                                    "textSizePx": null,
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "className": "android.view.View",
+                                "packageName": "dev.pragu.fixtures.compose",
                                 "resourceId": "twin-pay-button",
                                 "text": null,
                                 "contentDescription": null,
@@ -948,9 +1086,9 @@
                                 "roleDescription": null,
                                 "bounds": [
                                   42,
-                                  1157,
+                                  1283,
                                   1038,
-                                  1283
+                                  1409
                                 ],
                                 "clickable": true,
                                 "longClickable": false,
@@ -982,9 +1120,9 @@
                                     "roleDescription": null,
                                     "bounds": [
                                       449,
-                                      1193,
+                                      1319,
                                       631,
-                                      1246
+                                      1372
                                     ],
                                     "clickable": false,
                                     "longClickable": false,
@@ -1018,9 +1156,9 @@
                                     "roleDescription": null,
                                     "bounds": [
                                       42,
-                                      1167,
+                                      1293,
                                       1038,
-                                      1272
+                                      1398
                                     ],
                                     "clickable": false,
                                     "longClickable": false,
@@ -1053,9 +1191,9 @@
                                 "roleDescription": null,
                                 "bounds": [
                                   42,
-                                  1304,
+                                  1430,
                                   1038,
-                                  1430
+                                  1556
                                 ],
                                 "clickable": true,
                                 "longClickable": false,
@@ -1085,9 +1223,9 @@
                                     "roleDescription": null,
                                     "bounds": [
                                       415,
-                                      1340,
+                                      1466,
                                       665,
-                                      1393
+                                      1519
                                     ],
                                     "clickable": false,
                                     "longClickable": false,
@@ -1121,9 +1259,9 @@
                                     "roleDescription": null,
                                     "bounds": [
                                       42,
-                                      1314,
+                                      1440,
                                       1038,
-                                      1419
+                                      1545
                                     ],
                                     "clickable": false,
                                     "longClickable": false,

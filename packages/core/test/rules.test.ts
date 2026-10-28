@@ -3,6 +3,7 @@ import {
   inputMissingLabel,
   interactiveMissingName,
   requiredTextRatio,
+  stateNotExposed,
   targetSize,
   textContrast,
 } from '../src/index.js';
@@ -86,6 +87,47 @@ describe('input/missing-label', () => {
         field({ id: '1', exposedToAssistiveTech: false }),
         field({ id: '2', visible: false }),
         field({ id: '3', inWebView: true }),
+      ]),
+    ).toEqual([]);
+  });
+});
+
+describe('state/not-exposed', () => {
+  const check = (nodes: Parameters<typeof screenOf>[0]) =>
+    stateNotExposed.check({ screen: screenOf(nodes), device, raster: null });
+
+  it('flags a checkbox, switch or radio button that exposes no state, in the words a screen reader uses', () => {
+    const findings = check([
+      pamNode({ id: '0', role: 'checkbox', platformRole: 'android.widget.CheckBox', name: 'Gift wrap' }),
+      pamNode({ id: '1', role: 'switch', name: 'Dark theme' }),
+      pamNode({ id: '2', role: 'radio', name: 'Express' }),
+    ]);
+    expect(findings.map((finding) => finding.node.id)).toEqual(['0', '1', '2']);
+    expect(findings[0]?.message).toBe(
+      'This checkbox never says whether it is checked. A screen reader announces "Checkbox" but not "checked" or "not checked", so people cannot tell what they chose.',
+    );
+    expect(findings[0]?.evidence).toEqual({ role: 'checkbox', platformRole: 'android.widget.CheckBox' });
+    expect(findings[1]?.message).toContain('not "on" or "off"');
+    expect(findings[2]?.message).toContain('not "selected"');
+  });
+
+  it('accepts a checked state or a state description, and ignores other roles', () => {
+    expect(
+      check([
+        pamNode({ id: '0', role: 'checkbox', checked: false }),
+        pamNode({ id: '1', role: 'switch', stateDescription: 'On' }),
+        pamNode({ id: '2', role: 'button' }),
+      ]),
+    ).toEqual([]);
+  });
+
+  it('skips role-only children that TalkBack reads with their parent, and hidden or off-screen controls', () => {
+    expect(
+      check([
+        pamNode({ id: '0', role: 'checkbox', interactive: false }),
+        pamNode({ id: '1', role: 'checkbox', exposedToAssistiveTech: false }),
+        pamNode({ id: '2', role: 'checkbox', visible: false }),
+        pamNode({ id: '3', role: 'switch', inWebView: true }),
       ]),
     ).toEqual([]);
   });

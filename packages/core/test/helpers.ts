@@ -117,6 +117,8 @@ export function pamNode(overrides: Partial<PamNode> & { id: string }): PamNode {
     inWebView: false,
     window: 0,
     enabled: true,
+    checked: null,
+    stateDescription: null,
     textSizeDp: null,
     ...overrides,
   };

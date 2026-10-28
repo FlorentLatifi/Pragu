@@ -20,6 +20,8 @@
       "correctTwins": [
         { "rule": "name/interactive-missing", "testID": "twin-labeled-back" },
         { "rule": "name/interactive-missing", "testID": "twin-labeled-switch-row", "note": "toggleable Row: the Switch is named by the row's text" },
+        { "rule": "state/not-exposed", "testID": "twin-labeled-switch-row" },
+        { "rule": "state/not-exposed", "testID": "seed-unlabeled-switch", "note": "unnamed, but its state (Off) is exposed" },
         { "rule": "contrast/text", "testID": "twin-good-contrast-version" },
         { "rule": "contrast/text", "testID": "twin-large-text", "note": "28 sp at 3.2:1; large text needs 3:1, and Compose does not report text size" },
         { "rule": "target/size", "testID": "twin-labeled-back", "note": "IconButton: 48 dp touch area" },
@@ -36,7 +38,8 @@
       "marker": "screen-checkout",
       "barriers": [
         { "rule": "name/interactive-missing", "testID": "seed-custom-checkbox", "note": "clickable Box drawn as a checkbox" },
-        { "rule": "state/not-exposed", "testID": "seed-custom-checkbox", "note": "no role and no checked state" },
+        { "rule": "state/not-exposed", "testID": "seed-custom-checkbox", "note": "no role either: nothing in the tree says it is a checkbox, so a scan cannot tell it from a button. Seeing it needs a tap (crawler, M3)" },
+        { "rule": "state/not-exposed", "testID": "seed-stateless-checkbox", "note": "clickable(role = Role.Checkbox): a checkbox role with no state" },
         { "rule": "input/missing-label", "testID": "seed-unlabeled-field", "note": "the \"Promo code\" text above is not connected to it; TalkBack says only \"Edit box\"" },
         { "rule": "input/placeholder-label", "testID": "seed-placeholder-field", "note": "placeholder only: once someone types, it disappears from view and from the accessibility tree. A scan of the empty field cannot tell it from a label" }
       ],
@@ -44,6 +47,7 @@
         { "rule": "name/interactive-missing", "testID": "twin-checkbox-row", "note": "toggleable Row: the Checkbox is named by the row's text" },
         { "rule": "name/interactive-missing", "testID": "twin-pay-button" },
         { "rule": "state/not-exposed", "testID": "twin-checkbox-row" },
+        { "rule": "name/interactive-missing", "testID": "seed-stateless-checkbox", "note": "named by its text; only its state is missing" },
         { "rule": "input/missing-label", "testID": "twin-labelled-field", "note": "OutlinedTextField with a label" },
         { "rule": "input/placeholder-label", "testID": "twin-labelled-field" },
         { "rule": "contrast/text", "testID": "twin-disabled-text", "note": "inactive components have no contrast requirement (WCAG 1.4.3)" },
