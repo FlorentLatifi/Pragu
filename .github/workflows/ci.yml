@@ -59,3 +59,6 @@ jobs:
           name: pragu-agent-apk
           path: agents/android/agent/build/outputs/apk/release/agent-release.apk
           retention-days: 14
+      - name: Build the Compose fixture
+        working-directory: fixtures/android-compose
+        run: ./gradlew --no-daemon assembleRelease

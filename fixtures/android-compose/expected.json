@@ -1,0 +1,52 @@
+{
+  "$comment": "Ground truth for Pragu Bench. Each entry names a rule and an element's testTag (exposed as its resource id through testTagsAsResourceId). 'barriers' must be reported; 'correctTwins' must not be. Rules not implemented yet are kept and skipped until they exist.",
+  "fixture": "android-compose",
+  "appId": "dev.pragu.fixtures.compose",
+  "apk": "app/build/outputs/apk/release/app-release.apk",
+  "screens": [
+    {
+      "id": "settings",
+      "name": "Settings",
+      "url": "composeshop://settings",
+      "marker": "screen-settings",
+      "barriers": [
+        { "rule": "name/interactive-missing", "testID": "seed-unlabeled-more", "note": "IconButton whose Icon has contentDescription = null" },
+        { "rule": "name/interactive-missing", "testID": "seed-unlabeled-switch", "note": "the Text beside the Switch is not connected to it; TalkBack says only \"Off, Switch\"" },
+        { "rule": "contrast/text", "testID": "seed-low-contrast-synced", "note": "#B0B0B0 on white is 2.1:1" },
+        { "rule": "target/size", "testID": "seed-crowded-star-2", "note": "16 dp stars that touch: a touch inside a neighbour goes to the neighbour, so this star takes touches over 16 dp only. Compose reports touch areas that meet, which Pragu cannot split" },
+        { "rule": "target/size", "testID": "seed-crowded-star-3", "note": "as star 2" },
+        { "rule": "target/size", "testID": "seed-crowded-star-4", "note": "as star 2" }
+      ],
+      "correctTwins": [
+        { "rule": "name/interactive-missing", "testID": "twin-labeled-back" },
+        { "rule": "name/interactive-missing", "testID": "twin-labeled-switch-row", "note": "toggleable Row: the Switch is named by the row's text" },
+        { "rule": "contrast/text", "testID": "twin-good-contrast-version" },
+        { "rule": "contrast/text", "testID": "twin-large-text", "note": "28 sp at 3.2:1; large text needs 3:1, and Compose does not report text size" },
+        { "rule": "target/size", "testID": "twin-labeled-back", "note": "IconButton: 48 dp touch area" },
+        { "rule": "target/size", "testID": "twin-expanded-clear", "note": "20 dp icon 2 dp from another; Compose enlarges its touch area well past 24 dp (checked on the emulator)" },
+        { "rule": "target/size", "testID": "twin-expanded-info", "note": "as twin-expanded-clear" },
+        { "rule": "target/size", "testID": "twin-star-1", "note": "end star: it gains the free side's enlargement" },
+        { "rule": "target/size", "testID": "twin-star-5", "note": "end star: it gains the free side's enlargement" }
+      ]
+    },
+    {
+      "id": "checkout",
+      "name": "Checkout",
+      "url": "composeshop://checkout",
+      "marker": "screen-checkout",
+      "barriers": [
+        { "rule": "name/interactive-missing", "testID": "seed-custom-checkbox", "note": "clickable Box drawn as a checkbox" },
+        { "rule": "state/not-exposed", "testID": "seed-custom-checkbox", "note": "no role and no checked state" },
+        { "rule": "input/missing-label", "testID": "seed-placeholder-field", "note": "placeholder only: it disappears as soon as someone types" }
+      ],
+      "correctTwins": [
+        { "rule": "name/interactive-missing", "testID": "twin-checkbox-row", "note": "toggleable Row: the Checkbox is named by the row's text" },
+        { "rule": "name/interactive-missing", "testID": "twin-pay-button" },
+        { "rule": "state/not-exposed", "testID": "twin-checkbox-row" },
+        { "rule": "input/missing-label", "testID": "twin-labelled-field", "note": "OutlinedTextField with a label" },
+        { "rule": "contrast/text", "testID": "twin-disabled-text", "note": "inactive components have no contrast requirement (WCAG 1.4.3)" },
+        { "rule": "target/size", "testID": "twin-pay-button" }
+      ]
+    }
+  ]
+}

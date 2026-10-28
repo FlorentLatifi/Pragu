@@ -1,17 +1,18 @@
 {
   "benchVersion": 1,
   "fixtures": [
+    "android-compose",
     "rn-shop"
   ],
-  "screens": 4,
+  "screens": 6,
   "rules": [
     {
       "rule": "name/interactive-missing",
       "severity": "error",
-      "tp": 5,
+      "tp": 8,
       "fp": 0,
       "fn": 0,
-      "tn": 9,
+      "tn": 13,
       "precision": 1,
       "recall": 1,
       "f1": 1,
@@ -20,10 +21,10 @@
     {
       "rule": "contrast/text",
       "severity": "error",
-      "tp": 5,
+      "tp": 6,
       "fp": 0,
       "fn": 0,
-      "tn": 8,
+      "tn": 11,
       "precision": 1,
       "recall": 1,
       "f1": 1,
@@ -34,12 +35,12 @@
       "severity": "warning",
       "tp": 3,
       "fp": 1,
-      "fn": 0,
-      "tn": 5,
+      "fn": 3,
+      "tn": 11,
       "precision": 0.75,
-      "recall": 1,
-      "f1": 0.8571,
-      "mcc": 0.7905
+      "recall": 0.5,
+      "f1": 0.6,
+      "mcc": 0.4724
     }
   ],
   "falsePositives": [
@@ -52,17 +53,39 @@
       "note": "16 dp view, but hitSlop makes the touch area 48 dp; invisible in the accessibility tree"
     }
   ],
-  "falseNegatives": [],
+  "falseNegatives": [
+    {
+      "fixture": "android-compose",
+      "screen": "settings",
+      "rule": "target/size",
+      "element": "seed-crowded-star-2",
+      "note": "16 dp stars that touch: a touch inside a neighbour goes to the neighbour, so this star takes touches over 16 dp only. Compose reports touch areas that meet, which Pragu cannot split"
+    },
+    {
+      "fixture": "android-compose",
+      "screen": "settings",
+      "rule": "target/size",
+      "element": "seed-crowded-star-3",
+      "note": "as star 2"
+    },
+    {
+      "fixture": "android-compose",
+      "screen": "settings",
+      "rule": "target/size",
+      "element": "seed-crowded-star-4",
+      "note": "as star 2"
+    }
+  ],
   "awaiting": [
     {
       "rule": "input/missing-label",
-      "barriers": 1,
-      "correctTwins": 1
+      "barriers": 2,
+      "correctTwins": 2
     },
     {
       "rule": "state/not-exposed",
-      "barriers": 1,
-      "correctTwins": 1
+      "barriers": 2,
+      "correctTwins": 2
     }
   ]
 }

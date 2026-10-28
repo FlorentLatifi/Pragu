@@ -20,8 +20,11 @@ export interface TruthScreen {
 }
 
 export interface GroundTruth {
+  /** Also the fixture's folder name under fixtures/. */
   fixture: string;
   appId: string;
+  /** Release APK, relative to the fixture's folder; `pnpm fixture:build` produces it. */
+  apk: string;
   screens: TruthScreen[];
 }
 
@@ -29,6 +32,7 @@ export function parseGroundTruth(value: unknown, source: string): GroundTruth {
   const truth = record(value, source);
   const fixture = text(truth, 'fixture', source);
   const appId = text(truth, 'appId', source);
+  const apk = text(truth, 'apk', source);
   if (!Array.isArray(truth.screens) || truth.screens.length === 0) {
     throw new Error(`${source}: "screens" must be a non-empty array.`);
   }
@@ -48,7 +52,7 @@ export function parseGroundTruth(value: unknown, source: string): GroundTruth {
       correctTwins: elements(screen.correctTwins, `${path}.correctTwins`),
     };
   });
-  return { fixture, appId, screens };
+  return { fixture, appId, apk, screens };
 }
 
 function elements(value: unknown, path: string): LabelledElement[] {

@@ -12,9 +12,9 @@ pnpm test               # Vitest with coverage; packages/core must stay >= 90%
 pnpm build              # emit packages/*/dist and bench/dist (needed before the CLI or the bench)
 pnpm bench              # Pragu Bench: re-score rules on recorded fixture screens; fails if results differ (CI)
 pnpm bench:update       # accept new bench results (rewrites bench/results.json and docs/bench/results.md)
-pnpm bench:record       # re-record fixture screens on the emulator (after pnpm fixture:build)
+pnpm bench:record       # re-record fixture screens on the emulator (after pnpm fixture:build); --only <fixture>
 pnpm agent:build        # Android agent APK + JVM tests + Android Lint + no-INTERNET check (JDK 17+, ANDROID_HOME)
-pnpm fixture:build      # rn-shop release APK (JDK 17 required, about 9 min the first time)
+pnpm fixture:build      # fixture APKs, or name one: rn-shop (about 9 min the first time), android-compose (JDK 17)
 pnpm fixture:scan       # scan the rn-shop cart screen on the running emulator; exit 1 = barriers found
 node scripts/serve-reports.mjs   # view reports/ at http://127.0.0.1:4173
 ```
@@ -30,6 +30,7 @@ Android SDK tools: always pass `--no-metrics` to the `android` CLI (cmdline-tool
 | `packages/cli` | `pragu` command: adb orchestration, agent protocol client, scan pipeline. |
 | `agents/android` | Kotlin agent APK: Instrumentation + UiAutomation, abstract-socket server (protocol 2: every window, trees for the app's own). |
 | `fixtures/rn-shop` | Expo app with seeded barriers and correct twins on deep-linked screens (`rnshop://cart|product|form`). Standalone npm project, not in the workspace. |
+| `fixtures/android-compose` | Jetpack Compose app, same idea (`composeshop://settings|checkout`). Standalone Gradle project. How Pragu reads Compose: ADR-009. |
 | `bench` | Pragu Bench: ground-truth evaluation (precision, recall, F1, MCC per rule) on recorded fixture screens. |
 | `docs/` | Brief, PRD, technical design, ADRs, threat model, test strategy, plans, research notes. |
 

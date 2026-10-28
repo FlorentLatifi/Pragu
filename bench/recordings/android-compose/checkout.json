@@ -1,0 +1,1006 @@
+{
+  "protocol": 2,
+  "agentVersion": "0.0.2",
+  "capturedAt": "2026-10-28T12:13:30.537350Z",
+  "packageName": "dev.pragu.fixtures.compose",
+  "windowTitle": "Compose shop",
+  "screenWidthPx": 1080,
+  "screenHeightPx": 2400,
+  "device": {
+    "manufacturer": "Google",
+    "model": "sdk_gphone64_x86_64",
+    "sdkInt": 36,
+    "release": "16",
+    "densityDpi": 420,
+    "fontScale": 1,
+    "locale": "en-US",
+    "nightMode": false
+  },
+  "windows": [
+    {
+      "type": "application",
+      "layer": 0,
+      "title": "Compose shop",
+      "bounds": [
+        0,
+        0,
+        1080,
+        2400
+      ],
+      "active": true,
+      "focused": true,
+      "root": {
+        "className": "android.widget.FrameLayout",
+        "packageName": "dev.pragu.fixtures.compose",
+        "resourceId": null,
+        "text": null,
+        "contentDescription": null,
+        "hintText": null,
+        "stateDescription": null,
+        "roleDescription": null,
+        "bounds": [
+          0,
+          0,
+          1080,
+          2400
+        ],
+        "clickable": false,
+        "longClickable": false,
+        "focusable": false,
+        "checkable": false,
+        "checked": false,
+        "enabled": true,
+        "editable": false,
+        "visibleToUser": true,
+        "importantForAccessibility": true,
+        "heading": false,
+        "screenReaderFocusable": false,
+        "actions": [
+          4,
+          8,
+          64,
+          16908342
+        ],
+        "textSizePx": null,
+        "children": [
+          {
+            "className": "android.widget.LinearLayout",
+            "packageName": "dev.pragu.fixtures.compose",
+            "resourceId": null,
+            "text": null,
+            "contentDescription": null,
+            "hintText": null,
+            "stateDescription": null,
+            "roleDescription": null,
+            "bounds": [
+              0,
+              0,
+              1080,
+              2400
+            ],
+            "clickable": false,
+            "longClickable": false,
+            "focusable": false,
+            "checkable": false,
+            "checked": false,
+            "enabled": true,
+            "editable": false,
+            "visibleToUser": true,
+            "importantForAccessibility": false,
+            "heading": false,
+            "screenReaderFocusable": false,
+            "actions": [
+              4,
+              8,
+              64,
+              16908342
+            ],
+            "textSizePx": null,
+            "children": [
+              {
+                "className": "android.widget.FrameLayout",
+                "packageName": "dev.pragu.fixtures.compose",
+                "resourceId": "android:id/content",
+                "text": null,
+                "contentDescription": null,
+                "hintText": null,
+                "stateDescription": null,
+                "roleDescription": null,
+                "bounds": [
+                  0,
+                  0,
+                  1080,
+                  2400
+                ],
+                "clickable": false,
+                "longClickable": false,
+                "focusable": false,
+                "checkable": false,
+                "checked": false,
+                "enabled": true,
+                "editable": false,
+                "visibleToUser": true,
+                "importantForAccessibility": false,
+                "heading": false,
+                "screenReaderFocusable": false,
+                "actions": [
+                  4,
+                  8,
+                  64,
+                  16908342
+                ],
+                "textSizePx": null,
+                "children": [
+                  {
+                    "className": "androidx.compose.ui.platform.ComposeView",
+                    "packageName": "dev.pragu.fixtures.compose",
+                    "resourceId": null,
+                    "text": null,
+                    "contentDescription": null,
+                    "hintText": null,
+                    "stateDescription": null,
+                    "roleDescription": null,
+                    "bounds": [
+                      0,
+                      0,
+                      1080,
+                      2400
+                    ],
+                    "clickable": false,
+                    "longClickable": false,
+                    "focusable": false,
+                    "checkable": false,
+                    "checked": false,
+                    "enabled": true,
+                    "editable": false,
+                    "visibleToUser": true,
+                    "importantForAccessibility": true,
+                    "heading": false,
+                    "screenReaderFocusable": false,
+                    "actions": [
+                      4,
+                      8,
+                      64,
+                      16908342
+                    ],
+                    "textSizePx": null,
+                    "children": [
+                      {
+                        "className": "android.view.View",
+                        "packageName": "dev.pragu.fixtures.compose",
+                        "resourceId": null,
+                        "text": null,
+                        "contentDescription": null,
+                        "hintText": null,
+                        "stateDescription": null,
+                        "roleDescription": null,
+                        "bounds": [
+                          0,
+                          0,
+                          1080,
+                          2400
+                        ],
+                        "clickable": false,
+                        "longClickable": false,
+                        "focusable": false,
+                        "checkable": false,
+                        "checked": false,
+                        "enabled": true,
+                        "editable": false,
+                        "visibleToUser": true,
+                        "importantForAccessibility": false,
+                        "heading": false,
+                        "screenReaderFocusable": false,
+                        "actions": [
+                          64
+                        ],
+                        "textSizePx": null,
+                        "children": [
+                          {
+                            "className": "android.view.View",
+                            "packageName": "dev.pragu.fixtures.compose",
+                            "resourceId": null,
+                            "text": null,
+                            "contentDescription": null,
+                            "hintText": null,
+                            "stateDescription": null,
+                            "roleDescription": null,
+                            "bounds": [
+                              0,
+                              0,
+                              1080,
+                              2400
+                            ],
+                            "clickable": false,
+                            "longClickable": false,
+                            "focusable": false,
+                            "checkable": false,
+                            "checked": false,
+                            "enabled": true,
+                            "editable": false,
+                            "visibleToUser": true,
+                            "importantForAccessibility": true,
+                            "heading": false,
+                            "screenReaderFocusable": false,
+                            "actions": [
+                              64
+                            ],
+                            "textSizePx": null,
+                            "children": [
+                              {
+                                "className": "android.widget.TextView",
+                                "packageName": "dev.pragu.fixtures.compose",
+                                "resourceId": "screen-checkout",
+                                "text": "Checkout",
+                                "contentDescription": null,
+                                "hintText": null,
+                                "stateDescription": null,
+                                "roleDescription": null,
+                                "bounds": [
+                                  42,
+                                  126,
+                                  308,
+                                  210
+                                ],
+                                "clickable": false,
+                                "longClickable": false,
+                                "focusable": false,
+                                "checkable": false,
+                                "checked": false,
+                                "enabled": true,
+                                "editable": false,
+                                "visibleToUser": true,
+                                "importantForAccessibility": true,
+                                "heading": true,
+                                "screenReaderFocusable": true,
+                                "actions": [
+                                  256,
+                                  512,
+                                  64,
+                                  131072
+                                ],
+                                "textSizePx": null,
+                                "children": []
+                              },
+                              {
+                                "className": "android.widget.EditText",
+                                "packageName": "dev.pragu.fixtures.compose",
+                                "resourceId": "twin-labelled-field",
+                                "text": "",
+                                "contentDescription": null,
+                                "hintText": null,
+                                "stateDescription": null,
+                                "roleDescription": null,
+                                "bounds": [
+                                  42,
+                                  252,
+                                  1038,
+                                  420
+                                ],
+                                "clickable": true,
+                                "longClickable": true,
+                                "focusable": true,
+                                "checkable": false,
+                                "checked": false,
+                                "enabled": true,
+                                "editable": true,
+                                "visibleToUser": true,
+                                "importantForAccessibility": true,
+                                "heading": false,
+                                "screenReaderFocusable": true,
+                                "actions": [
+                                  1,
+                                  64,
+                                  16,
+                                  32,
+                                  2097152,
+                                  16908372
+                                ],
+                                "textSizePx": null,
+                                "children": [
+                                  {
+                                    "className": "android.view.View",
+                                    "packageName": "dev.pragu.fixtures.compose",
+                                    "resourceId": null,
+                                    "text": null,
+                                    "contentDescription": null,
+                                    "hintText": null,
+                                    "stateDescription": null,
+                                    "roleDescription": null,
+                                    "bounds": [
+                                      42,
+                                      273,
+                                      1038,
+                                      420
+                                    ],
+                                    "clickable": false,
+                                    "longClickable": false,
+                                    "focusable": false,
+                                    "checkable": false,
+                                    "checked": false,
+                                    "enabled": true,
+                                    "editable": false,
+                                    "visibleToUser": true,
+                                    "importantForAccessibility": false,
+                                    "heading": false,
+                                    "screenReaderFocusable": false,
+                                    "actions": [
+                                      64
+                                    ],
+                                    "textSizePx": null,
+                                    "children": []
+                                  },
+                                  {
+                                    "className": "android.widget.TextView",
+                                    "packageName": "dev.pragu.fixtures.compose",
+                                    "resourceId": null,
+                                    "text": "Full name",
+                                    "contentDescription": null,
+                                    "hintText": null,
+                                    "stateDescription": null,
+                                    "roleDescription": null,
+                                    "bounds": [
+                                      84,
+                                      315,
+                                      277,
+                                      378
+                                    ],
+                                    "clickable": false,
+                                    "longClickable": false,
+                                    "focusable": false,
+                                    "checkable": false,
+                                    "checked": false,
+                                    "enabled": true,
+                                    "editable": false,
+                                    "visibleToUser": true,
+                                    "importantForAccessibility": true,
+                                    "heading": false,
+                                    "screenReaderFocusable": false,
+                                    "actions": [
+                                      256,
+                                      512,
+                                      64,
+                                      131072
+                                    ],
+                                    "textSizePx": null,
+                                    "children": []
+                                  },
+                                  {
+                                    "className": "android.view.View",
+                                    "packageName": "dev.pragu.fixtures.compose",
+                                    "resourceId": null,
+                                    "text": null,
+                                    "contentDescription": null,
+                                    "hintText": null,
+                                    "stateDescription": null,
+                                    "roleDescription": null,
+                                    "bounds": [
+                                      84,
+                                      284,
+                                      996,
+                                      410
+                                    ],
+                                    "clickable": false,
+                                    "longClickable": false,
+                                    "focusable": false,
+                                    "checkable": false,
+                                    "checked": false,
+                                    "enabled": true,
+                                    "editable": false,
+                                    "visibleToUser": true,
+                                    "importantForAccessibility": false,
+                                    "heading": false,
+                                    "screenReaderFocusable": false,
+                                    "actions": [
+                                      64
+                                    ],
+                                    "textSizePx": null,
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "className": "android.widget.EditText",
+                                "packageName": "dev.pragu.fixtures.compose",
+                                "resourceId": "seed-placeholder-field",
+                                "text": "",
+                                "contentDescription": null,
+                                "hintText": null,
+                                "stateDescription": null,
+                                "roleDescription": null,
+                                "bounds": [
+                                  42,
+                                  441,
+                                  1038,
+                                  588
+                                ],
+                                "clickable": true,
+                                "longClickable": true,
+                                "focusable": true,
+                                "checkable": false,
+                                "checked": false,
+                                "enabled": true,
+                                "editable": true,
+                                "visibleToUser": true,
+                                "importantForAccessibility": true,
+                                "heading": false,
+                                "screenReaderFocusable": true,
+                                "actions": [
+                                  1,
+                                  64,
+                                  16,
+                                  32,
+                                  2097152,
+                                  16908372
+                                ],
+                                "textSizePx": null,
+                                "children": [
+                                  {
+                                    "className": "android.view.View",
+                                    "packageName": "dev.pragu.fixtures.compose",
+                                    "resourceId": null,
+                                    "text": null,
+                                    "contentDescription": null,
+                                    "hintText": null,
+                                    "stateDescription": null,
+                                    "roleDescription": null,
+                                    "bounds": [
+                                      42,
+                                      441,
+                                      1038,
+                                      588
+                                    ],
+                                    "clickable": false,
+                                    "longClickable": false,
+                                    "focusable": false,
+                                    "checkable": false,
+                                    "checked": false,
+                                    "enabled": true,
+                                    "editable": false,
+                                    "visibleToUser": true,
+                                    "importantForAccessibility": false,
+                                    "heading": false,
+                                    "screenReaderFocusable": false,
+                                    "actions": [
+                                      64
+                                    ],
+                                    "textSizePx": null,
+                                    "children": []
+                                  },
+                                  {
+                                    "className": "android.view.View",
+                                    "packageName": "dev.pragu.fixtures.compose",
+                                    "resourceId": null,
+                                    "text": null,
+                                    "contentDescription": null,
+                                    "hintText": null,
+                                    "stateDescription": null,
+                                    "roleDescription": null,
+                                    "bounds": [
+                                      84,
+                                      452,
+                                      996,
+                                      578
+                                    ],
+                                    "clickable": false,
+                                    "longClickable": false,
+                                    "focusable": false,
+                                    "checkable": false,
+                                    "checked": false,
+                                    "enabled": true,
+                                    "editable": false,
+                                    "visibleToUser": true,
+                                    "importantForAccessibility": false,
+                                    "heading": false,
+                                    "screenReaderFocusable": false,
+                                    "actions": [
+                                      64
+                                    ],
+                                    "textSizePx": null,
+                                    "children": []
+                                  },
+                                  {
+                                    "className": "android.view.View",
+                                    "packageName": "dev.pragu.fixtures.compose",
+                                    "resourceId": null,
+                                    "text": null,
+                                    "contentDescription": null,
+                                    "hintText": null,
+                                    "stateDescription": null,
+                                    "roleDescription": null,
+                                    "bounds": [
+                                      84,
+                                      452,
+                                      366,
+                                      578
+                                    ],
+                                    "clickable": false,
+                                    "longClickable": false,
+                                    "focusable": false,
+                                    "checkable": false,
+                                    "checked": false,
+                                    "enabled": true,
+                                    "editable": false,
+                                    "visibleToUser": true,
+                                    "importantForAccessibility": false,
+                                    "heading": false,
+                                    "screenReaderFocusable": false,
+                                    "actions": [
+                                      64
+                                    ],
+                                    "textSizePx": null,
+                                    "children": [
+                                      {
+                                        "className": "android.widget.TextView",
+                                        "packageName": "dev.pragu.fixtures.compose",
+                                        "resourceId": null,
+                                        "text": "Email address",
+                                        "contentDescription": null,
+                                        "hintText": null,
+                                        "stateDescription": null,
+                                        "roleDescription": null,
+                                        "bounds": [
+                                          84,
+                                          483,
+                                          366,
+                                          546
+                                        ],
+                                        "clickable": false,
+                                        "longClickable": false,
+                                        "focusable": false,
+                                        "checkable": false,
+                                        "checked": false,
+                                        "enabled": true,
+                                        "editable": false,
+                                        "visibleToUser": true,
+                                        "importantForAccessibility": true,
+                                        "heading": false,
+                                        "screenReaderFocusable": false,
+                                        "actions": [
+                                          256,
+                                          512,
+                                          64,
+                                          131072
+                                        ],
+                                        "textSizePx": null,
+                                        "children": []
+                                      }
+                                    ]
+                                  }
+                                ]
+                              },
+                              {
+                                "className": "android.view.View",
+                                "packageName": "dev.pragu.fixtures.compose",
+                                "resourceId": "twin-checkbox-row",
+                                "text": null,
+                                "contentDescription": null,
+                                "hintText": null,
+                                "stateDescription": null,
+                                "roleDescription": null,
+                                "bounds": [
+                                  42,
+                                  588,
+                                  1038,
+                                  735
+                                ],
+                                "clickable": true,
+                                "longClickable": false,
+                                "focusable": true,
+                                "checkable": true,
+                                "checked": false,
+                                "enabled": true,
+                                "editable": false,
+                                "visibleToUser": true,
+                                "importantForAccessibility": true,
+                                "heading": false,
+                                "screenReaderFocusable": true,
+                                "actions": [
+                                  1,
+                                  64,
+                                  16
+                                ],
+                                "textSizePx": null,
+                                "children": [
+                                  {
+                                    "className": "android.widget.TextView",
+                                    "packageName": "dev.pragu.fixtures.compose",
+                                    "resourceId": null,
+                                    "text": "I accept the terms",
+                                    "contentDescription": null,
+                                    "hintText": null,
+                                    "stateDescription": null,
+                                    "roleDescription": null,
+                                    "bounds": [
+                                      126,
+                                      630,
+                                      486,
+                                      693
+                                    ],
+                                    "clickable": false,
+                                    "longClickable": false,
+                                    "focusable": false,
+                                    "checkable": false,
+                                    "checked": false,
+                                    "enabled": true,
+                                    "editable": false,
+                                    "visibleToUser": true,
+                                    "importantForAccessibility": true,
+                                    "heading": false,
+                                    "screenReaderFocusable": false,
+                                    "actions": [
+                                      256,
+                                      512,
+                                      64,
+                                      131072
+                                    ],
+                                    "textSizePx": null,
+                                    "children": []
+                                  },
+                                  {
+                                    "className": "android.widget.CheckBox",
+                                    "packageName": "dev.pragu.fixtures.compose",
+                                    "resourceId": null,
+                                    "text": null,
+                                    "contentDescription": null,
+                                    "hintText": null,
+                                    "stateDescription": null,
+                                    "roleDescription": null,
+                                    "bounds": [
+                                      42,
+                                      588,
+                                      1038,
+                                      735
+                                    ],
+                                    "clickable": false,
+                                    "longClickable": false,
+                                    "focusable": false,
+                                    "checkable": false,
+                                    "checked": false,
+                                    "enabled": true,
+                                    "editable": false,
+                                    "visibleToUser": true,
+                                    "importantForAccessibility": true,
+                                    "heading": false,
+                                    "screenReaderFocusable": false,
+                                    "actions": [
+                                      64
+                                    ],
+                                    "textSizePx": null,
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "className": "android.view.View",
+                                "packageName": "dev.pragu.fixtures.compose",
+                                "resourceId": "seed-custom-checkbox",
+                                "text": null,
+                                "contentDescription": null,
+                                "hintText": null,
+                                "stateDescription": null,
+                                "roleDescription": null,
+                                "bounds": [
+                                  42,
+                                  735,
+                                  168,
+                                  861
+                                ],
+                                "clickable": true,
+                                "longClickable": false,
+                                "focusable": true,
+                                "checkable": false,
+                                "checked": false,
+                                "enabled": true,
+                                "editable": false,
+                                "visibleToUser": true,
+                                "importantForAccessibility": true,
+                                "heading": false,
+                                "screenReaderFocusable": true,
+                                "actions": [
+                                  1,
+                                  64,
+                                  16
+                                ],
+                                "textSizePx": null,
+                                "children": [
+                                  {
+                                    "className": "android.view.View",
+                                    "packageName": "dev.pragu.fixtures.compose",
+                                    "resourceId": null,
+                                    "text": null,
+                                    "contentDescription": null,
+                                    "hintText": null,
+                                    "stateDescription": null,
+                                    "roleDescription": null,
+                                    "bounds": [
+                                      43,
+                                      736,
+                                      169,
+                                      862
+                                    ],
+                                    "clickable": false,
+                                    "longClickable": false,
+                                    "focusable": false,
+                                    "checkable": false,
+                                    "checked": false,
+                                    "enabled": true,
+                                    "editable": false,
+                                    "visibleToUser": true,
+                                    "importantForAccessibility": false,
+                                    "heading": false,
+                                    "screenReaderFocusable": false,
+                                    "actions": [
+                                      64
+                                    ],
+                                    "textSizePx": null,
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "className": "android.widget.TextView",
+                                "packageName": "dev.pragu.fixtures.compose",
+                                "resourceId": null,
+                                "text": "Save this card",
+                                "contentDescription": null,
+                                "hintText": null,
+                                "stateDescription": null,
+                                "roleDescription": null,
+                                "bounds": [
+                                  168,
+                                  767,
+                                  448,
+                                  830
+                                ],
+                                "clickable": false,
+                                "longClickable": false,
+                                "focusable": false,
+                                "checkable": false,
+                                "checked": false,
+                                "enabled": true,
+                                "editable": false,
+                                "visibleToUser": true,
+                                "importantForAccessibility": true,
+                                "heading": false,
+                                "screenReaderFocusable": true,
+                                "actions": [
+                                  256,
+                                  512,
+                                  64,
+                                  131072
+                                ],
+                                "textSizePx": null,
+                                "children": []
+                              },
+                              {
+                                "className": "android.view.View",
+                                "packageName": "dev.pragu.fixtures.compose",
+                                "resourceId": "twin-pay-button",
+                                "text": null,
+                                "contentDescription": null,
+                                "hintText": null,
+                                "stateDescription": null,
+                                "roleDescription": null,
+                                "bounds": [
+                                  42,
+                                  904,
+                                  1038,
+                                  1030
+                                ],
+                                "clickable": true,
+                                "longClickable": false,
+                                "focusable": true,
+                                "checkable": false,
+                                "checked": false,
+                                "enabled": true,
+                                "editable": false,
+                                "visibleToUser": true,
+                                "importantForAccessibility": true,
+                                "heading": false,
+                                "screenReaderFocusable": true,
+                                "actions": [
+                                  1,
+                                  64,
+                                  16
+                                ],
+                                "textSizePx": null,
+                                "children": [
+                                  {
+                                    "className": "android.widget.TextView",
+                                    "packageName": "dev.pragu.fixtures.compose",
+                                    "resourceId": null,
+                                    "text": "Pay €36.00",
+                                    "contentDescription": null,
+                                    "hintText": null,
+                                    "stateDescription": null,
+                                    "roleDescription": null,
+                                    "bounds": [
+                                      449,
+                                      940,
+                                      631,
+                                      993
+                                    ],
+                                    "clickable": false,
+                                    "longClickable": false,
+                                    "focusable": false,
+                                    "checkable": false,
+                                    "checked": false,
+                                    "enabled": true,
+                                    "editable": false,
+                                    "visibleToUser": true,
+                                    "importantForAccessibility": true,
+                                    "heading": false,
+                                    "screenReaderFocusable": false,
+                                    "actions": [
+                                      256,
+                                      512,
+                                      64,
+                                      131072
+                                    ],
+                                    "textSizePx": null,
+                                    "children": []
+                                  },
+                                  {
+                                    "className": "android.widget.Button",
+                                    "packageName": "dev.pragu.fixtures.compose",
+                                    "resourceId": null,
+                                    "text": null,
+                                    "contentDescription": null,
+                                    "hintText": null,
+                                    "stateDescription": null,
+                                    "roleDescription": null,
+                                    "bounds": [
+                                      42,
+                                      914,
+                                      1038,
+                                      1019
+                                    ],
+                                    "clickable": false,
+                                    "longClickable": false,
+                                    "focusable": false,
+                                    "checkable": false,
+                                    "checked": false,
+                                    "enabled": true,
+                                    "editable": false,
+                                    "visibleToUser": true,
+                                    "importantForAccessibility": true,
+                                    "heading": false,
+                                    "screenReaderFocusable": false,
+                                    "actions": [
+                                      64
+                                    ],
+                                    "textSizePx": null,
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "className": "android.view.View",
+                                "packageName": "dev.pragu.fixtures.compose",
+                                "resourceId": "twin-disabled-button",
+                                "text": null,
+                                "contentDescription": null,
+                                "hintText": null,
+                                "stateDescription": null,
+                                "roleDescription": null,
+                                "bounds": [
+                                  42,
+                                  1051,
+                                  1038,
+                                  1177
+                                ],
+                                "clickable": true,
+                                "longClickable": false,
+                                "focusable": false,
+                                "checkable": false,
+                                "checked": false,
+                                "enabled": false,
+                                "editable": false,
+                                "visibleToUser": true,
+                                "importantForAccessibility": true,
+                                "heading": false,
+                                "screenReaderFocusable": true,
+                                "actions": [
+                                  64
+                                ],
+                                "textSizePx": null,
+                                "children": [
+                                  {
+                                    "className": "android.widget.TextView",
+                                    "packageName": "dev.pragu.fixtures.compose",
+                                    "resourceId": "twin-disabled-text",
+                                    "text": "Use saved card",
+                                    "contentDescription": null,
+                                    "hintText": null,
+                                    "stateDescription": null,
+                                    "roleDescription": null,
+                                    "bounds": [
+                                      415,
+                                      1087,
+                                      665,
+                                      1140
+                                    ],
+                                    "clickable": false,
+                                    "longClickable": false,
+                                    "focusable": false,
+                                    "checkable": false,
+                                    "checked": false,
+                                    "enabled": true,
+                                    "editable": false,
+                                    "visibleToUser": true,
+                                    "importantForAccessibility": true,
+                                    "heading": false,
+                                    "screenReaderFocusable": false,
+                                    "actions": [
+                                      256,
+                                      512,
+                                      64,
+                                      131072
+                                    ],
+                                    "textSizePx": null,
+                                    "children": []
+                                  },
+                                  {
+                                    "className": "android.widget.Button",
+                                    "packageName": "dev.pragu.fixtures.compose",
+                                    "resourceId": null,
+                                    "text": null,
+                                    "contentDescription": null,
+                                    "hintText": null,
+                                    "stateDescription": null,
+                                    "roleDescription": null,
+                                    "bounds": [
+                                      42,
+                                      1061,
+                                      1038,
+                                      1166
+                                    ],
+                                    "clickable": false,
+                                    "longClickable": false,
+                                    "focusable": false,
+                                    "checkable": false,
+                                    "checked": false,
+                                    "enabled": true,
+                                    "editable": false,
+                                    "visibleToUser": true,
+                                    "importantForAccessibility": true,
+                                    "heading": false,
+                                    "screenReaderFocusable": false,
+                                    "actions": [
+                                      64
+                                    ],
+                                    "textSizePx": null,
+                                    "children": []
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "system",
+      "layer": 1,
+      "title": null,
+      "bounds": [
+        0,
+        0,
+        1080,
+        63
+      ],
+      "active": false,
+      "focused": false,
+      "root": null
+    }
+  ]
+}

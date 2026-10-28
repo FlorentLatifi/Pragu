@@ -20,7 +20,7 @@
     "fixture:scan": "node packages/cli/dist/bin.js scan --install fixtures/rn-shop/android/app/build/outputs/apk/release/app-release.apk --app dev.pragu.fixtures.rnshop --screen-name Cart --out reports/rn-shop",
     "bench": "node bench/dist/cli.js evaluate",
     "bench:update": "node bench/dist/cli.js evaluate --update",
-    "bench:record": "node bench/dist/cli.js record --install fixtures/rn-shop/android/app/build/outputs/apk/release/app-release.apk"
+    "bench:record": "node bench/dist/cli.js record --install"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

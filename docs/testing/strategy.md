@@ -18,7 +18,7 @@ Two questions, kept apart: **does the code do what we wrote?** (tests) and **are
 
 ## Evaluation: Pragu Bench
 
-- **Ground truth:** each fixture screen has `expected.json`, listing barriers (must be reported) and correct twins (must not be reported), keyed by `testID`/resource id. Later: real open-source apps (e.g. from F-Droid) with screens labelled by hand.
+- **Ground truth:** two fixture apps, React Native (`rn-shop`) and Jetpack Compose (`android-compose`), because the toolkits expose accessibility differently (ADR-009). Each fixture screen has `expected.json`, listing barriers (must be reported) and correct twins (must not be reported), keyed by `testID`/resource id. Later: real open-source apps (e.g. from F-Droid) with screens labelled by hand.
 - **Matching:** a reported issue is a true positive when its rule and element match a barrier. A false positive is any other reported issue: on a twin, or not listed at all. A false negative is a barrier that was not reported. A true negative is a twin that was not flagged.
 - **Metrics per rule:** precision, recall, F1 and MCC (Matthews correlation coefficient, which stays meaningful when classes are unbalanced), with the counts behind each number.
 - **Recordings:** real captures of every labelled screen are committed (`bench/recordings/`), so CI re-scores every rule on every PR without an emulator (`pnpm bench`). They are re-recorded on an emulator when a fixture changes (`pnpm bench:record`).

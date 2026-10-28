@@ -184,7 +184,7 @@ describe('gate', () => {
 });
 
 describe('ground truth', () => {
-  const valid = { fixture: 'shop', appId: 'com.example', screens: [{ ...screen }] };
+  const valid = { fixture: 'shop', appId: 'com.example', apk: 'app.apk', screens: [{ ...screen }] };
 
   it('accepts a valid file and keeps notes', () => {
     expect(parseGroundTruth(valid, 'expected.json').screens[0]?.correctTwins[1]?.note).toBe(
@@ -197,6 +197,9 @@ describe('ground truth', () => {
     expect(() => parseGroundTruth({ ...valid, screens: [] }, 'x.json')).toThrow('"screens" must be a non-empty array.');
     expect(() => parseGroundTruth({ ...valid, appId: '' }, 'x.json')).toThrow(
       'x.json: "appId" must be a non-empty string.',
+    );
+    expect(() => parseGroundTruth({ ...valid, apk: undefined }, 'x.json')).toThrow(
+      'x.json: "apk" must be a non-empty string.',
     );
     expect(() => parseGroundTruth({ ...valid, screens: [screen, screen] }, 'x.json')).toThrow(
       'duplicate screen id "cart"',

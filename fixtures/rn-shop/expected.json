@@ -2,6 +2,7 @@
   "$comment": "Ground truth for Pragu Bench. Each entry names a rule and an element's testID (exposed on Android as the view's resource id). 'barriers' must be reported; 'correctTwins' must not be. Rules not implemented yet are kept and skipped until they exist.",
   "fixture": "rn-shop",
   "appId": "dev.pragu.fixtures.rnshop",
+  "apk": "android/app/build/outputs/apk/release/app-release.apk",
   "screens": [
     {
       "id": "cart",

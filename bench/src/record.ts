@@ -23,7 +23,10 @@ export function containsResourceId(node: AndroidRawNode, resourceId: string): bo
 }
 
 export interface RecordOptions {
-  install: string | undefined;
+  /** Install each fixture's release APK first. */
+  install: boolean;
+  /** Record one fixture only, leaving the others' recordings untouched. */
+  only: string | undefined;
   serial: string | undefined;
 }
 
@@ -41,12 +44,20 @@ export async function recordAll(root: string, options: RecordOptions, log: (line
     });
   const cli = join(root, 'packages', 'cli', 'dist', 'bin.js');
   if (!existsSync(cli)) throw new Error('The CLI is not built. Run "pnpm build" first.');
-  if (options.install !== undefined) {
-    log(`Installing ${options.install}`);
-    await adb(['install', '-r', options.install]);
-  }
+  const fixtures = (await loadFixtures(root)).filter(
+    (truth) => options.only === undefined || truth.fixture === options.only,
+  );
+  if (fixtures.length === 0) throw new Error(`No fixture named "${options.only ?? ''}" has an expected.json.`);
 
-  for (const truth of await loadFixtures(root)) {
+  for (const truth of fixtures) {
+    if (options.install) {
+      const apk = join(root, 'fixtures', truth.fixture, truth.apk);
+      if (!existsSync(apk)) {
+        throw new Error(`No APK for ${truth.fixture} at ${apk}. Build it with "pnpm fixture:build ${truth.fixture}".`);
+      }
+      log(`Installing ${truth.fixture}`);
+      await adb(['install', '-r', apk]);
+    }
     for (const screen of truth.screens) {
       let recorded = false;
       for (let attempt = 1; attempt <= ATTEMPTS && !recorded; attempt++) {

@@ -13,7 +13,7 @@ import { renderMarkdown } from './report.js';
 
 // Usage:
 //   node bench/dist/cli.js evaluate [--update]                 score the recordings (CI runs this)
-//   node bench/dist/cli.js record [--install <apk>] [--serial <id>]   refresh recordings on a device
+//   node bench/dist/cli.js record [--install] [--only <fixture>] [--serial <id>]   refresh recordings on a device
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const resultsFile = join(root, 'bench', 'results.json');
@@ -64,12 +64,17 @@ try {
   if (command === 'evaluate') {
     process.exitCode = await evaluateCommand(args.includes('--update'));
   } else if (command === 'record') {
-    await recordAll(root, { install: valueAfter(args, '--install'), serial: valueAfter(args, '--serial') }, (line) => {
+    const options = {
+      install: args.includes('--install'),
+      only: valueAfter(args, '--only'),
+      serial: valueAfter(args, '--serial'),
+    };
+    await recordAll(root, options, (line) => {
       console.log(line);
     });
   } else {
     console.error(
-      `Unknown command "${command}". Use "evaluate [--update]" or "record [--install <apk>] [--serial <id>]".`,
+      `Unknown command "${command}". Use "evaluate [--update]" or "record [--install] [--only <fixture>] [--serial <id>]".`,
     );
     process.exitCode = 2;
   }

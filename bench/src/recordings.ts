@@ -28,7 +28,11 @@ export async function loadFixtures(root: string): Promise<GroundTruth[]> {
     .sort()) {
     const file = join(fixturesDir, name, 'expected.json');
     if (!existsSync(file)) continue;
-    truths.push(parseGroundTruth(JSON.parse(await readFile(file, 'utf8')), `fixtures/${name}/expected.json`));
+    const truth = parseGroundTruth(JSON.parse(await readFile(file, 'utf8')), `fixtures/${name}/expected.json`);
+    if (truth.fixture !== name) {
+      throw new Error(`fixtures/${name}/expected.json: "fixture" must match its folder name, "${name}".`);
+    }
+    truths.push(truth);
   }
   return truths;
 }
