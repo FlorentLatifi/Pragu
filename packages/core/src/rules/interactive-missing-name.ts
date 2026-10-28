@@ -1,4 +1,5 @@
 import type { Role } from '../model.js';
+import { inScope } from './scope.js';
 import type { Rule } from './types.js';
 
 const SPOKEN_ROLE: Partial<Record<Role, string>> = {
@@ -34,7 +35,7 @@ export const interactiveMissingName: Rule = {
       .filter(
         (node) =>
           node.interactive &&
-          node.visible &&
+          inScope(node) &&
           node.exposedToAssistiveTech &&
           // Text fields are covered by input/missing-label, which explains labels vs placeholders.
           node.role !== 'textfield' &&

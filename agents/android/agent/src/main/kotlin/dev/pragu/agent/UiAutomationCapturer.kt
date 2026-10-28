@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.os.SystemClock
 import android.util.Log
 import android.view.accessibility.AccessibilityNodeInfo
+import android.view.accessibility.AccessibilityWindowInfo
 import java.io.ByteArrayOutputStream
 import java.time.Instant
 import java.util.concurrent.TimeoutException
@@ -48,22 +49,23 @@ class UiAutomationCapturer(private val ui: UiAutomation, private val context: Co
     }
 
     /**
-     * Polls until the app is in the foreground and its tree is the same twice in a
-     * row with real content in it. React Native shows an empty root while the JS
-     * bundle loads, so "idle" alone would capture a blank screen.
+     * Polls until the app's topmost window is on screen and every window is the same
+     * twice in a row, with real content in the app. React Native shows an empty root
+     * while the JS bundle loads, so "idle" alone would capture a blank screen.
      */
     override fun capture(packageName: String?, timeoutMs: Long): Capture {
         val deadline = SystemClock.uptimeMillis() + timeoutMs
-        var latest: Pair<AccessibilityNodeInfo, NodeSnapshot>? = null
+        var latest: List<WindowSnapshot>? = null
         var previousSignature: Int? = null
         while (true) {
             waitForIdle()
-            val root = ui.rootInActiveWindow
-            if (root != null && (packageName == null || root.packageName?.toString() == packageName)) {
-                val snapshot = snapshotOf(root)
-                val signature = snapshot.signature()
-                latest = root to snapshot
-                if (signature == previousSignature && snapshot.hasContent()) break
+            val target = packageName ?: ui.rootInActiveWindow?.packageName?.toString()
+            val windows = if (target == null) emptyList() else snapshotWindows(target)
+            val foreground = windows.lastOrNull { it.root != null }
+            if (foreground != null) {
+                val signature = windows.map { it.signature() }.hashCode()
+                latest = windows
+                if (signature == previousSignature && foreground.root?.hasContent() == true) break
                 previousSignature = signature
             }
             if (SystemClock.uptimeMillis() >= deadline) {
@@ -72,13 +74,14 @@ class UiAutomationCapturer(private val ui: UiAutomation, private val context: Co
             }
             SystemClock.sleep(SETTLE_POLL_MS)
         }
-        val (root, snapshot) = latest ?: throw CaptureException(
+        val windows = latest ?: throw CaptureException(
             if (packageName == null) {
                 "No app window is in the foreground."
             } else {
                 "$packageName did not reach the foreground within ${timeoutMs / 1000} s."
             },
         )
+        val foreground = windows.last { it.root != null }
         val bitmap = ui.takeScreenshot()
             ?: throw CaptureException("Android refused the screenshot. A secure window (FLAG_SECURE) may be showing.")
         val width = bitmap.width
@@ -89,15 +92,39 @@ class UiAutomationCapturer(private val ui: UiAutomation, private val context: Co
         }
         bitmap.recycle()
         return Capture(
-            packageName = root.packageName?.toString() ?: "unknown",
-            windowTitle = ui.windows.firstOrNull { it.isActive }?.title?.toString(),
+            packageName = foreground.root?.packageName ?: "unknown",
+            windowTitle = foreground.title,
             capturedAt = Instant.now().toString(),
             screenWidthPx = width,
             screenHeightPx = height,
-            root = snapshot,
+            windows = windows,
             png = png,
         )
     }
+
+    /** Every window, bottom first. Only the target app's own windows get a tree. */
+    private fun snapshotWindows(target: String): List<WindowSnapshot> =
+        ui.windows.sortedBy { it.layer }.map { window ->
+            val bounds = Rect()
+            window.getBoundsInScreen(bounds)
+            val root = if (window.type == AccessibilityWindowInfo.TYPE_APPLICATION) {
+                window.root?.takeIf { it.packageName?.toString() == target }
+            } else {
+                null
+            }
+            WindowSnapshot(
+                type = windowTypeName(window.type),
+                layer = window.layer,
+                title = window.title?.toString(),
+                left = bounds.left,
+                top = bounds.top,
+                right = bounds.right,
+                bottom = bounds.bottom,
+                active = window.isActive,
+                focused = window.isFocused,
+                root = root?.let { snapshotOf(it) },
+            )
+        }
 
     private fun waitForIdle() {
         try {

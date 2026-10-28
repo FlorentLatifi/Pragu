@@ -5,6 +5,7 @@ import type { Rule } from './types.js';
 
 export { interactiveMissingName, targetSize, textContrast };
 export { requiredTextRatio } from './text-contrast.js';
+export { inScope } from './scope.js';
 export type { Finding, Rule, RuleContext, RuleMeta } from './types.js';
 
 /** The rules a scan runs when the config does not choose. */

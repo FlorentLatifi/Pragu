@@ -14,7 +14,7 @@ The agent can read every screen and take screenshots, which often show personal 
 - **Peer check:** the agent accepts connections only from uid 2000 (shell, which is what adb runs as) or uid 0 (root). Other apps on the device cannot ask it for screenshots.
 - **No INTERNET permission, enforced:** the Gradle task `verify<Variant>NoInternetPermission` fails the build if the merged manifest contains it. CI runs it on every change.
 - **No exported components:** the APK has no activities, services or receivers. Only `adb shell am instrument` can start it.
-- **Protocol 1:**
+- **Protocol (version 2 since ADR-008, which added windows):**
   - A request is one JSON line: `hello`, `capture`, `shutdown`.
   - A response is one JSON header line `{"ok":…,"payloads":[{name, bytes, type}]}`, followed by the raw payload bytes.
   - Captures stream straight to the computer and are never written to the device's storage.

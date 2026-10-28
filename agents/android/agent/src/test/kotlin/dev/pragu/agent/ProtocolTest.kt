@@ -20,7 +20,8 @@ private class FakeCapturer(private val failure: String? = null) : ScreenCapturer
         lastPackage = packageName
         lastTimeout = timeoutMs
         if (failure != null) throw CaptureException(failure)
-        return Capture("com.example.shop", "Shop", "2026-10-27T12:00:00Z", 1080, 2400, snapshot(text = "Hi"), byteArrayOf(9, 8, 7))
+        val app = WindowSnapshot("application", 0, "Shop", 0, 0, 1080, 2400, active = true, focused = true, root = snapshot(text = "Hi"))
+        return Capture("com.example.shop", "Shop", "2026-10-27T12:00:00Z", 1080, 2400, listOf(app), byteArrayOf(9, 8, 7))
     }
 }
 
@@ -88,7 +89,8 @@ class RequestHandlerTest {
         assertTrue(response.ok)
         assertEquals(listOf("tree", "screenshot"), response.payloads.map { it.name })
         val tree = JSONObject(String(response.payloads[0].bytes, Charsets.UTF_8))
-        assertEquals("Hi", tree.getJSONObject("root").getString("text"))
+        assertEquals("Hi", tree.getJSONArray("windows").getJSONObject(0).getJSONObject("root").getString("text"))
+        assertEquals(1, response.data!!.getInt("windows"))
         assertEquals(listOf<Byte>(9, 8, 7), response.payloads[1].bytes.toList())
         assertEquals("com.example.shop", capturer.lastPackage)
         assertEquals(5_000L, capturer.lastTimeout)

@@ -2,11 +2,31 @@
 // model. Everything Android-specific (class names, TalkBack's naming rules,
 // density) stays in this file.
 
-import { scaleRect } from './geometry.js';
-import type { DeviceInfo, PamNode, PamScreen, Rect, Role } from './model.js';
+import { containsRect, rectsOverlap, scaleRect } from './geometry.js';
+import type { DeviceInfo, PamNode, PamScreen, PamWindow, Rect, Role } from './model.js';
 
-/** The agent protocol version this adapter understands. */
-export const ANDROID_AGENT_PROTOCOL = 1;
+/** The agent protocol version this adapter understands. 2 added windows. */
+export const ANDROID_AGENT_PROTOCOL = 2;
+
+/** AccessibilityWindowInfo types, as the agent names them. */
+export type AndroidWindowType =
+  | 'application'
+  | 'input_method'
+  | 'system'
+  | 'accessibility_overlay'
+  | 'split_screen_divider'
+  | 'magnification_overlay'
+  | 'unknown';
+
+const WINDOW_TYPES: readonly AndroidWindowType[] = [
+  'application',
+  'input_method',
+  'system',
+  'accessibility_overlay',
+  'split_screen_divider',
+  'magnification_overlay',
+  'unknown',
+];
 
 /** One node as the agent reports it, close to AccessibilityNodeInfo. */
 export interface AndroidRawNode {
@@ -48,6 +68,18 @@ export interface AndroidRawDevice {
   nightMode: boolean;
 }
 
+/** One window on screen. Only the scanned app's windows carry a tree. */
+export interface AndroidRawWindow {
+  type: AndroidWindowType;
+  /** Stacking order: higher layers are drawn on top. */
+  layer: number;
+  title: string | null;
+  bounds: [number, number, number, number];
+  active: boolean;
+  focused: boolean;
+  root: AndroidRawNode | null;
+}
+
 export interface AndroidCapture {
   protocol: number;
   agentVersion: string;
@@ -57,7 +89,8 @@ export interface AndroidCapture {
   screenWidthPx: number;
   screenHeightPx: number;
   device: AndroidRawDevice;
-  root: AndroidRawNode;
+  /** Every window on screen, bottom first. */
+  windows: AndroidRawWindow[];
 }
 
 const ACTION_CLICK = 16;
@@ -177,17 +210,69 @@ export interface NormalizedCapture {
   device: DeviceInfo;
 }
 
+function windowKind(window: AndroidRawWindow): PamWindow['kind'] {
+  switch (window.type) {
+    case 'application':
+      return window.root === null ? 'other-app' : 'app';
+    case 'input_method':
+      return 'keyboard';
+    case 'accessibility_overlay':
+    case 'magnification_overlay':
+      return 'overlay';
+    default:
+      return 'system';
+  }
+}
+
+function rectFrom([left, top, right, bottom]: [number, number, number, number]): Rect {
+  return { left, top, right, bottom };
+}
+
+/** Web content is the job of web tools such as axe-core; Pragu checks native UI only. */
+function isWebView(raw: AndroidRawNode): boolean {
+  const className = raw.className ?? '';
+  return className.slice(className.lastIndexOf('.') + 1).includes('WebView');
+}
+
+interface VisitContext {
+  windowIndex: number;
+  inForeground: boolean;
+  inWebView: boolean;
+}
+
+/**
+ * Builds the PAM screen from every window. Only the app's topmost window is
+ * checked: a dialog over the app means the content behind it is not what the user
+ * can act on. Within it, elements fully covered by a window above (the keyboard, a
+ * system panel) are invisible, and partly covered ones are marked obscured, because
+ * their pixels in the screenshot are not all their own.
+ */
 export function normalizeAndroidCapture(
   capture: AndroidCapture,
   options: { screenId: string; screenName: string; screenshotFile: string | null },
 ): NormalizedCapture {
   const density = capture.device.densityDpi / 160;
+  const rawWindows = [...capture.windows].sort((a, b) => a.layer - b.layer);
+  const foregroundIndex = rawWindows.findLastIndex((window) => window.root !== null);
+  const windows: PamWindow[] = rawWindows.map((window, index) => ({
+    kind: windowKind(window),
+    title: window.title,
+    boundsPx: rectFrom(window.bounds),
+    foreground: index === foregroundIndex,
+  }));
+  // Overlays drawn by assistive technology are see-through; every other window above hides what is under it.
+  const coverers = windows
+    .slice(foregroundIndex + 1)
+    .filter((window) => window.kind !== 'overlay')
+    .map((window) => window.boundsPx);
   const nodes: PamNode[] = [];
 
-  const visit = (raw: AndroidRawNode, id: string, parentId: string | null): void => {
+  const visit = (raw: AndroidRawNode, id: string, parentId: string | null, context: VisitContext): void => {
     const role = androidRole(raw);
-    const [left, top, right, bottom] = raw.bounds;
-    const boundsPx: Rect = { left, top, right, bottom };
+    const boundsPx = rectFrom(raw.bounds);
+    const onScreen = raw.visibleToUser && boundsPx.right > boundsPx.left && boundsPx.bottom > boundsPx.top;
+    const covered = !context.inForeground || coverers.some((cover) => containsRect(cover, boundsPx));
+    const inWebView = context.inWebView || isWebView(raw);
     const node: PamNode = {
       id,
       parentId,
@@ -202,7 +287,10 @@ export function normalizeAndroidCapture(
       boundsDp: roundRect(scaleRect(boundsPx, 1 / density)),
       interactive: isInteractive(raw, role),
       exposedToAssistiveTech: raw.importantForAccessibility,
-      visible: raw.visibleToUser && right > left && bottom > top,
+      visible: onScreen && !covered,
+      obscured: !covered && coverers.some((cover) => rectsOverlap(cover, boundsPx)),
+      inWebView,
+      window: context.windowIndex,
       enabled: raw.enabled,
       textSizeDp: raw.textSizePx === null ? null : round1(raw.textSizePx / density),
     };
@@ -210,10 +298,20 @@ export function normalizeAndroidCapture(
     raw.children.forEach((child, index) => {
       const childId = `${id}.${String(index)}`;
       node.childIds.push(childId);
-      visit(child, childId, id);
+      visit(child, childId, id, { ...context, inWebView });
     });
   };
-  visit(capture.root, '0', null);
+
+  // Each app window's root is "0", "1", ... bottom first, so a single-window screen keeps the ids "0", "0.1", ...
+  let appWindowNumber = 0;
+  rawWindows.forEach((window, windowIndex) => {
+    if (window.root === null) return;
+    visit(window.root, String(appWindowNumber++), null, {
+      windowIndex,
+      inForeground: windowIndex === foregroundIndex,
+      inWebView: false,
+    });
+  });
 
   const screen: PamScreen = {
     id: options.screenId,
@@ -223,6 +321,7 @@ export function normalizeAndroidCapture(
       options.screenshotFile === null
         ? null
         : { file: options.screenshotFile, widthPx: capture.screenWidthPx, heightPx: capture.screenHeightPx },
+    windows,
     nodes,
   };
   const device: DeviceInfo = {
@@ -278,7 +377,29 @@ export function parseAndroidCapture(value: unknown): AndroidCapture {
   for (const key of ['manufacturer', 'model', 'release', 'locale']) expectString(device, key, 'capture.device');
   for (const key of ['sdkInt', 'densityDpi', 'fontScale']) expectNumber(device, key, 'capture.device');
   expectBoolean(device, 'nightMode', 'capture.device');
-  validateNode(capture.root, 'capture.root');
+  if (!Array.isArray(capture.windows) || capture.windows.length === 0) {
+    throw new Error('capture.windows must be a non-empty array.');
+  }
+  let appWindows = 0;
+  capture.windows.forEach((item, index) => {
+    const path = `capture.windows[${String(index)}]`;
+    const window = asRecord(item, path);
+    if (typeof window.type !== 'string' || !(WINDOW_TYPES as readonly string[]).includes(window.type)) {
+      throw new Error(`${path}.type must be one of ${WINDOW_TYPES.join(', ')}.`);
+    }
+    expectNumber(window, 'layer', path);
+    expectNullableString(window, 'title', path);
+    expectBounds(window.bounds, path);
+    expectBoolean(window, 'active', path);
+    expectBoolean(window, 'focused', path);
+    if (window.root !== null) {
+      validateNode(window.root, `${path}.root`);
+      appWindows++;
+    }
+  });
+  if (appWindows === 0) {
+    throw new Error('The capture has no window of the scanned app: no window carries an element tree.');
+  }
   return value as AndroidCapture;
 }
 
@@ -310,10 +431,7 @@ function validateNode(value: unknown, path: string): void {
   const node = asRecord(value, path);
   for (const key of NODE_STRINGS) expectNullableString(node, key, path);
   for (const key of NODE_BOOLEANS) expectBoolean(node, key, path);
-  const bounds = node.bounds;
-  if (!Array.isArray(bounds) || bounds.length !== 4 || !bounds.every((n) => typeof n === 'number')) {
-    throw new Error(`${path}.bounds must be four numbers [left, top, right, bottom].`);
-  }
+  expectBounds(node.bounds, path);
   if (!Array.isArray(node.actions) || !node.actions.every((n) => typeof n === 'number')) {
     throw new Error(`${path}.actions must be an array of numbers.`);
   }
@@ -324,6 +442,12 @@ function validateNode(value: unknown, path: string): void {
   node.children.forEach((child, index) => {
     validateNode(child, `${path}.children[${String(index)}]`);
   });
+}
+
+function expectBounds(bounds: unknown, path: string): void {
+  if (!Array.isArray(bounds) || bounds.length !== 4 || !bounds.every((n) => typeof n === 'number')) {
+    throw new Error(`${path}.bounds must be four numbers [left, top, right, bottom].`);
+  }
 }
 
 function asRecord(value: unknown, path: string): Record<string, unknown> {

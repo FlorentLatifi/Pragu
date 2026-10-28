@@ -30,7 +30,20 @@ export function BackIcon() {
   return <View style={styles.back} />;
 }
 
+export function CloseIcon() {
+  return (
+    <View style={styles.close}>
+      <View style={[styles.closeBar, styles.closeBarDown]} />
+      <View style={[styles.closeBar, styles.closeBarUp]} />
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
+  close: { width: 18, height: 18, alignItems: 'center', justifyContent: 'center' },
+  closeBar: { position: 'absolute', width: 20, height: 3, borderRadius: 1, backgroundColor: '#1A1A18' },
+  closeBarDown: { transform: [{ rotate: '45deg' }] },
+  closeBarUp: { transform: [{ rotate: '-45deg' }] },
   trash: { alignItems: 'center' },
   trashLid: { width: 18, height: 3, borderRadius: 1, backgroundColor: '#1A1A18', marginBottom: 2 },
   trashBody: {

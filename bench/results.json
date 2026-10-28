@@ -3,15 +3,15 @@
   "fixtures": [
     "rn-shop"
   ],
-  "screens": 3,
+  "screens": 4,
   "rules": [
     {
       "rule": "name/interactive-missing",
       "severity": "error",
-      "tp": 4,
+      "tp": 5,
       "fp": 0,
       "fn": 0,
-      "tn": 7,
+      "tn": 9,
       "precision": 1,
       "recall": 1,
       "f1": 1,
@@ -20,10 +20,10 @@
     {
       "rule": "contrast/text",
       "severity": "error",
-      "tp": 4,
+      "tp": 5,
       "fp": 0,
       "fn": 0,
-      "tn": 6,
+      "tn": 8,
       "precision": 1,
       "recall": 1,
       "f1": 1,
@@ -35,11 +35,11 @@
       "tp": 3,
       "fp": 1,
       "fn": 0,
-      "tn": 3,
+      "tn": 5,
       "precision": 0.75,
       "recall": 1,
       "f1": 0.8571,
-      "mcc": 0.75
+      "mcc": 0.7905
     }
   ],
   "falsePositives": [

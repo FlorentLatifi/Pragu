@@ -98,26 +98,73 @@ data class DeviceInfo(
         .put("nightMode", nightMode)
 }
 
+/** AccessibilityWindowInfo.TYPE_* values as protocol strings (6, magnification overlay, is API 33+). */
+fun windowTypeName(type: Int): String = when (type) {
+    1 -> "application"
+    2 -> "input_method"
+    3 -> "system"
+    4 -> "accessibility_overlay"
+    5 -> "split_screen_divider"
+    6 -> "magnification_overlay"
+    else -> "unknown"
+}
+
+/**
+ * One window on screen: the app, a dialog, the keyboard, the status bar. Only the
+ * scanned app's windows carry a tree; other apps and system UI are reported as
+ * rectangles, so their content never leaves the device.
+ */
+data class WindowSnapshot(
+    val type: String,
+    val layer: Int,
+    val title: String?,
+    val left: Int,
+    val top: Int,
+    val right: Int,
+    val bottom: Int,
+    val active: Boolean,
+    val focused: Boolean,
+    val root: NodeSnapshot?,
+) {
+    fun toJson(): JSONObject = JSONObject()
+        .put("type", type)
+        .put("layer", layer)
+        .putNullable("title", title)
+        .put("bounds", JSONArray(listOf(left, top, right, bottom)))
+        .put("active", active)
+        .put("focused", focused)
+        .putNullable("root", root?.toJson())
+
+    fun signature(): Int = listOf(type, layer, left, top, right, bottom, root?.signature()).hashCode()
+}
+
 class Capture(
     val packageName: String,
     val windowTitle: String?,
     val capturedAt: String,
     val screenWidthPx: Int,
     val screenHeightPx: Int,
-    val root: NodeSnapshot,
+    /** Every window on screen, bottom first. */
+    val windows: List<WindowSnapshot>,
     val png: ByteArray,
 ) {
-    /** The protocol-1 capture document (AndroidCapture in packages/core/src/android.ts). */
-    fun toJson(device: DeviceInfo, agentVersion: String): JSONObject = JSONObject()
-        .put("protocol", PROTOCOL_VERSION)
-        .put("agentVersion", agentVersion)
-        .put("capturedAt", capturedAt)
-        .put("packageName", packageName)
-        .putNullable("windowTitle", windowTitle)
-        .put("screenWidthPx", screenWidthPx)
-        .put("screenHeightPx", screenHeightPx)
-        .put("device", device.toJson())
-        .put("root", root.toJson())
+    fun nodeCount(): Int = windows.sumOf { it.root?.nodeCount() ?: 0 }
+
+    /** The protocol-2 capture document (AndroidCapture in packages/core/src/android.ts). */
+    fun toJson(device: DeviceInfo, agentVersion: String): JSONObject {
+        val windowArray = JSONArray()
+        windows.forEach { windowArray.put(it.toJson()) }
+        return JSONObject()
+            .put("protocol", PROTOCOL_VERSION)
+            .put("agentVersion", agentVersion)
+            .put("capturedAt", capturedAt)
+            .put("packageName", packageName)
+            .putNullable("windowTitle", windowTitle)
+            .put("screenWidthPx", screenWidthPx)
+            .put("screenHeightPx", screenHeightPx)
+            .put("device", device.toJson())
+            .put("windows", windowArray)
+    }
 }
 
 /** org.json drops a key when given null; the protocol wants an explicit JSON null instead. */

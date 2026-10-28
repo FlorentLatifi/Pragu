@@ -95,6 +95,23 @@ ${screens}
 `;
 }
 
+/** What this screen's checks could not see, said plainly next to the results. */
+export function screenNotes(screen: PamScreen): string[] {
+  const notes: string[] = [];
+  if (screen.windows.filter((window) => window.kind === 'app').length > 1) {
+    notes.push('A dialog or popup was open, so only its content was checked.');
+  }
+  if (screen.windows.some((window) => window.kind === 'keyboard')) {
+    notes.push('The keyboard was open; elements it covered were not checked.');
+  }
+  if (screen.nodes.some((node) => node.inWebView)) {
+    notes.push(
+      'This screen contains web content (a WebView). Pragu checks native UI only; test web content with a web tool such as axe-core.',
+    );
+  }
+  return notes;
+}
+
 function renderScreen(
   screen: PamScreen,
   numbered: { issue: Issue; number: number }[],
@@ -124,8 +141,12 @@ function renderScreen(
     numbered.length === 0
       ? '<p class="empty">Nothing found on this screen by these checks. That is a good start, not proof of accessibility: try it with TalkBack next.</p>'
       : `<ol class="issues">${numbered.map(({ issue, number }) => renderIssue(issue, number)).join('\n')}</ol>`;
+  const notes = screenNotes(screen);
+  const notesList =
+    notes.length === 0 ? '' : `<ul class="notes">${notes.map((note) => `<li>${escapeHtml(note)}</li>`).join('')}</ul>`;
   return `<section class="screen" aria-labelledby="${headingId}">
   <h2 id="${headingId}">${escapeHtml(screen.name)} <span class="screen-app">${escapeHtml(screen.appId)}</span></h2>
+  ${notesList}
   <div class="screen-grid">
     ${figure}
     ${list}
@@ -221,6 +242,7 @@ h3 { font-size: 16px; line-height: 1.4; margin: 0; display: flex; gap: 12px; ali
 .counts dd { margin: 0; font: 600 40px/1.1 var(--font-mono); }
 .screen { padding: 32px 0; border-bottom: 1px solid var(--line); }
 .screen-app { font: 400 14px var(--font-mono); color: var(--muted); margin-left: 8px; }
+.notes { margin: -8px 0 16px; padding-left: 20px; color: var(--muted); font-size: 14px; }
 .screen-grid { display: grid; gap: 32px; grid-template-columns: minmax(0, 1fr); }
 @media (min-width: 900px) { .screen-grid { grid-template-columns: 360px minmax(0, 1fr); align-items: start; } .shot { position: sticky; top: 16px; } }
 .shot { margin: 0; max-width: 360px; }

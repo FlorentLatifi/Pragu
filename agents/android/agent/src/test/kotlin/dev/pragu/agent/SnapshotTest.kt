@@ -97,13 +97,47 @@ class SnapshotTest {
     }
 
     @Test
-    fun captureJsonCarriesProtocolDeviceAndRoot() {
+    fun captureJsonCarriesProtocolDeviceAndWindows() {
         val device = DeviceInfo("Google", "Pixel", 36, "16", 420, 1.0f, "en-US", false)
-        val capture = Capture("com.example.shop", null, "2026-10-27T12:00:00Z", 1080, 2400, snapshot(), byteArrayOf())
-        val json = capture.toJson(device, "0.0.1")
+        val windows = listOf(window("application", 0, snapshot()), window("input_method", 1, null))
+        val capture = Capture("com.example.shop", null, "2026-10-27T12:00:00Z", 1080, 2400, windows, byteArrayOf())
+        val json = capture.toJson(device, "0.0.2")
+        assertEquals(2, PROTOCOL_VERSION)
         assertEquals(PROTOCOL_VERSION, json.getInt("protocol"))
+        assertFalse(json.has("root"))
         assertTrue(json.isNull("windowTitle"))
         assertEquals(420, json.getJSONObject("device").getInt("densityDpi"))
-        assertEquals("android.widget.TextView", json.getJSONObject("root").getString("className"))
+        val app = json.getJSONArray("windows").getJSONObject(0)
+        assertEquals("android.widget.TextView", app.getJSONObject("root").getString("className"))
+        assertTrue(json.getJSONArray("windows").getJSONObject(1).isNull("root"))
+        assertEquals(1, capture.nodeCount())
     }
+
+    @Test
+    fun windowJsonHasExactlyTheProtocolFields() {
+        val json = window("application", 3, snapshot()).toJson()
+        assertEquals(setOf("type", "layer", "title", "bounds", "active", "focused", "root"), json.keys().asSequence().toSet())
+        assertEquals(3, json.getInt("layer"))
+        val bounds = json.getJSONArray("bounds")
+        assertEquals(listOf(0, 0, 1080, 2400), (0 until bounds.length()).map { bounds.getInt(it) })
+    }
+
+    @Test
+    fun windowSignatureFollowsBoundsAndContent() {
+        val dialog = window("application", 1, snapshot(text = "Remove?"))
+        assertEquals(dialog.signature(), dialog.copy().signature())
+        assertNotEquals(dialog.signature(), dialog.copy(bottom = 1200).signature())
+        assertNotEquals(dialog.signature(), dialog.copy(root = snapshot(text = "Keep?")).signature())
+    }
+
+    @Test
+    fun windowTypesMapToProtocolNames() {
+        assertEquals(
+            listOf("application", "input_method", "system", "accessibility_overlay", "split_screen_divider", "magnification_overlay", "unknown"),
+            (1..7).map { windowTypeName(it) },
+        )
+    }
+
+    private fun window(type: String, layer: Int, root: NodeSnapshot?) =
+        WindowSnapshot(type, layer, null, 0, 0, 1080, 2400, active = layer == 0, focused = layer == 0, root = root)
 }

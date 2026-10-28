@@ -1,10 +1,54 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { TrashIcon } from '../components/icons';
+import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { CloseIcon, TrashIcon } from '../components/icons';
 
 const noop = () => {};
 
+// A confirmation dialog in its own window (React Native's Modal). Its barriers count;
+// the cart's barriers behind it must not, because nobody can act on them while it is open.
+function RemoveDialog() {
+  return (
+    <Modal transparent animationType="none" visible onRequestClose={noop}>
+      <View style={styles.scrim}>
+        <View style={styles.dialog}>
+          <View style={styles.dialogHeader}>
+            <Text testID="screen-cart-dialog" accessibilityRole="header" style={styles.dialogTitle}>
+              Remove Ceramic mug?
+            </Text>
+            {/* Seeded barrier: an icon-only close button with no name, inside the dialog. */}
+            <Pressable
+              testID="seed-dialog-unlabeled-close"
+              accessibilityRole="button"
+              onPress={noop}
+              style={styles.iconButton}
+            >
+              <CloseIcon />
+            </Pressable>
+          </View>
+          {/* Seeded barrier: #AAAAAA on white is 2.3:1. */}
+          <Text testID="seed-dialog-low-contrast" style={styles.dialogCaption}>
+            You can add it again later.
+          </Text>
+          <View style={styles.dialogActions}>
+            <Pressable testID="twin-dialog-keep" accessibilityRole="button" onPress={noop} style={styles.dialogButton}>
+              <Text style={styles.dialogKeepText}>Keep it</Text>
+            </Pressable>
+            <Pressable
+              testID="twin-dialog-remove"
+              accessibilityRole="button"
+              onPress={noop}
+              style={[styles.dialogButton, styles.dialogRemove]}
+            >
+              <Text style={styles.dialogRemoveText}>Remove</Text>
+            </Pressable>
+          </View>
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
 // Three seeded barriers, each next to a correct twin (see expected.json).
-export function CartScreen() {
+export function CartScreen({ confirmRemove = false }: { confirmRemove?: boolean }) {
   return (
     <View style={styles.screen}>
       <View style={styles.header}>
@@ -77,11 +121,22 @@ export function CartScreen() {
       <Pressable testID="checkout" accessibilityRole="button" onPress={noop} style={styles.checkout}>
         <Text style={styles.checkoutText}>Checkout · €36.00</Text>
       </Pressable>
+      {confirmRemove ? <RemoveDialog /> : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  scrim: { flex: 1, backgroundColor: 'rgba(26, 26, 24, 0.5)', justifyContent: 'center', padding: 24 },
+  dialog: { backgroundColor: '#FFFFFF', borderRadius: 6, padding: 20 },
+  dialogHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  dialogTitle: { flex: 1, fontSize: 20, fontWeight: '600', color: '#1A1A18' },
+  dialogCaption: { fontSize: 14, color: '#AAAAAA', marginTop: 4 },
+  dialogActions: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 20 },
+  dialogButton: { height: 48, paddingHorizontal: 16, borderRadius: 6, justifyContent: 'center' },
+  dialogRemove: { backgroundColor: '#A8432F', marginLeft: 8 },
+  dialogKeepText: { fontSize: 16, fontWeight: '600', color: '#1A1A18' },
+  dialogRemoveText: { fontSize: 16, fontWeight: '600', color: '#FFFFFF' },
   screen: { flex: 1, backgroundColor: '#FFFFFF', paddingTop: 64, paddingHorizontal: 20 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 },
   title: { fontSize: 28, fontWeight: '600', color: '#1A1A18' },

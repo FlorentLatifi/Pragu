@@ -1,4 +1,13 @@
-import type { AndroidCapture, AndroidRawNode, DeviceInfo, PamNode, PamScreen, Raster, Rect } from '../src/index.js';
+import type {
+  AndroidCapture,
+  AndroidRawNode,
+  AndroidRawWindow,
+  DeviceInfo,
+  PamNode,
+  PamScreen,
+  Raster,
+  Rect,
+} from '../src/index.js';
 
 export function rawNode(overrides: Partial<AndroidRawNode> = {}): AndroidRawNode {
   return {
@@ -29,10 +38,29 @@ export function rawNode(overrides: Partial<AndroidRawNode> = {}): AndroidRawNode
   };
 }
 
-export function captureOf(root: AndroidRawNode, densityDpi = 160): AndroidCapture {
+/** A window; by default the app's full-screen window holding `root`. */
+export function windowOf(root: AndroidRawNode | null, overrides: Partial<AndroidRawWindow> = {}): AndroidRawWindow {
   return {
-    protocol: 1,
-    agentVersion: '0.0.1',
+    type: 'application',
+    layer: 0,
+    title: 'Shop',
+    bounds: [0, 0, 1080, 2400],
+    active: true,
+    focused: true,
+    root,
+    ...overrides,
+  };
+}
+
+/** A protocol-2 capture with a single app window, unless `windows` are given. */
+export function captureOf(
+  root: AndroidRawNode,
+  densityDpi = 160,
+  windows: AndroidRawWindow[] = [windowOf(root)],
+): AndroidCapture {
+  return {
+    protocol: 2,
+    agentVersion: '0.0.2',
     capturedAt: '2026-10-27T12:00:00.000Z',
     packageName: 'com.example.shop',
     windowTitle: 'Shop',
@@ -48,7 +76,7 @@ export function captureOf(root: AndroidRawNode, densityDpi = 160): AndroidCaptur
       locale: 'en-US',
       nightMode: false,
     },
-    root,
+    windows,
   };
 }
 
@@ -83,6 +111,9 @@ export function pamNode(overrides: Partial<PamNode> & { id: string }): PamNode {
     interactive: true,
     exposedToAssistiveTech: true,
     visible: true,
+    obscured: false,
+    inWebView: false,
+    window: 0,
     enabled: true,
     textSizeDp: null,
     ...overrides,
@@ -90,7 +121,14 @@ export function pamNode(overrides: Partial<PamNode> & { id: string }): PamNode {
 }
 
 export function screenOf(nodes: PamNode[]): PamScreen {
-  return { id: 'screen-1', name: 'Cart', appId: 'com.example.shop', screenshot: null, nodes };
+  return {
+    id: 'screen-1',
+    name: 'Cart',
+    appId: 'com.example.shop',
+    screenshot: null,
+    windows: [{ kind: 'app', title: 'Shop', boundsPx: rect(0, 0, 1080, 2400), foreground: true }],
+    nodes,
+  };
 }
 
 export function rect(left: number, top: number, right: number, bottom: number): Rect {

@@ -1,5 +1,6 @@
 import { estimateTextColors, formatRatio, toHex } from '../color.js';
 import type { Confidence, PamNode } from '../model.js';
+import { inScope } from './scope.js';
 import type { Finding, Rule } from './types.js';
 
 /** WCAG 1.4.3 sets no contrast requirement for text that is part of an inactive (disabled) component. */
@@ -53,7 +54,8 @@ export const textContrast: Rule = {
     const findings: Finding[] = [];
     const byId = new Map(screen.nodes.map((node) => [node.id, node]));
     for (const node of screen.nodes) {
-      if (!node.visible || node.text === null || isInsideInactiveComponent(node, byId)) continue;
+      // An obscured element's pixels partly belong to the window covering it, so its colours cannot be trusted.
+      if (!inScope(node) || node.obscured || node.text === null || isInsideInactiveComponent(node, byId)) continue;
       const colors = estimateTextColors(raster, node.boundsPx);
       if (colors === null) continue;
       const { required, confidence } = requiredTextRatio(node.textSizeDp);

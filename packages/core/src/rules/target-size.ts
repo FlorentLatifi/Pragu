@@ -1,5 +1,6 @@
 import { circleIntersectsRect, rectCenter, rectGap, rectHeight, rectWidth } from '../geometry.js';
 import type { PamNode } from '../model.js';
+import { inScope } from './scope.js';
 import type { Finding, Rule } from './types.js';
 
 /** WCAG 2.5.8 minimum: 24×24 CSS px. A CSS px and a dp are both ~1/160 inch, so 24 dp. */
@@ -42,7 +43,7 @@ export const targetSize: Rule = {
   },
   check({ screen }) {
     const targets = screen.nodes.filter(
-      (node) => node.interactive && node.visible && node.enabled && node.exposedToAssistiveTech,
+      (node) => node.interactive && inScope(node) && node.enabled && node.exposedToAssistiveTech,
     );
     const undersized = new Set(targets.filter(isUndersized).map((node) => node.id));
     const findings: Finding[] = [];

@@ -238,7 +238,9 @@ describe('recordings', () => {
     const { capture, png } = recording();
     const issues = analyzeRecording(capture, png, screen);
     expect(issues.map((found) => [found.ruleId, found.resourceId])).toEqual([['name/interactive-missing', 'seed-a']]);
-    expect(containsResourceId(capture.root, 'seed-a')).toBe(true);
+    const root = capture.windows[0]?.root;
+    expect(root !== null && root !== undefined && containsResourceId(root, 'seed-a')).toBe(true);
+    expect(root !== null && root !== undefined && containsResourceId(root, 'nope')).toBe(false);
   });
 
   it('rejects a recording of the wrong screen', () => {

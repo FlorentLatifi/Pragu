@@ -1,0 +1,670 @@
+{
+  "protocol": 2,
+  "agentVersion": "0.0.2",
+  "capturedAt": "2026-10-28T11:35:51.110987Z",
+  "packageName": "dev.pragu.fixtures.rnshop",
+  "windowTitle": null,
+  "screenWidthPx": 1080,
+  "screenHeightPx": 2400,
+  "device": {
+    "manufacturer": "Google",
+    "model": "sdk_gphone64_x86_64",
+    "sdkInt": 36,
+    "release": "16",
+    "densityDpi": 420,
+    "fontScale": 1,
+    "locale": "en-US",
+    "nightMode": false
+  },
+  "windows": [
+    {
+      "type": "application",
+      "layer": 0,
+      "title": null,
+      "bounds": [
+        0,
+        0,
+        1080,
+        2400
+      ],
+      "active": true,
+      "focused": true,
+      "root": {
+        "className": "android.widget.FrameLayout",
+        "packageName": "dev.pragu.fixtures.rnshop",
+        "resourceId": null,
+        "text": null,
+        "contentDescription": null,
+        "hintText": null,
+        "stateDescription": null,
+        "roleDescription": null,
+        "bounds": [
+          0,
+          0,
+          1080,
+          2400
+        ],
+        "clickable": false,
+        "longClickable": false,
+        "focusable": false,
+        "checkable": false,
+        "checked": false,
+        "enabled": true,
+        "editable": false,
+        "visibleToUser": true,
+        "importantForAccessibility": true,
+        "heading": false,
+        "screenReaderFocusable": false,
+        "actions": [
+          4,
+          8,
+          64,
+          16908342
+        ],
+        "textSizePx": null,
+        "children": [
+          {
+            "className": "android.widget.LinearLayout",
+            "packageName": "dev.pragu.fixtures.rnshop",
+            "resourceId": null,
+            "text": null,
+            "contentDescription": null,
+            "hintText": null,
+            "stateDescription": null,
+            "roleDescription": null,
+            "bounds": [
+              0,
+              0,
+              1080,
+              2400
+            ],
+            "clickable": false,
+            "longClickable": false,
+            "focusable": false,
+            "checkable": false,
+            "checked": false,
+            "enabled": true,
+            "editable": false,
+            "visibleToUser": true,
+            "importantForAccessibility": false,
+            "heading": false,
+            "screenReaderFocusable": false,
+            "actions": [
+              4,
+              8,
+              64,
+              16908342
+            ],
+            "textSizePx": null,
+            "children": [
+              {
+                "className": "android.widget.FrameLayout",
+                "packageName": "dev.pragu.fixtures.rnshop",
+                "resourceId": "android:id/content",
+                "text": null,
+                "contentDescription": null,
+                "hintText": null,
+                "stateDescription": null,
+                "roleDescription": null,
+                "bounds": [
+                  0,
+                  0,
+                  1080,
+                  2400
+                ],
+                "clickable": false,
+                "longClickable": false,
+                "focusable": false,
+                "checkable": false,
+                "checked": false,
+                "enabled": true,
+                "editable": false,
+                "visibleToUser": true,
+                "importantForAccessibility": false,
+                "heading": false,
+                "screenReaderFocusable": false,
+                "actions": [
+                  4,
+                  8,
+                  64,
+                  16908342
+                ],
+                "textSizePx": null,
+                "children": [
+                  {
+                    "className": "android.widget.FrameLayout",
+                    "packageName": "dev.pragu.fixtures.rnshop",
+                    "resourceId": null,
+                    "text": null,
+                    "contentDescription": null,
+                    "hintText": null,
+                    "stateDescription": null,
+                    "roleDescription": null,
+                    "bounds": [
+                      0,
+                      0,
+                      1080,
+                      2400
+                    ],
+                    "clickable": false,
+                    "longClickable": false,
+                    "focusable": false,
+                    "checkable": false,
+                    "checked": false,
+                    "enabled": true,
+                    "editable": false,
+                    "visibleToUser": true,
+                    "importantForAccessibility": false,
+                    "heading": false,
+                    "screenReaderFocusable": false,
+                    "actions": [
+                      4,
+                      8,
+                      64,
+                      16908342
+                    ],
+                    "textSizePx": null,
+                    "children": [
+                      {
+                        "className": "android.view.ViewGroup",
+                        "packageName": "dev.pragu.fixtures.rnshop",
+                        "resourceId": null,
+                        "text": null,
+                        "contentDescription": null,
+                        "hintText": null,
+                        "stateDescription": null,
+                        "roleDescription": null,
+                        "bounds": [
+                          0,
+                          0,
+                          1080,
+                          2400
+                        ],
+                        "clickable": false,
+                        "longClickable": false,
+                        "focusable": false,
+                        "checkable": false,
+                        "checked": false,
+                        "enabled": true,
+                        "editable": false,
+                        "visibleToUser": true,
+                        "importantForAccessibility": false,
+                        "heading": false,
+                        "screenReaderFocusable": false,
+                        "actions": [
+                          4,
+                          8,
+                          64,
+                          16908342
+                        ],
+                        "textSizePx": null,
+                        "children": [
+                          {
+                            "className": "android.view.ViewGroup",
+                            "packageName": "dev.pragu.fixtures.rnshop",
+                            "resourceId": null,
+                            "text": null,
+                            "contentDescription": null,
+                            "hintText": null,
+                            "stateDescription": null,
+                            "roleDescription": null,
+                            "bounds": [
+                              0,
+                              0,
+                              1080,
+                              2400
+                            ],
+                            "clickable": false,
+                            "longClickable": false,
+                            "focusable": false,
+                            "checkable": false,
+                            "checked": false,
+                            "enabled": true,
+                            "editable": false,
+                            "visibleToUser": true,
+                            "importantForAccessibility": false,
+                            "heading": false,
+                            "screenReaderFocusable": false,
+                            "actions": [
+                              4,
+                              8,
+                              64,
+                              16908342
+                            ],
+                            "textSizePx": null,
+                            "children": [
+                              {
+                                "className": "android.view.ViewGroup",
+                                "packageName": "dev.pragu.fixtures.rnshop",
+                                "resourceId": null,
+                                "text": null,
+                                "contentDescription": null,
+                                "hintText": null,
+                                "stateDescription": null,
+                                "roleDescription": null,
+                                "bounds": [
+                                  0,
+                                  0,
+                                  1080,
+                                  2400
+                                ],
+                                "clickable": false,
+                                "longClickable": false,
+                                "focusable": false,
+                                "checkable": false,
+                                "checked": false,
+                                "enabled": true,
+                                "editable": false,
+                                "visibleToUser": true,
+                                "importantForAccessibility": false,
+                                "heading": false,
+                                "screenReaderFocusable": false,
+                                "actions": [
+                                  4,
+                                  8,
+                                  64,
+                                  16908342
+                                ],
+                                "textSizePx": null,
+                                "children": []
+                              },
+                              {
+                                "className": "android.view.ViewGroup",
+                                "packageName": "dev.pragu.fixtures.rnshop",
+                                "resourceId": null,
+                                "text": null,
+                                "contentDescription": null,
+                                "hintText": null,
+                                "stateDescription": null,
+                                "roleDescription": null,
+                                "bounds": [
+                                  63,
+                                  965,
+                                  1017,
+                                  1436
+                                ],
+                                "clickable": false,
+                                "longClickable": false,
+                                "focusable": false,
+                                "checkable": false,
+                                "checked": false,
+                                "enabled": true,
+                                "editable": false,
+                                "visibleToUser": true,
+                                "importantForAccessibility": false,
+                                "heading": false,
+                                "screenReaderFocusable": false,
+                                "actions": [
+                                  4,
+                                  8,
+                                  64,
+                                  16908342
+                                ],
+                                "textSizePx": null,
+                                "children": []
+                              },
+                              {
+                                "className": "android.view.View",
+                                "packageName": "dev.pragu.fixtures.rnshop",
+                                "resourceId": "screen-cart-dialog",
+                                "text": "Remove Ceramic mug?",
+                                "contentDescription": null,
+                                "hintText": null,
+                                "stateDescription": null,
+                                "roleDescription": null,
+                                "bounds": [
+                                  116,
+                                  1045,
+                                  839,
+                                  1116
+                                ],
+                                "clickable": false,
+                                "longClickable": false,
+                                "focusable": false,
+                                "checkable": false,
+                                "checked": false,
+                                "enabled": true,
+                                "editable": false,
+                                "visibleToUser": true,
+                                "importantForAccessibility": true,
+                                "heading": true,
+                                "screenReaderFocusable": false,
+                                "actions": [
+                                  4,
+                                  8,
+                                  64,
+                                  256,
+                                  512,
+                                  131072,
+                                  16908342
+                                ],
+                                "textSizePx": 53,
+                                "children": []
+                              },
+                              {
+                                "className": "android.widget.Button",
+                                "packageName": "dev.pragu.fixtures.rnshop",
+                                "resourceId": "seed-dialog-unlabeled-close",
+                                "text": null,
+                                "contentDescription": "",
+                                "hintText": null,
+                                "stateDescription": null,
+                                "roleDescription": null,
+                                "bounds": [
+                                  839,
+                                  1018,
+                                  965,
+                                  1144
+                                ],
+                                "clickable": true,
+                                "longClickable": false,
+                                "focusable": true,
+                                "checkable": false,
+                                "checked": false,
+                                "enabled": true,
+                                "editable": false,
+                                "visibleToUser": true,
+                                "importantForAccessibility": true,
+                                "heading": false,
+                                "screenReaderFocusable": false,
+                                "actions": [
+                                  1,
+                                  4,
+                                  8,
+                                  16,
+                                  64,
+                                  16908342
+                                ],
+                                "textSizePx": null,
+                                "children": [
+                                  {
+                                    "className": "android.view.ViewGroup",
+                                    "packageName": "dev.pragu.fixtures.rnshop",
+                                    "resourceId": null,
+                                    "text": null,
+                                    "contentDescription": null,
+                                    "hintText": null,
+                                    "stateDescription": null,
+                                    "roleDescription": null,
+                                    "bounds": [
+                                      880,
+                                      1059,
+                                      923,
+                                      1103
+                                    ],
+                                    "clickable": false,
+                                    "longClickable": false,
+                                    "focusable": false,
+                                    "checkable": false,
+                                    "checked": false,
+                                    "enabled": true,
+                                    "editable": false,
+                                    "visibleToUser": true,
+                                    "importantForAccessibility": false,
+                                    "heading": false,
+                                    "screenReaderFocusable": false,
+                                    "actions": [
+                                      4,
+                                      8,
+                                      64,
+                                      16908342
+                                    ],
+                                    "textSizePx": null,
+                                    "children": []
+                                  },
+                                  {
+                                    "className": "android.view.ViewGroup",
+                                    "packageName": "dev.pragu.fixtures.rnshop",
+                                    "resourceId": null,
+                                    "text": null,
+                                    "contentDescription": null,
+                                    "hintText": null,
+                                    "stateDescription": null,
+                                    "roleDescription": null,
+                                    "bounds": [
+                                      880,
+                                      1059,
+                                      923,
+                                      1103
+                                    ],
+                                    "clickable": false,
+                                    "longClickable": false,
+                                    "focusable": false,
+                                    "checkable": false,
+                                    "checked": false,
+                                    "enabled": true,
+                                    "editable": false,
+                                    "visibleToUser": true,
+                                    "importantForAccessibility": false,
+                                    "heading": false,
+                                    "screenReaderFocusable": false,
+                                    "actions": [
+                                      4,
+                                      8,
+                                      64,
+                                      16908342
+                                    ],
+                                    "textSizePx": null,
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "className": "android.widget.TextView",
+                                "packageName": "dev.pragu.fixtures.rnshop",
+                                "resourceId": "seed-dialog-low-contrast",
+                                "text": "You can add it again later.",
+                                "contentDescription": null,
+                                "hintText": null,
+                                "stateDescription": null,
+                                "roleDescription": null,
+                                "bounds": [
+                                  115,
+                                  1154,
+                                  964,
+                                  1205
+                                ],
+                                "clickable": false,
+                                "longClickable": false,
+                                "focusable": false,
+                                "checkable": false,
+                                "checked": false,
+                                "enabled": true,
+                                "editable": false,
+                                "visibleToUser": true,
+                                "importantForAccessibility": true,
+                                "heading": false,
+                                "screenReaderFocusable": false,
+                                "actions": [
+                                  4,
+                                  8,
+                                  64,
+                                  256,
+                                  512,
+                                  131072,
+                                  16908342
+                                ],
+                                "textSizePx": 37,
+                                "children": []
+                              },
+                              {
+                                "className": "android.widget.Button",
+                                "packageName": "dev.pragu.fixtures.rnshop",
+                                "resourceId": "twin-dialog-keep",
+                                "text": null,
+                                "contentDescription": "Keep it",
+                                "hintText": null,
+                                "stateDescription": null,
+                                "roleDescription": null,
+                                "bounds": [
+                                  492,
+                                  1258,
+                                  707,
+                                  1384
+                                ],
+                                "clickable": true,
+                                "longClickable": false,
+                                "focusable": true,
+                                "checkable": false,
+                                "checked": false,
+                                "enabled": true,
+                                "editable": false,
+                                "visibleToUser": true,
+                                "importantForAccessibility": true,
+                                "heading": false,
+                                "screenReaderFocusable": false,
+                                "actions": [
+                                  1,
+                                  4,
+                                  8,
+                                  16,
+                                  64,
+                                  16908342
+                                ],
+                                "textSizePx": null,
+                                "children": [
+                                  {
+                                    "className": "android.widget.TextView",
+                                    "packageName": "dev.pragu.fixtures.rnshop",
+                                    "resourceId": null,
+                                    "text": "Keep it",
+                                    "contentDescription": null,
+                                    "hintText": null,
+                                    "stateDescription": null,
+                                    "roleDescription": null,
+                                    "bounds": [
+                                      534,
+                                      1292,
+                                      665,
+                                      1349
+                                    ],
+                                    "clickable": false,
+                                    "longClickable": false,
+                                    "focusable": false,
+                                    "checkable": false,
+                                    "checked": false,
+                                    "enabled": true,
+                                    "editable": false,
+                                    "visibleToUser": true,
+                                    "importantForAccessibility": true,
+                                    "heading": false,
+                                    "screenReaderFocusable": false,
+                                    "actions": [
+                                      4,
+                                      8,
+                                      64,
+                                      256,
+                                      512,
+                                      131072,
+                                      16908342
+                                    ],
+                                    "textSizePx": 42,
+                                    "children": []
+                                  }
+                                ]
+                              },
+                              {
+                                "className": "android.widget.Button",
+                                "packageName": "dev.pragu.fixtures.rnshop",
+                                "resourceId": "twin-dialog-remove",
+                                "text": null,
+                                "contentDescription": "Remove",
+                                "hintText": null,
+                                "stateDescription": null,
+                                "roleDescription": null,
+                                "bounds": [
+                                  728,
+                                  1258,
+                                  965,
+                                  1384
+                                ],
+                                "clickable": true,
+                                "longClickable": false,
+                                "focusable": true,
+                                "checkable": false,
+                                "checked": false,
+                                "enabled": true,
+                                "editable": false,
+                                "visibleToUser": true,
+                                "importantForAccessibility": true,
+                                "heading": false,
+                                "screenReaderFocusable": false,
+                                "actions": [
+                                  1,
+                                  4,
+                                  8,
+                                  16,
+                                  64,
+                                  16908342
+                                ],
+                                "textSizePx": null,
+                                "children": [
+                                  {
+                                    "className": "android.widget.TextView",
+                                    "packageName": "dev.pragu.fixtures.rnshop",
+                                    "resourceId": null,
+                                    "text": "Remove",
+                                    "contentDescription": null,
+                                    "hintText": null,
+                                    "stateDescription": null,
+                                    "roleDescription": null,
+                                    "bounds": [
+                                      770,
+                                      1292,
+                                      923,
+                                      1349
+                                    ],
+                                    "clickable": false,
+                                    "longClickable": false,
+                                    "focusable": false,
+                                    "checkable": false,
+                                    "checked": false,
+                                    "enabled": true,
+                                    "editable": false,
+                                    "visibleToUser": true,
+                                    "importantForAccessibility": true,
+                                    "heading": false,
+                                    "screenReaderFocusable": false,
+                                    "actions": [
+                                      4,
+                                      8,
+                                      64,
+                                      256,
+                                      512,
+                                      131072,
+                                      16908342
+                                    ],
+                                    "textSizePx": 42,
+                                    "children": []
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "type": "system",
+      "layer": 1,
+      "title": null,
+      "bounds": [
+        0,
+        0,
+        1080,
+        63
+      ],
+      "active": false,
+      "focused": false,
+      "root": null
+    }
+  ]
+}

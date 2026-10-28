@@ -28,6 +28,18 @@ export function rectGap(a: Rect, b: Rect): number {
   return Math.hypot(dx, dy);
 }
 
+/** True when `outer` covers every point of `inner`. */
+export function containsRect(outer: Rect, inner: Rect): boolean {
+  return (
+    outer.left <= inner.left && outer.top <= inner.top && outer.right >= inner.right && outer.bottom >= inner.bottom
+  );
+}
+
+/** True when the rectangles share some area (touching edges do not count). */
+export function rectsOverlap(a: Rect, b: Rect): boolean {
+  return a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
+}
+
 export function circleIntersectsRect(cx: number, cy: number, radius: number, rect: Rect): boolean {
   const nearestX = Math.min(Math.max(cx, rect.left), rect.right);
   const nearestY = Math.min(Math.max(cy, rect.top), rect.bottom);

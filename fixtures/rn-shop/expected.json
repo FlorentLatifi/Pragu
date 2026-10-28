@@ -20,6 +20,24 @@
       ]
     },
     {
+      "id": "cart-dialog",
+      "name": "Cart, remove dialog",
+      "url": "rnshop://cart?dialog=remove",
+      "marker": "screen-cart-dialog",
+      "barriers": [
+        { "rule": "name/interactive-missing", "testID": "seed-dialog-unlabeled-close" },
+        { "rule": "contrast/text", "testID": "seed-dialog-low-contrast", "note": "#AAAAAA on white is 2.3:1" }
+      ],
+      "correctTwins": [
+        { "rule": "name/interactive-missing", "testID": "twin-dialog-keep" },
+        { "rule": "name/interactive-missing", "testID": "seed-unlabeled-remove", "note": "behind the open dialog: nobody can act on it until the dialog closes" },
+        { "rule": "contrast/text", "testID": "screen-cart-dialog" },
+        { "rule": "contrast/text", "testID": "seed-low-contrast", "note": "behind the dialog's scrim" },
+        { "rule": "target/size", "testID": "seed-tiny-dismiss", "note": "behind the open dialog" },
+        { "rule": "target/size", "testID": "twin-dialog-remove" }
+      ]
+    },
+    {
       "id": "product",
       "name": "Product",
       "url": "rnshop://product",

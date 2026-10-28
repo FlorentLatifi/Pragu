@@ -25,7 +25,7 @@ Device / emulator                         Developer machine or CI
 3. Launch the app with `monkey -p <id> -c android.intent.category.LAUNCHER 1`.
 4. `am instrument -w -e socket pragu-<random> dev.pragu.agent/.PraguInstrumentation`, then `adb forward tcp:0 localabstract:pragu-<random>`.
 5. Connect, and retry `hello` until it answers. adb accepts the connection before the agent listens.
-6. `capture {packageName, timeoutMs}`. The agent polls until the app's window is in front and its tree is the same twice with content in it. It returns the tree as JSON and the screenshot as PNG.
+6. `capture {packageName, timeoutMs}`. The agent polls until the app's topmost window is on screen and every window is the same twice, with content in the app. It returns all windows as JSON (protocol 2: trees only for the app's own windows) and the screenshot as PNG.
 7. `shutdown`, then remove the forward.
 8. Validate the capture (`parseAndroidCapture`), normalise it to PAM, decode the PNG, run the rules, and write `pragu-result.json`, `pragu-report.html` and the raw capture.
 9. Exit 0, or 1 when issues reach `--fail-on` (default: error).
@@ -36,8 +36,10 @@ Device / emulator                         Developer machine or CI
 
 Defined in `packages/core/src/model.ts`. It is platform-neutral, so rules never see Android types.
 
-- **Node:** normalised `role` plus `platformRole`, accessible `name`, `text`, `hint`, `resourceId`, bounds in px and dp, `interactive`, `exposedToAssistiveTech`, `visible`, `enabled`, `textSizeDp`. Ids are tree paths (`0.3.1`).
-- **Screen:** app id, name, screenshot reference, nodes in depth-first order.
+- **Node:** normalised `role` plus `platformRole`, accessible `name`, `text`, `hint`, `resourceId`, bounds in px and dp, `interactive`, `exposedToAssistiveTech`, `visible`, `obscured`, `inWebView`, `window`, `enabled`, `textSizeDp`. Ids are tree paths whose first segment numbers the app's windows from the bottom (`0.3.1`, `1.0`).
+- **Window:** kind (`app`, `keyboard`, `system`, `other-app`, `overlay`), title, bounds, and whether it is the app's topmost (`foreground`) window.
+- **Screen:** app id, name, screenshot reference, windows bottom first, nodes depth-first per app window.
+- **What rules judge** (ADR-008): visible elements of the app's topmost window, not fully covered by another window, and not web content. Contrast also skips partly covered (`obscured`) elements.
 - **Issue:** rule metadata copied in (WCAG/EN mappings, who is affected, fix guidance), evidence, confidence, fingerprint (ADR-004).
 
 ## Android specifics, in `android.ts`
@@ -65,6 +67,6 @@ WCAG 2.5.8 asks for 24 × 24 CSS pixels. A CSS pixel is a reference unit, not a 
 
 Every user-facing error is a `PraguError` with what happened and the exact fix. Exit codes: 0 OK, 1 issues at the threshold, 2 usage, 3 environment. An unexpected exception prints the stack and asks for a bug report.
 
-## Deliberately not in M0
+## Not done yet
 
-Multiple windows (dialogs, keyboard), WebViews, scrolling and off-screen content, flows and crawling, baselines, SARIF, config, scoring, transcript, iOS. See `docs/plans/m1.md` and `ROADMAP.md`.
+Scrolling and off-screen content, flows and crawling, baselines, SARIF, config, scoring, transcript, iOS. See `docs/plans/m1.md` and `ROADMAP.md`. Windows, dialogs, the keyboard and WebViews arrived in M1 (ADR-008).

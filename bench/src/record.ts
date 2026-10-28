@@ -51,7 +51,9 @@ export async function recordAll(root: string, options: RecordOptions, log: (line
       let recorded = false;
       for (let attempt = 1; attempt <= ATTEMPTS && !recorded; attempt++) {
         await adb(['shell', 'am', 'force-stop', truth.appId]);
-        await adb(['shell', 'am', 'start', '-W', '-a', 'android.intent.action.VIEW', '-d', screen.url, truth.appId]);
+        // adb hands the command to the device's shell, which would treat ? and & in a deep link specially.
+        const url = `'${screen.url.replaceAll("'", '')}'`;
+        await adb(['shell', 'am', 'start', '-W', '-a', 'android.intent.action.VIEW', '-d', url, truth.appId]);
         const out = await mkdtemp(join(tmpdir(), 'pragu-bench-'));
         try {
           await run(
@@ -74,7 +76,10 @@ export async function recordAll(root: string, options: RecordOptions, log: (line
           );
           const captureFile = join(out, 'capture', 'screen-1.json');
           const capture = parseAndroidCapture(JSON.parse(await readFile(captureFile, 'utf8')));
-          if (!containsResourceId(capture.root, screen.marker)) {
+          const showsMarker = capture.windows.some(
+            (window) => window.root !== null && containsResourceId(window.root, screen.marker),
+          );
+          if (!showsMarker) {
             log(
               `${truth.fixture} › ${screen.id}: marker "${screen.marker}" not on screen yet (attempt ${String(attempt)})`,
             );

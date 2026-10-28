@@ -41,7 +41,10 @@ class RequestHandler(private val capturer: ScreenCapturer, private val agentVers
             val tree = capture.toJson(capturer.deviceInfo(), agentVersion).toString().toByteArray(Charsets.UTF_8)
             Response(
                 ok = true,
-                data = JSONObject().put("packageName", capture.packageName).put("nodes", capture.root.nodeCount()),
+                data = JSONObject()
+                    .put("packageName", capture.packageName)
+                    .put("windows", capture.windows.size)
+                    .put("nodes", capture.nodeCount()),
                 payloads = listOf(
                     Payload("tree", "application/json", tree),
                     Payload("screenshot", "image/png", capture.png),

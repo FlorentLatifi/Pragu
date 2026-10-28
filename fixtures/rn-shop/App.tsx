@@ -1,39 +1,54 @@
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
-import type { ComponentType } from 'react';
 import { Linking } from 'react-native';
 import { CartScreen } from './src/screens/CartScreen';
 import { FormScreen } from './src/screens/FormScreen';
 import { ProductScreen } from './src/screens/ProductScreen';
 
 // Pragu fixture "rn-shop". Each screen seeds accessibility barriers next to correct
-// twins. Pragu Bench opens a screen by deep link (rnshop://cart, rnshop://product,
-// rnshop://form) and checks the scan against expected.json, keyed by testID.
+// twins. Pragu Bench opens a screen by deep link (rnshop://cart, rnshop://cart?dialog=remove,
+// rnshop://product, rnshop://form) and checks the scan against expected.json, keyed by testID.
 
-const SCREENS = { cart: CartScreen, product: ProductScreen, form: FormScreen } satisfies Record<string, ComponentType>;
-type ScreenId = keyof typeof SCREENS;
+interface Route {
+  screen: 'cart' | 'product' | 'form';
+  dialog: boolean;
+}
 
-function screenFromUrl(url: string | null | undefined): ScreenId {
-  const name = url?.replace(/^rnshop:\/\//, '').split(/[/?#]/)[0];
-  return name === 'product' || name === 'form' ? name : 'cart';
+function routeFromUrl(url: string | null | undefined): Route {
+  const path = url?.replace(/^rnshop:\/\//, '') ?? '';
+  const name = path.split(/[/?#]/)[0];
+  return {
+    screen: name === 'product' || name === 'form' ? name : 'cart',
+    dialog: /[?&]dialog=remove(&|$)/.test(path),
+  };
+}
+
+function Screen({ route }: { route: Route }) {
+  switch (route.screen) {
+    case 'product':
+      return <ProductScreen />;
+    case 'form':
+      return <FormScreen />;
+    default:
+      return <CartScreen confirmRemove={route.dialog} />;
+  }
 }
 
 export default function App() {
   // Nothing renders until the launch URL is known, so a capture never sees the wrong screen.
-  const [screen, setScreen] = useState<ScreenId | null>(null);
+  const [route, setRoute] = useState<Route | null>(null);
 
   useEffect(() => {
-    void Linking.getInitialURL().then((url) => setScreen(screenFromUrl(url)));
-    const subscription = Linking.addEventListener('url', ({ url }) => setScreen(screenFromUrl(url)));
+    void Linking.getInitialURL().then((url) => setRoute(routeFromUrl(url)));
+    const subscription = Linking.addEventListener('url', ({ url }) => setRoute(routeFromUrl(url)));
     return () => subscription.remove();
   }, []);
 
-  if (screen === null) return null;
-  const Screen = SCREENS[screen];
+  if (route === null) return null;
   return (
     <>
       <StatusBar style="dark" />
-      <Screen />
+      <Screen route={route} />
     </>
   );
 }

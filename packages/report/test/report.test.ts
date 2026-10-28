@@ -1,7 +1,7 @@
 import { RESULT_SCHEMA_VERSION } from '@pragu/core';
 import type { Issue, ScanResult } from '@pragu/core';
 import { describe, expect, it } from 'vitest';
-import { escapeHtml, renderReport } from '../src/index.js';
+import { escapeHtml, renderReport, screenNotes } from '../src/index.js';
 
 function issue(overrides: Partial<Issue> = {}): Issue {
   return {
@@ -50,6 +50,9 @@ function result(issues: Issue[]): ScanResult {
         name: 'Cart',
         appId: 'dev.pragu.fixtures.rnshop',
         screenshot: { file: 'screen-1.png', widthPx: 1080, heightPx: 2400 },
+        windows: [
+          { kind: 'app', title: 'rn-shop', boundsPx: { left: 0, top: 0, right: 1080, bottom: 2400 }, foreground: true },
+        ],
         nodes: [],
       },
     ],
@@ -129,6 +132,30 @@ describe('renderReport', () => {
   it('states the limits of automated checks', () => {
     const html = renderReport({ result: result([issue()]), screenshots });
     expect(html).toContain('not a compliance statement');
+  });
+
+  it('says when a dialog, the keyboard or web content limited what was checked', () => {
+    const base = result([issue()]);
+    const screen = base.screens[0];
+    if (screen === undefined) throw new Error('fixture has a screen');
+    const full = { left: 0, top: 0, right: 1080, bottom: 2400 };
+    const limited = {
+      ...screen,
+      windows: [
+        { kind: 'app' as const, title: 'rn-shop', boundsPx: full, foreground: false },
+        { kind: 'app' as const, title: 'Remove?', boundsPx: full, foreground: true },
+        { kind: 'keyboard' as const, title: null, boundsPx: { ...full, top: 1500 }, foreground: false },
+      ],
+      nodes: [{ inWebView: true } as ScanResult['screens'][number]['nodes'][number]],
+    };
+    expect(screenNotes(limited)).toEqual([
+      'A dialog or popup was open, so only its content was checked.',
+      'The keyboard was open; elements it covered were not checked.',
+      'This screen contains web content (a WebView). Pragu checks native UI only; test web content with a web tool such as axe-core.',
+    ]);
+    const html = renderReport({ result: { ...base, screens: [limited] }, screenshots });
+    expect(html).toContain('<ul class="notes"><li>A dialog or popup was open');
+    expect(screenNotes(screen)).toEqual([]);
   });
 });
 

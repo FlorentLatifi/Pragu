@@ -121,6 +121,24 @@ describe('contrast/text', () => {
     expect(textContrast.check({ screen: screenOf([button(false), label]), device, raster })).toEqual([]);
     expect(textContrast.check({ screen: screenOf([button(true), label]), device, raster })).toHaveLength(1);
   });
+
+  it('does not trust the pixels of text partly covered by another window, or judge web content', () => {
+    const raster = rasterWithText(0xa3a3a3);
+    expect(textContrast.check({ screen: screenOf([textNode({ obscured: true })]), device, raster })).toEqual([]);
+    expect(textContrast.check({ screen: screenOf([textNode({ inWebView: true })]), device, raster })).toEqual([]);
+  });
+});
+
+describe('rule scope', () => {
+  it('leaves web content to web tools in the name and target rules too', () => {
+    const webButton = pamNode({ id: '0', name: null, inWebView: true });
+    expect(interactiveMissingName.check({ screen: screenOf([webButton]), device, raster: null })).toEqual([]);
+    const crowded = [
+      pamNode({ id: '0', boundsDp: rect(100, 100, 200, 148) }),
+      pamNode({ id: '1', boundsDp: rect(202, 116, 218, 132), inWebView: true }),
+    ];
+    expect(targetSize.check({ screen: screenOf(crowded), device, raster: null })).toEqual([]);
+  });
 });
 
 describe('target/size', () => {
