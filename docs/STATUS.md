@@ -1,6 +1,6 @@
 # Pragu status
 
-Last updated: 2026-10-28, M1 session 3. **M0 approved. M1 in progress:** Pragu Bench covers two fixtures (React Native and Jetpack Compose); agent hardening mostly done; three M1 rules have landed (`input/missing-label`, `state/not-exposed`, `name/image-missing`).
+Last updated: 2026-10-28, M1 session 3. **M0 approved. M1 in progress:** Pragu Bench covers two fixtures (React Native and Jetpack Compose); agent hardening mostly done; four M1 rules have landed (`input/missing-label`, `state/not-exposed`, `name/image-missing`, `focus/unreachable`).
 
 ## Decisions made
 
@@ -39,7 +39,8 @@ Walking skeleton on the emulator, CI, docs (PRD, technical design, ADR-001 to 00
 - **`input/missing-label`** (ADR-010): flags text fields with no label and names the visible text that should be connected. Seeds and twins in both fixtures, including an `aria-labelledby` twin that proves the `labeledBy` capture.
 - **`state/not-exposed`**: flags a checkbox, switch or radio button that never says whether it is checked or on (a role with no state). Seeds and twins on the rn-shop cart and Compose checkout. The two home-made checkboxes with no role stay published as misses.
 - **`name/image-missing`**: flags images TalkBack stops on but can only call "Image". Images it skips are left alone, since telling decoration from content would be a guess. Seed and twins (named, decorative) on the rn-shop product screen.
-- Checks: 149 TypeScript tests, 26 JVM tests, lint, typecheck, bench gate.
+- **`focus/unreachable`**: flags controls that work by touch but are hidden from assistive technology, unless a row around them is one accessible control. Compose's `hideFromAccessibility()` looks like off-screen content and stays a published miss.
+- Checks: 152 TypeScript tests, 26 JVM tests, lint, typecheck, bench gate.
 
 ## Bench results (6 screens: rn-shop, android-compose)
 
@@ -49,14 +50,15 @@ Walking skeleton on the emulator, CI, docs (PRD, technical design, ADR-001 to 00
 | `name/image-missing` | error | 1 | 0 | 0 | 2 | 1.00 | 1.00 |
 | `input/missing-label` | error | 2 | 0 | 0 | 4 | 1.00 | 1.00 |
 | `state/not-exposed` | error | 2 | 0 | 2 | 5 | 1.00 | 0.50 |
+| `focus/unreachable` | error | 1 | 0 | 1 | 3 | 1.00 | 0.50 |
 | `contrast/text` | error | 6 | 0 | 0 | 11 | 1.00 | 1.00 |
 | `target/size` | warning | 3 | 1 | 3 | 11 | 0.75 | 0.50 |
 
-All error rules meet the 0.90 bar. Known misses stay published: home-made checkboxes with no role (`state/not-exposed`), React Native `hitSlop` and crowded Compose targets (`target/size`). Small sample: early signals, not final quality figures. Full page: `docs/bench/results.md`.
+All error rules meet the 0.90 bar. Known misses stay published: home-made checkboxes with no role (`state/not-exposed`), Compose `hideFromAccessibility()` (`focus/unreachable`), React Native `hitSlop` and crowded Compose targets (`target/size`). Small sample: early signals, not final quality figures. Full page: `docs/bench/results.md`.
 
 ## Next
 
-1. Next M1 rules, each with fixtures and bench labels: `focus/unreachable`, `text/scaling-truncation` (needs a second capture at font scale 2.0).
+1. Last M1 error rule: `text/scaling-truncation`, which needs a second capture at font scale 2.0 (CLI and agent work).
 2. Agent hardening, last piece: instrumented tests of the capturer on an emulator (lands with the CI emulator job, work package 9).
 3. Report v1 once the design direction is chosen.
 4. Owner-implements for Florent: the `target/size` 48 dp platform tier (info for now, per ADR-007).
