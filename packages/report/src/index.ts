@@ -154,6 +154,19 @@ function renderScreen(
 </section>`;
 }
 
+const FIX_TOOLKITS: readonly (readonly [keyof Issue['fix'], string])[] = [
+  ['reactNative', 'React Native'],
+  ['compose', 'Jetpack Compose'],
+  ['androidViews', 'Android Views'],
+];
+
+// Pragu does not yet tell which toolkit built the app, so every fix is shown.
+function renderFixes(issue: Issue): string {
+  return FIX_TOOLKITS.filter(([toolkit]) => issue.fix[toolkit].trim() !== '')
+    .map(([toolkit, label]) => `    <dt>Fix in ${label}</dt><dd>${escapeHtml(issue.fix[toolkit])}</dd>`)
+    .join('\n');
+}
+
 function renderIssue(issue: Issue, number: number): string {
   const evidence = Object.entries(issue.evidence)
     .map(([key, value]) => `<code>${escapeHtml(key)}: ${escapeHtml(String(value))}</code>`)
@@ -171,7 +184,7 @@ function renderIssue(issue: Issue, number: number): string {
     <dt>Who it affects</dt><dd>${escapeHtml(issue.whoIsAffected)}</dd>
     <dt>What they experience</dt><dd>${escapeHtml(issue.whatTheyExperience)}</dd>
     <dt>Evidence</dt><dd>${evidence}</dd>
-    <dt>Fix in React Native</dt><dd>${escapeHtml(issue.fix.reactNative)}</dd>
+${renderFixes(issue)}
   </dl>
   <p class="where">${element}Rule <code>${escapeHtml(issue.ruleId)}</code></p>
 </li>`;

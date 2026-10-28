@@ -20,7 +20,11 @@ function issue(overrides: Partial<Issue> = {}): Issue {
     en301549: ['11.4.1.2'],
     boundsPx: { left: 108, top: 240, right: 216, bottom: 480 },
     evidence: { role: 'button' },
-    fix: { reactNative: 'Add accessibilityLabel.', compose: '', androidViews: '' },
+    fix: {
+      reactNative: 'Add accessibilityLabel.',
+      compose: 'Give the icon a contentDescription.',
+      androidViews: 'Set android:contentDescription.',
+    },
     ...overrides,
   };
 }
@@ -101,6 +105,18 @@ describe('renderReport', () => {
     expect(html).toContain('<span class="severity severity-error">Error</span>');
     expect(html).toContain('<span>WCAG 4.1.2</span>');
     expect(html).toContain('<span>EN 301 549 11.4.1.2</span>');
+  });
+
+  it('gives the fix for each toolkit, and skips a toolkit without one', () => {
+    const fix = {
+      reactNative: 'Add accessibilityLabel.',
+      compose: '',
+      androidViews: 'Set android:contentDescription.',
+    };
+    const html = renderReport({ result: result([issue({ fix })]), screenshots });
+    expect(html).toContain('<dt>Fix in React Native</dt><dd>Add accessibilityLabel.</dd>');
+    expect(html).toContain('<dt>Fix in Android Views</dt><dd>Set android:contentDescription.</dd>');
+    expect(html).not.toContain('Fix in Jetpack Compose');
   });
 
   it('is self-contained: no external scripts, styles, fonts or images', () => {
