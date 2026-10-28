@@ -168,6 +168,13 @@ describe('gate', () => {
     expect(compareWithBaseline(moreScreens, baseline).messages[0]).toBe('Screens: 1 → 2.');
     const relabelled = { ...baseline, awaiting: [] };
     expect(compareWithBaseline(relabelled, baseline).messages[0]).toContain('Same counts');
+    const demoted = {
+      ...baseline,
+      rules: baseline.rules.map((rule) =>
+        rule.rule === 'target/size' ? { ...rule, severity: 'warning' as const } : rule,
+      ),
+    };
+    expect(compareWithBaseline(demoted, baseline).messages[0]).toBe('Severity of target/size: error → warning.');
   });
 
   it('lists error rules below the precision bar', () => {

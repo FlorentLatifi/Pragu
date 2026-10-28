@@ -16,7 +16,7 @@ Milestones come from the [founding brief](docs/00-founding-brief.md); dates depe
 Not in any milestone yet; noted so they don't creep into code early.
 
 - Warn when `--out` is inside a cloud-synced folder (OneDrive, Dropbox, iCloud), since reports contain screenshots.
-- Agent idle timeout, so an abandoned session stops by itself.
+- Capture native `TouchDelegate` areas (`getTouchDelegateInfo()`, API 29+), so `target/size` can size native targets correctly before M4 (ADR-007).
 - WebP screenshots in reports (decided against the report-size budget in M1).
 - An `AccessibilityService` capture mode for live exploration (M3 RFC).
 - iOS runner on macOS CI runners, when there is no local Mac.

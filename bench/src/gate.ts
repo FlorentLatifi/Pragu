@@ -32,6 +32,9 @@ export function compareWithBaseline(current: BenchResult, baseline: BenchResult 
     } else if (countsDiff(previous, rule) !== '') {
       messages.push(`Changed ${rule.rule}: ${countsDiff(previous, rule)}.`);
     }
+    if (previous.severity !== rule.severity) {
+      messages.push(`Severity of ${rule.rule}: ${previous.severity} → ${rule.severity}.`);
+    }
   }
   for (const previous of baseline.rules) {
     if (!current.rules.some((rule) => rule.rule === previous.rule)) messages.push(`Rule ${previous.rule} disappeared.`);

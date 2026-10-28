@@ -112,9 +112,10 @@ async function runScan(args: string[], io: Io): Promise<number> {
 
   const { result } = outcome;
   const { errors, warnings, infos } = result.summary;
+  const count = (n: number, one: string, many: string) => `${String(n)} ${n === 1 ? one : many}`;
   io.out(`\nPragu scanned ${result.app.id} on ${result.device.model} (Android ${result.device.osVersion})\n`);
   io.out(
-    `${String(result.issues.length)} ${result.issues.length === 1 ? 'barrier' : 'barriers'}: ${String(errors)} errors, ${String(warnings)} warnings, ${String(infos)} info\n`,
+    `${count(result.issues.length, 'barrier', 'barriers')}: ${count(errors, 'error', 'errors')}, ${count(warnings, 'warning', 'warnings')}, ${String(infos)} info\n`,
   );
   result.issues.forEach((issue, index) => {
     io.out(describeIssue(issue, index));

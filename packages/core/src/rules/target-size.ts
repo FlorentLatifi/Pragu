@@ -22,7 +22,9 @@ export const targetSize: Rule = {
   meta: {
     id: 'target/size',
     title: 'Touch target is too small',
-    severity: 'error',
+    // A warning until Pragu can see hitSlop (ADR-007): React Native enlarges touch areas in
+    // JavaScript, invisibly to the accessibility tree, so some flagged targets really pass.
+    severity: 'warning',
     // React Native hitSlop and Android TouchDelegate can enlarge the real touch area invisibly.
     confidence: 'medium',
     wcag: ['2.5.8'],

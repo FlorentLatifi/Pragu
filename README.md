@@ -11,15 +11,16 @@ Pragu finds accessibility barriers in your mobile app, shows who they hurt, and 
 ```text
 $ pnpm fixture:scan
 Pragu scanned dev.pragu.fixtures.rnshop on sdk_gphone64_x86_64 (Android 16)
-3 barriers: 3 errors, 0 warnings, 0 info
-  1. Error: Touch target is too small · seed-tiny-dismiss (WCAG 2.5.8)
+3 barriers: 2 errors, 1 warning, 0 info
+  1. Warning: Touch target is too small · seed-tiny-dismiss (WCAG 2.5.8)
   2. Error: Interactive element has no accessible name · seed-unlabeled-remove (WCAG 4.1.2)
   3. Error: Text contrast is too low · seed-low-contrast (WCAG 1.4.3)
 Report: reports/rn-shop/pragu-report.html
 ```
 
 - `pragu scan` launches your app on an emulator or phone and reads what TalkBack would see, plus a screenshot. There are no changes to your app's code.
-- Three rules so far: missing names on controls, low text contrast (measured from the screenshot), and touch targets below 24 dp (with WCAG's spacing exception).
+- Three rules so far: missing names on controls, low text contrast (measured from the screenshot), and touch targets below 24 dp (with WCAG's spacing exception; a warning until Pragu can see React Native's `hitSlop`).
+- [Pragu Bench](docs/bench/results.md) measures each rule's precision and recall on labelled screens, and CI re-checks it on every change.
 - One offline HTML report with numbered markers on the screenshot. Every issue says who it affects, what they experience, and how to fix it in React Native.
 - A versioned JSON result for machines.
 

@@ -55,11 +55,11 @@ Defined in `packages/core/src/model.ts`. It is platform-neutral, so rules never 
 |---|---|---|
 | `name/interactive-missing` | Interactive, visible, exposed, not a text field, and no accessible name | Text fields belong to `input/missing-label` (M1) |
 | `contrast/text` | Per visible text node, estimate text and background colours from the screenshot. 4.5:1 for normal text, 3:1 for large | Background is the dominant colour. Text is the frequent colour with the highest contrast against it, so anti-aliased edges never win. A busy background returns nothing, to avoid false alarms. Text size from `ExtraRenderingInfo` (API 30+). Unknown size gives medium confidence. |
-| `target/size` | Interactive targets under 24×24 dp, unless WCAG's spacing exception applies | The exception: a 24 dp circle around the target touches no other target and no other undersized target's circle. Parent and child targets are not counted as neighbours. Medium confidence, because `hitSlop` and `TouchDelegate` are invisible to the tree. |
+| `target/size` | Interactive targets under 24×24 dp, unless WCAG's spacing exception applies | The exception: a 24 dp circle around the target touches no other target and no other undersized target's circle. Parent and child targets are not counted as neighbours. Medium confidence, and a warning rather than an error, because `hitSlop` and `TouchDelegate` are invisible to the tree (ADR-007). |
 
 ### WCAG CSS pixels in dp and pt
 
-WCAG 2.5.8 asks for 24 × 24 CSS pixels. A CSS pixel is a reference unit, not a device pixel. Mobile browsers define one CSS pixel as one density-independent unit: Chrome on Android sets the device-pixel ratio to density/160, so 1 CSS px = 1 dp, and Safari on iOS maps 1 CSS px to 1 pt. So 24 CSS px is 24 dp on Android and 24 pt on iOS, the size the same content would have in the phone's browser. The platform guidance Pragu reports as warnings is larger: 48 dp (Android) and 44 pt (iOS).
+WCAG 2.5.8 asks for 24 × 24 CSS pixels. A CSS pixel is a reference unit, not a device pixel. Mobile browsers define one CSS pixel as one density-independent unit: Chrome on Android sets the device-pixel ratio to density/160, so 1 CSS px = 1 dp, and Safari on iOS maps 1 CSS px to 1 pt. So 24 CSS px is 24 dp on Android and 24 pt on iOS, the size the same content would have in the phone's browser. Platform guidance is larger, 48 dp (Android) and 44 pt (iOS), and Pragu reports it one level below the WCAG tier (ADR-007).
 
 ## Errors and exit codes
 

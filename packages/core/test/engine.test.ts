@@ -78,7 +78,7 @@ describe('analyze', () => {
     const [first] = analyze({ device, screens: [screen], rasters });
     expect(first).toMatchObject({
       title: 'Touch target is too small',
-      severity: 'error',
+      severity: 'warning',
       confidence: 'medium',
       wcag: ['2.5.8'],
       screenId: 'screen-1',
@@ -134,8 +134,8 @@ describe('summarize', () => {
     const { screen, rasters } = cartScreen();
     const summary = summarize(analyze({ device, screens: [screen], rasters }));
     expect(summary).toEqual({
-      errors: 3,
-      warnings: 0,
+      errors: 2,
+      warnings: 1,
       infos: 0,
       rulesRun: ['name/interactive-missing', 'contrast/text', 'target/size'],
     });

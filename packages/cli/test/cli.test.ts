@@ -143,7 +143,17 @@ describe('scan --from-capture (whole pipeline, no device)', () => {
     const report = await readFile(join(out, 'pragu-report.html'), 'utf8');
     expect(report).toContain('<h1>3 barriers found in com.example.shop</h1>');
     expect(report.match(/class="marker"/g)).toHaveLength(3);
-    expect(io.stdout).toContain('3 barriers: 3 errors, 0 warnings, 0 info');
+    expect(io.stdout).toContain('3 barriers: 2 errors, 1 warning, 0 info');
+    expect(io.stdout).toContain('1. Warning: Touch target is too small · seed-tiny-dismiss (WCAG 2.5.8)');
+  });
+
+  it('fails on target warnings only when asked with --fail-on warning', async () => {
+    const captureFile = await writeFixtureCapture();
+    const { sink } = capturingIo();
+    // Targets are warnings (ADR-007), so they fail a build only at --fail-on warning or stricter.
+    expect(
+      await main(['scan', '--from-capture', captureFile, '--out', join(dir, 'w'), '--fail-on', 'warning'], sink),
+    ).toBe(1);
   });
 
   it('exits 0 with --fail-on never', async () => {
