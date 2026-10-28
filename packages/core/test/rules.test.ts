@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  imageMissingName,
   inputMissingLabel,
   interactiveMissingName,
   requiredTextRatio,
@@ -87,6 +88,41 @@ describe('input/missing-label', () => {
         field({ id: '1', exposedToAssistiveTech: false }),
         field({ id: '2', visible: false }),
         field({ id: '3', inWebView: true }),
+      ]),
+    ).toEqual([]);
+  });
+});
+
+describe('name/image-missing', () => {
+  const check = (nodes: Parameters<typeof screenOf>[0]) =>
+    imageMissingName.check({ screen: screenOf(nodes), device, raster: null });
+  const image = (overrides: Partial<Parameters<typeof pamNode>[0]> = {}) =>
+    pamNode({
+      id: '0',
+      role: 'image',
+      platformRole: 'android.widget.ImageView',
+      name: null,
+      interactive: false,
+      ...overrides,
+    });
+
+  it('flags an image the screen reader stops on but cannot name', () => {
+    const findings = check([image()]);
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.message).toBe(
+      'A screen reader stops on this image but can only announce "Image". Describe what it shows, or let the screen reader skip it if it is decorative.',
+    );
+    expect(findings[0]?.evidence).toEqual({ role: 'image', platformRole: 'android.widget.ImageView' });
+  });
+
+  it('leaves named, skipped (decorative), interactive, hidden and off-screen images alone', () => {
+    expect(
+      check([
+        image({ id: '0', name: 'Mug in sage green' }),
+        image({ id: '1', focusable: false }),
+        image({ id: '2', interactive: true }),
+        image({ id: '3', exposedToAssistiveTech: false }),
+        image({ id: '4', visible: false }),
       ]),
     ).toEqual([]);
   });

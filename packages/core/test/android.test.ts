@@ -160,6 +160,15 @@ describe('normalizeAndroidCapture', () => {
     expect(screen.nodes[2]).toMatchObject({ role: 'text', interactive: false, name: 'Free shipping' });
   });
 
+  it('records whether a screen reader gives a node its own focus stop', () => {
+    const focusable = (raw: AndroidRawNode) =>
+      normalizeAndroidCapture(captureOf(raw), { screenId: 's', screenName: 's', screenshotFile: null }).screen.nodes[0]
+        ?.focusable;
+    expect(focusable(rawNode({ focusable: true }))).toBe(true);
+    expect(focusable(rawNode({ screenReaderFocusable: true }))).toBe(true);
+    expect(focusable(rawNode({ className: 'android.widget.ImageView' }))).toBe(false);
+  });
+
   it('exposes a checked state only for checkable nodes, and keeps the state text', () => {
     const normalize = (raw: AndroidRawNode) =>
       normalizeAndroidCapture(captureOf(raw), { screenId: 's', screenName: 's', screenshotFile: null }).screen.nodes[0];

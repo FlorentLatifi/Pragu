@@ -36,7 +36,7 @@ Device / emulator                         Developer machine or CI
 
 Defined in `packages/core/src/model.ts`. It is platform-neutral, so rules never see Android types.
 
-- **Node:** normalised `role` plus `platformRole`, accessible `name`, `text`, `hint`, `resourceId`, bounds in px and dp, `boundsAreTouchArea` (Compose reports touch areas, ADR-009), `interactive`, `exposedToAssistiveTech`, `visible`, `obscured`, `inWebView`, `window`, `enabled`, `checked` (null when no checked state is exposed), `stateDescription`, `textSizeDp`. Ids are tree paths whose first segment numbers the app's windows from the bottom (`0.3.1`, `1.0`).
+- **Node:** normalised `role` plus `platformRole`, accessible `name`, `text`, `hint`, `resourceId`, bounds in px and dp, `boundsAreTouchArea` (Compose reports touch areas, ADR-009), `interactive`, `focusable` (gets its own screen-reader focus stop), `exposedToAssistiveTech`, `visible`, `obscured`, `inWebView`, `window`, `enabled`, `checked` (null when no checked state is exposed), `stateDescription`, `textSizeDp`. Ids are tree paths whose first segment numbers the app's windows from the bottom (`0.3.1`, `1.0`).
 - **Window:** kind (`app`, `keyboard`, `system`, `other-app`, `overlay`), title, bounds, and whether it is the app's topmost (`foreground`) window.
 - **Screen:** app id, name, screenshot reference, windows bottom first, nodes depth-first per app window.
 - **What rules judge** (ADR-008): visible elements of the app's topmost window, not fully covered by another window, and not web content. Contrast also skips partly covered (`obscured`) elements.
@@ -56,6 +56,7 @@ Defined in `packages/core/src/model.ts`. It is platform-neutral, so rules never 
 | Rule | Check | Notes |
 |---|---|---|
 | `name/interactive-missing` | Interactive, visible, exposed, not a text field, and no accessible name | Text fields belong to `input/missing-label` |
+| `name/image-missing` | Non-interactive image that a screen reader stops on, with no name | An unnamed image the screen reader skips may be decorative; judging that would be a guess, so it is left alone. Interactive images belong to `name/interactive-missing`. |
 | `input/missing-label` | Visible text field with no name: no content description, no `labeledBy` label, no hint, no label text inside (Compose) | The message names the visible text just above or beside the field. Placeholder-only labels need typing to see, so they wait for `input/placeholder-label` (ADR-010). |
 | `state/not-exposed` | Interactive checkbox, switch or radio button with no checked state and no state description | Catches a role without a state, e.g. React Native `accessibilityRole="checkbox"` without `aria-checked`, or Compose `clickable(role = Role.Checkbox)`. A home-made toggle with no role at all looks like a button in the tree; seeing it needs a tap (crawler, M3). |
 | `contrast/text` | Per visible text node, estimate text and background colours from the screenshot. 4.5:1 for normal text, 3:1 for large | Background is the dominant colour. Text is the frequent colour with the highest contrast against it, so anti-aliased edges never win. A busy background returns nothing, to avoid false alarms. Text size from `ExtraRenderingInfo` (API 30+). Compose reports none: the element's height then bounds the size, with medium confidence (ADR-009). |

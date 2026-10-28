@@ -5,9 +5,9 @@
 /**
  * Version of the JSON result contract written to pragu-result.json.
  * 0.2.0 added windows; 0.3.0 added `PamNode.boundsAreTouchArea`; 0.4.0 added
- * `PamNode.checked` and `stateDescription`.
+ * `PamNode.checked` and `stateDescription`; 0.5.0 added `PamNode.focusable`.
  */
-export const RESULT_SCHEMA_VERSION = '0.4.0';
+export const RESULT_SCHEMA_VERSION = '0.5.0';
 
 export type Platform = 'android' | 'ios';
 export type Severity = 'error' | 'warning' | 'info';
@@ -61,6 +61,8 @@ export interface PamNode {
   boundsAreTouchArea: boolean;
   /** Responds to activation: tap, long press, toggle or text entry. */
   interactive: boolean;
+  /** A screen reader gives it a focus stop of its own, even when it has nothing to say. */
+  focusable: boolean;
   /** False when the app hides the element from assistive technology. */
   exposedToAssistiveTech: boolean;
   /** On screen, in the app's topmost window, and not covered by another window. */

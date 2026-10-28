@@ -111,6 +111,7 @@ export function pamNode(overrides: Partial<PamNode> & { id: string }): PamNode {
     boundsDp,
     boundsAreTouchArea: false,
     interactive: true,
+    focusable: true,
     exposedToAssistiveTech: true,
     visible: true,
     obscured: false,

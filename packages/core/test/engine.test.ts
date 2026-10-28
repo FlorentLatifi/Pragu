@@ -139,6 +139,7 @@ describe('summarize', () => {
       infos: 0,
       rulesRun: [
         'name/interactive-missing',
+        'name/image-missing',
         'input/missing-label',
         'state/not-exposed',
         'contrast/text',

@@ -1,7 +1,8 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { BackIcon, HeartIcon, ShareIcon } from '../components/icons';
 
 const noop = () => {};
+const THUMBNAIL = require('../../assets/icon.png') as number;
 // Dark stripes stand in for a photo: a busy background on which the white caption stays readable.
 const PHOTO_STRIPES = ['#3B2F2A', '#2E3A34', '#4A3B32', '#3A3346', '#463A2F'];
 
@@ -113,11 +114,30 @@ export function ProductScreen() {
       <Pressable testID="twin-text-button" accessibilityRole="button" onPress={noop} style={styles.primary}>
         <Text style={styles.primaryText}>Add to cart · €14.00</Text>
       </Pressable>
+
+      <Text style={styles.colorsTitle}>Other colours</Text>
+      <View style={styles.colors}>
+        {/* Seeded barrier: TalkBack stops on this image but can only say "Image" (WCAG 1.1.1). */}
+        <Image testID="seed-unnamed-image" accessible accessibilityRole="image" source={THUMBNAIL} style={styles.thumb} />
+        <Image
+          testID="twin-named-image"
+          accessible
+          accessibilityRole="image"
+          accessibilityLabel="Mug in sage green"
+          source={THUMBNAIL}
+          style={styles.thumb}
+        />
+        {/* Twin: not a focus stop, so TalkBack skips it, as it should a decorative image. */}
+        <Image testID="twin-decorative-image" source={THUMBNAIL} style={styles.thumb} />
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  colorsTitle: { fontSize: 16, fontWeight: '600', color: '#1A1A18', marginTop: 20 },
+  colors: { flexDirection: 'row', marginTop: 8 },
+  thumb: { width: 64, height: 64, borderRadius: 6, marginRight: 12 },
   screen: { flex: 1, backgroundColor: '#FFFFFF', paddingTop: 56, paddingHorizontal: 20 },
   toolbar: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 },
   toolbarEnd: { flexDirection: 'row' },

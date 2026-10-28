@@ -48,6 +48,7 @@
       "url": "rnshop://product",
       "marker": "screen-product",
       "barriers": [
+        { "rule": "name/image-missing", "testID": "seed-unnamed-image", "note": "accessible image with no label: TalkBack says only \"Image\"" },
         { "rule": "name/interactive-missing", "testID": "seed-unlabeled-favorite" },
         { "rule": "name/interactive-missing", "testID": "seed-unlabeled-share" },
         { "rule": "contrast/text", "testID": "seed-low-contrast-badge" },
@@ -56,6 +57,8 @@
         { "rule": "target/size", "testID": "seed-tiny-plus" }
       ],
       "correctTwins": [
+        { "rule": "name/image-missing", "testID": "twin-named-image" },
+        { "rule": "name/image-missing", "testID": "twin-decorative-image", "note": "not a focus stop, so TalkBack skips it, as it should a decorative image" },
         { "rule": "name/interactive-missing", "testID": "twin-labeled-back" },
         { "rule": "name/interactive-missing", "testID": "twin-text-button" },
         { "rule": "name/interactive-missing", "testID": "twin-isolated-info" },

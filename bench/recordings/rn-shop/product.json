@@ -1,7 +1,7 @@
 {
   "protocol": 3,
   "agentVersion": "0.0.3",
-  "capturedAt": "2026-10-28T14:19:23.655347Z",
+  "capturedAt": "2026-10-28T14:40:54.486142Z",
   "packageName": "dev.pragu.fixtures.rnshop",
   "windowTitle": "rn-shop",
   "screenWidthPx": 1080,
@@ -2519,6 +2519,158 @@
                                     "children": []
                                   }
                                 ]
+                              },
+                              {
+                                "className": "android.widget.TextView",
+                                "packageName": "dev.pragu.fixtures.rnshop",
+                                "resourceId": null,
+                                "text": "Other colours",
+                                "contentDescription": null,
+                                "hintText": null,
+                                "labeledBy": null,
+                                "stateDescription": null,
+                                "roleDescription": null,
+                                "bounds": [
+                                  52,
+                                  1682,
+                                  1027,
+                                  1739
+                                ],
+                                "clickable": false,
+                                "longClickable": false,
+                                "focusable": false,
+                                "checkable": false,
+                                "checked": false,
+                                "enabled": true,
+                                "editable": false,
+                                "visibleToUser": true,
+                                "importantForAccessibility": true,
+                                "heading": false,
+                                "screenReaderFocusable": false,
+                                "actions": [
+                                  4,
+                                  8,
+                                  64,
+                                  256,
+                                  512,
+                                  131072,
+                                  16908342
+                                ],
+                                "textSizePx": 42,
+                                "children": []
+                              },
+                              {
+                                "className": "android.widget.ImageView",
+                                "packageName": "dev.pragu.fixtures.rnshop",
+                                "resourceId": "seed-unnamed-image",
+                                "text": null,
+                                "contentDescription": null,
+                                "hintText": null,
+                                "labeledBy": null,
+                                "stateDescription": null,
+                                "roleDescription": "Image",
+                                "bounds": [
+                                  53,
+                                  1761,
+                                  221,
+                                  1929
+                                ],
+                                "clickable": false,
+                                "longClickable": false,
+                                "focusable": true,
+                                "checkable": false,
+                                "checked": false,
+                                "enabled": true,
+                                "editable": false,
+                                "visibleToUser": true,
+                                "importantForAccessibility": true,
+                                "heading": false,
+                                "screenReaderFocusable": false,
+                                "actions": [
+                                  1,
+                                  4,
+                                  8,
+                                  64,
+                                  16908342
+                                ],
+                                "textSizePx": null,
+                                "children": []
+                              },
+                              {
+                                "className": "android.widget.ImageView",
+                                "packageName": "dev.pragu.fixtures.rnshop",
+                                "resourceId": "twin-named-image",
+                                "text": null,
+                                "contentDescription": "Mug in sage green",
+                                "hintText": null,
+                                "labeledBy": null,
+                                "stateDescription": null,
+                                "roleDescription": "Image",
+                                "bounds": [
+                                  253,
+                                  1761,
+                                  421,
+                                  1929
+                                ],
+                                "clickable": false,
+                                "longClickable": false,
+                                "focusable": true,
+                                "checkable": false,
+                                "checked": false,
+                                "enabled": true,
+                                "editable": false,
+                                "visibleToUser": true,
+                                "importantForAccessibility": true,
+                                "heading": false,
+                                "screenReaderFocusable": false,
+                                "actions": [
+                                  1,
+                                  4,
+                                  8,
+                                  64,
+                                  256,
+                                  512,
+                                  131072,
+                                  16908342
+                                ],
+                                "textSizePx": null,
+                                "children": []
+                              },
+                              {
+                                "className": "android.widget.ImageView",
+                                "packageName": "dev.pragu.fixtures.rnshop",
+                                "resourceId": "twin-decorative-image",
+                                "text": null,
+                                "contentDescription": null,
+                                "hintText": null,
+                                "labeledBy": null,
+                                "stateDescription": null,
+                                "roleDescription": null,
+                                "bounds": [
+                                  452,
+                                  1761,
+                                  620,
+                                  1929
+                                ],
+                                "clickable": false,
+                                "longClickable": false,
+                                "focusable": false,
+                                "checkable": false,
+                                "checked": false,
+                                "enabled": true,
+                                "editable": false,
+                                "visibleToUser": true,
+                                "importantForAccessibility": true,
+                                "heading": false,
+                                "screenReaderFocusable": false,
+                                "actions": [
+                                  4,
+                                  8,
+                                  64,
+                                  16908342
+                                ],
+                                "textSizePx": null,
+                                "children": []
                               }
                             ]
                           }

@@ -327,6 +327,7 @@ export function normalizeAndroidCapture(
       // Compose reports a clickable's touch area (enlarged to 48 dp) as its bounds.
       boundsAreTouchArea: context.inCompose && interactive,
       interactive,
+      focusable: isActionable(raw),
       exposedToAssistiveTech: raw.importantForAccessibility,
       visible: onScreen && !covered,
       obscured: !covered && coverers.some((cover) => rectsOverlap(cover, boundsPx)),

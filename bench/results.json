@@ -19,6 +19,18 @@
       "mcc": 1
     },
     {
+      "rule": "name/image-missing",
+      "severity": "error",
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "tn": 2,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "mcc": 1
+    },
+    {
       "rule": "input/missing-label",
       "severity": "error",
       "tp": 2,
