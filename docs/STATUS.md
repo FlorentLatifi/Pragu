@@ -1,6 +1,6 @@
 # Pragu status
 
-Last updated: 2026-10-28, M1 session 2. **M0 approved. M1 in progress:** Pragu Bench v1 done; agent hardening mostly done (windows, dialogs, keyboard, WebViews, idle timeout).
+Last updated: 2026-10-28, M1 session 3. **M0 approved. M1 in progress:** Pragu Bench covers two fixtures (React Native and Jetpack Compose); agent hardening mostly done; the first M1 rule, `input/missing-label`, has landed.
 
 ## Decisions made
 
@@ -9,7 +9,10 @@ Last updated: 2026-10-28, M1 session 2. **M0 approved. M1 in progress:** Pragu B
 - Label suggestions (M4): local by default, own API key only as an opt-in. No Mac, so iOS waits.
 - M1 plan approved (`docs/plans/m1.md`).
 - `target/size` is a warning until Pragu can see React Native's `hitSlop` (M4), then returns to error (ADR-007, Florent, 2026-10-28).
-- Protocol 2: the agent reports every window; rules judge only the app's topmost window, skip covered elements and leave WebView content to web tools (ADR-008).
+- The agent reports every window; rules judge only the app's topmost window, skip covered elements and leave WebView content to web tools (ADR-008).
+- Compose is read the way TalkBack reads it: a role on a child is not a control of its own, text size is bounded by the element's height, and `target/size` stays silent where two Compose touch areas meet (ADR-009).
+- Protocol 3 captures `labeledBy`. `input/missing-label` reports fields with no label at all. Placeholder-only labels wait for `input/placeholder-label`, which needs typing during a crawl (ADR-010).
+- Commits carry no AI attribution lines (Florent rewrote `main` to remove them).
 
 ## Decisions needed (Florent)
 
@@ -23,34 +26,40 @@ Walking skeleton on the emulator, CI, docs (PRD, technical design, ADR-001 to 00
 
 ### M1 so far
 
-- **Pragu Bench v1** (`bench/`): 3 deep-linked rn-shop screens (cart, product, form) with labelled barriers and correct twins; real recordings committed; precision, recall, F1 and MCC per rule; CI re-scores every rule on every PR without an emulator and fails when results differ from `bench/results.json`.
-- **First bench catch, fixed:** `contrast/text` flagged a disabled button's grey text, which WCAG 1.4.3 exempts. Now skipped.
-- **Agent idle timeout:** the agent stops after 5 idle minutes (configurable). Verified on the emulator: with a 3 s timeout it logged "Idle for 3 s; stopping" and exited cleanly.
-- **`target/size` demoted to warning** (ADR-007): the bench's `hitSlop` false positive stays published; builds no longer fail on it at the default `--fail-on error`.
-- **Every window, protocol 2** (ADR-008): dialogs, popups, the keyboard and system UI are captured as windows; only the app's own windows carry trees. Rules judge the app's topmost window only, skip elements a window covers, skip contrast on partly covered text, and leave WebView content to web tools. Reports say when a dialog, the keyboard or web content limited the checks.
-- **Bench dialog state:** `rnshop://cart?dialog=remove` opens a React Native `Modal`; its barriers are found and the cart's barriers behind it are not. On API 36 Android itself omits the covered window from `getWindows()` (ADR-008).
-- **Keyboard verified on the emulator:** the keyboard is captured as its own window without a tree, elements under it are marked, and the report says it was open.
-- Checks: 130 TypeScript tests, 24 JVM tests, lint, typecheck, bench gate.
+- **Pragu Bench v1** (`bench/`): deep-linked fixture screens with labelled barriers and correct twins; real recordings committed; precision, recall, F1 and MCC per rule; CI re-scores every rule on every PR without an emulator and fails when results differ from `bench/results.json`.
+- **Agent hardening:** idle timeout (5 minutes); every window captured (ADR-008), with dialogs, the keyboard and WebViews verified on the emulator; `labeledBy` captured (protocol 3).
+- **`target/size` demoted to warning** (ADR-007).
+- **Jetpack Compose fixture** (`fixtures/android-compose`, ADR-009): its first scan gave 12 issues where 5 were real. Three general fixes followed:
+  - role children are no longer controls;
+  - unknown text size is bounded by the element's height;
+  - meeting touch areas are left alone.
+  Held presses on the emulator settled the labels. The 20 dp icons Compose enlarges are twins, while touching 16 dp stars are real barriers that Pragu misses. The bench publishes them as a known blind spot. CI builds the fixture.
+- **Report:** every finding shows the React Native, Compose and Android Views fix (it showed only React Native's before).
+- **`input/missing-label`** (ADR-010): flags text fields with no label and names the visible text that should be connected. Seeds and twins in both fixtures, including an `aria-labelledby` twin that proves the `labeledBy` capture.
+- Checks: 141 TypeScript tests, 26 JVM tests, lint, typecheck, bench gate.
 
-## Bench results (4 screens, rn-shop)
+## Bench results (6 screens: rn-shop, android-compose)
 
 | Rule | Severity | TP | FP | FN | TN | Precision | Recall |
 |---|---|---|---|---|---|---|---|
-| `name/interactive-missing` | error | 5 | 0 | 0 | 9 | 1.00 | 1.00 |
-| `contrast/text` | error | 5 | 0 | 0 | 8 | 1.00 | 1.00 |
-| `target/size` | warning | 3 | 1 | 0 | 5 | 0.75 | 1.00 |
+| `name/interactive-missing` | error | 8 | 0 | 0 | 13 | 1.00 | 1.00 |
+| `input/missing-label` | error | 2 | 0 | 0 | 4 | 1.00 | 1.00 |
+| `contrast/text` | error | 6 | 0 | 0 | 11 | 1.00 | 1.00 |
+| `target/size` | warning | 3 | 1 | 3 | 11 | 0.75 | 0.50 |
 
-Both error rules meet the 0.90 bar. Small sample: early signals, not final quality figures. Full page: `docs/bench/results.md`.
+All error rules meet the 0.90 bar. `target/size` keeps its known misses (React Native `hitSlop`, crowded Compose targets). Small sample: early signals, not final quality figures. Full page: `docs/bench/results.md`.
 
 ## Next
 
-1. Agent hardening, last piece: instrumented tests of the capturer on an emulator (lands with the CI emulator job, work package 9).
-2. `fixtures/android-compose` for the bench, so it is not React Native only.
-3. Then the M1 rules, each landing with fixtures and bench labels.
+1. Next M1 rules, each with fixtures and bench labels: `state/not-exposed` (already labelled in both fixtures), `name/image-missing`, `focus/unreachable`, `text/scaling-truncation`.
+2. Agent hardening, last piece: instrumented tests of the capturer on an emulator (lands with the CI emulator job, work package 9).
+3. Report v1 once the design direction is chosen.
 4. Owner-implements for Florent: the `target/size` 48 dp platform tier (info for now, per ADR-007).
 
 ## Notes and risks
 
+- `main` was rewritten on GitHub on 2026-10-28 (same content, new hashes). A clone made before then has no merge base: replay local work with `git rebase --onto origin/main <old tip>`, never force-push.
+- The emulator died once while idle Gradle and Kotlin daemons held about 4 GB. Stop them after fixture builds.
 - Disk: about 15 GB free on `C:`.
 - Agent lint warnings to clear: compile and target SDK 37 available; `dataExtractionRules`; app icon.
 - Dependabot PR #1 (TypeScript 7, `@types/node` 26) is ruled out by ADR-002; Florent can close it.
