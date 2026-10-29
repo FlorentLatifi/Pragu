@@ -83,6 +83,7 @@ export function renderReport({ result, screenshots }: ReportInput): string {
     <div><dt>Screens</dt><dd>${String(result.screens.length)}</dd></div>
   </dl>
   <p class="rules">Rules run: ${summary.rulesRun.map((id) => `<code>${escapeHtml(id)}</code>`).join(', ')}</p>
+  ${summary.ignored === 0 ? '' : `<p class="rules">${escapeHtml(plural(summary.ignored, 'issue', 'issues'))} ignored by the project's config (pragu.config.ts), not counted above.</p>`}
 </section>
 ${screens}
 <section class="limits" aria-labelledby="limits-heading">

@@ -1,5 +1,6 @@
 import { parseArgs } from 'node:util';
 import type { Issue } from '@pragu/core';
+import { initConfig, loadConfig } from './config.js';
 import { EXIT, PraguError, formatError } from './errors.js';
 import { scan } from './scan.js';
 import type { FailOn } from './scan.js';
@@ -19,15 +20,19 @@ const HELP = `Pragu finds accessibility barriers in your mobile app.
 
 Usage
   pragu scan --app <applicationId> [options]
+  pragu init               Write a starter pragu.config.ts
   pragu --version
 
 Scan options
   --app <id>             Application id to launch and scan, e.g. com.example.shop
+  --config <file>        Use this config instead of pragu.config.ts in this folder
   --out <dir>            Where to write the report and JSON (default: pragu-report)
   --serial <id>          Device to use when several are connected (see "adb devices")
   --install <apk>        Install this APK before scanning
   --screen-name <name>   Name for the screen in the report
   --fail-on <level>      Exit 1 on issues at this severity or worse: error, warning, info, never (default: error)
+
+Flags win over pragu.config.ts, which wins over the defaults.
   --no-launch            Scan whatever is on screen instead of launching the app
   --check-font-scale     Also capture at 200% text to find text that is cut off; changes the
                          device's font size for a few seconds and always restores it
@@ -40,7 +45,7 @@ Exit codes
 Automated checks find some barriers, not all. Pragu never certifies compliance.
 `;
 
-const PLANNED = new Set(['init', 'doctor', 'report', 'baseline', 'rules']);
+const PLANNED = new Set(['doctor', 'report', 'baseline', 'rules']);
 const FAIL_ON: readonly FailOn[] = ['error', 'warning', 'info', 'never'];
 
 function parseScanArgs(args: string[]) {
@@ -51,11 +56,12 @@ function parseScanArgs(args: string[]) {
       allowPositionals: false,
       options: {
         app: { type: 'string' },
-        out: { type: 'string', default: 'pragu-report' },
+        out: { type: 'string' },
+        config: { type: 'string' },
         serial: { type: 'string' },
         install: { type: 'string' },
         'screen-name': { type: 'string' },
-        'fail-on': { type: 'string', default: 'error' },
+        'fail-on': { type: 'string' },
         'no-launch': { type: 'boolean', default: false },
         'check-font-scale': { type: 'boolean', default: false },
         'from-capture': { type: 'string' },
@@ -84,22 +90,24 @@ async function runScan(args: string[], io: Io): Promise<number> {
     io.out(HELP);
     return EXIT.ok;
   }
-  const failOn = values['fail-on'] as FailOn;
+  const { config } = await loadConfig(process.cwd(), values.config);
+  const failOn = (values['fail-on'] ?? config.failOn ?? 'error') as FailOn;
   if (!FAIL_ON.includes(failOn)) {
     throw new PraguError(EXIT.usage, `--fail-on must be one of ${FAIL_ON.join(', ')}.`);
   }
-  if (values.app === undefined && values['from-capture'] === undefined) {
+  const appId = values.app ?? config.app;
+  if (appId === undefined && values['from-capture'] === undefined) {
     throw new PraguError(
       EXIT.usage,
       'Tell Pragu which app to scan.',
-      'Add --app <applicationId>, e.g. --app com.example.shop.',
+      'Add --app <applicationId>, e.g. --app com.example.shop, or set "app" in pragu.config.ts.',
     );
   }
 
   const outcome = await scan(
     {
-      appId: values.app,
-      outDir: values.out,
+      appId,
+      outDir: values.out ?? config.out ?? 'pragu-report',
       serial: values.serial,
       installApk: values.install,
       agentApk: values['agent-apk'],
@@ -107,7 +115,8 @@ async function runScan(args: string[], io: Io): Promise<number> {
       failOn,
       fromCapture: values['from-capture'],
       launch: !values['no-launch'],
-      checkFontScale: values['check-font-scale'],
+      checkFontScale: values['check-font-scale'] || config.checkFontScale === true,
+      config,
     },
     (line) => {
       io.err(`${line}\n`);
@@ -140,6 +149,11 @@ export async function main(argv: string[], io: Io = defaultIo): Promise<number> 
       return EXIT.ok;
     }
     if (command === 'scan') return await runScan(rest, io);
+    if (command === 'init') {
+      const file = await initConfig(process.cwd());
+      io.out(`Wrote ${file}. Set "app" to your applicationId, then run "pragu scan".\n`);
+      return EXIT.ok;
+    }
     if (PLANNED.has(command)) {
       throw new PraguError(
         EXIT.usage,

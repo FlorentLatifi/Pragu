@@ -1,13 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:pragu:result:0.6.0",
+  "$id": "urn:pragu:result:0.7.0",
   "title": "Pragu scan result",
   "description": "pragu-result.json: what one scan found. The stable machine contract; see packages/core/schema/README.md for the versioning policy.",
   "type": "object",
   "additionalProperties": false,
   "required": ["schemaVersion", "tool", "startedAt", "device", "app", "screens", "issues", "summary"],
   "properties": {
-    "schemaVersion": { "const": "0.6.0" },
+    "schemaVersion": { "const": "0.7.0" },
     "tool": {
       "type": "object",
       "additionalProperties": false,
@@ -27,11 +27,16 @@
     "summary": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["errors", "warnings", "infos", "rulesRun"],
+      "required": ["errors", "warnings", "infos", "ignored", "rulesRun"],
       "properties": {
         "errors": { "type": "integer", "minimum": 0 },
         "warnings": { "type": "integer", "minimum": 0 },
         "infos": { "type": "integer", "minimum": 0 },
+        "ignored": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Issues the config ignores, left out of the counts and the issue list."
+        },
         "rulesRun": { "type": "array", "items": { "type": "string" } }
       }
     }

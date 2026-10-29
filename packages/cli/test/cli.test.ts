@@ -7,6 +7,7 @@ import { PNG } from 'pngjs';
 import { afterEach, describe, expect, it } from 'vitest';
 import { captureOf, createRaster, fillRect, paintText, rawNode, rect } from '../../core/test/helpers.js';
 import { parseDevices } from '../src/adb.js';
+import { initConfig, loadConfig } from '../src/config.js';
 import { formatError, PraguError } from '../src/errors.js';
 import { main } from '../src/main.js';
 import { FrameDecoder, parseHeader } from '../src/protocol.js';
@@ -134,7 +135,7 @@ describe('scan --from-capture (whole pipeline, no device)', () => {
 
     expect(code).toBe(1);
     const result = JSON.parse(await readFile(join(out, 'pragu-result.json'), 'utf8')) as ScanResult;
-    expect(result.schemaVersion).toBe('0.6.0');
+    expect(result.schemaVersion).toBe('0.7.0');
     expect(result.issues.map((issue) => [issue.ruleId, issue.resourceId])).toEqual([
       ['target/size', 'seed-tiny-dismiss'],
       ['name/interactive-missing', 'seed-unlabeled-remove'],
@@ -163,6 +164,27 @@ describe('scan --from-capture (whole pipeline, no device)', () => {
       await main(['scan', '--from-capture', captureFile, '--out', join(dir, 'o'), '--fail-on', 'never'], sink),
     ).toBe(0);
     expect(existsSync(join(dir, 'o', 'pragu-report.html'))).toBe(true);
+  });
+
+  it('turns rules off and ignores issues as the config says, and counts what it ignored', async () => {
+    const captureFile = await writeFixtureCapture();
+    const configFile = join(dir, 'pragu.config.mjs');
+    await writeFile(
+      configFile,
+      "export default { rules: { 'target/size': 'off' }, ignore: [{ rule: 'contrast/text', reason: 'Brand colours' }] };\n",
+    );
+    const { sink } = capturingIo();
+    const out = join(dir, 'configured');
+
+    await main(
+      ['scan', '--from-capture', captureFile, '--config', configFile, '--out', out, '--fail-on', 'never'],
+      sink,
+    );
+
+    const result = JSON.parse(await readFile(join(out, 'pragu-result.json'), 'utf8')) as ScanResult;
+    expect(result.summary.rulesRun).not.toContain('target/size');
+    expect(result.issues.map((found) => found.ruleId)).toEqual(['name/interactive-missing']);
+    expect(result.summary.ignored).toBe(1);
   });
 
   it('compares with the 200% capture saved next to the first, and keeps it in the result', async () => {
@@ -256,5 +278,38 @@ describe('formatError', () => {
     expect(unexpected.exitCode).toBe(3);
     expect(unexpected.text).toContain('unexpected error');
     expect(formatError('plain').text).toContain('plain');
+  });
+});
+
+describe('pragu.config.ts', () => {
+  let dir = '';
+  afterEach(async () => {
+    if (dir !== '') await rm(dir, { recursive: true, force: true });
+  });
+
+  it('loads a TypeScript config, and works without one', async () => {
+    dir = await mkdtemp(join(tmpdir(), 'pragu-config-'));
+    expect(await loadConfig(dir, undefined)).toEqual({ config: {}, file: null });
+    await writeFile(
+      join(dir, 'pragu.config.ts'),
+      "const failOn: 'warning' = 'warning';\nexport default { app: 'com.example.shop', failOn };\n",
+    );
+    const { config, file } = await loadConfig(dir, undefined);
+    expect(config).toEqual({ app: 'com.example.shop', failOn: 'warning' });
+    expect(file).toBe(join(dir, 'pragu.config.ts'));
+  });
+
+  it('names the file and the field when a setting is wrong, and when a --config path is missing', async () => {
+    dir = await mkdtemp(join(tmpdir(), 'pragu-config-'));
+    await writeFile(join(dir, 'pragu.config.mjs'), "export default { failOn: 'sometimes' };\n");
+    await expect(loadConfig(dir, undefined)).rejects.toThrow('pragu.config.mjs: "failOn" must be one of');
+    await expect(loadConfig(dir, 'nope.ts')).rejects.toThrow('The config file was not found: nope.ts');
+  });
+
+  it('pragu init writes a starter config and never overwrites one', async () => {
+    dir = await mkdtemp(join(tmpdir(), 'pragu-config-'));
+    const file = await initConfig(dir);
+    expect(await readFile(file, 'utf8')).toContain("import { defineConfig } from 'pragu';");
+    await expect(initConfig(dir)).rejects.toThrow('This project already has pragu.config.ts.');
   });
 });

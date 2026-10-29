@@ -17,6 +17,8 @@ export type {
   NormalizedCapture,
 } from './android.js';
 export { analyze, summarize } from './engine.js';
+export { applyConfig, defineConfig, enabledRules, parseConfig } from './config.js';
+export type { FailOn, IgnoreEntry, PraguConfig } from './config.js';
 export type { AnalyzeInput } from './engine.js';
 export { fnv1a64, issueFingerprint } from './fingerprint.js';
 export {

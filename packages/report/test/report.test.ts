@@ -66,6 +66,7 @@ function result(issues: Issue[]): ScanResult {
       errors: issues.filter((i) => i.severity === 'error').length,
       warnings: issues.filter((i) => i.severity === 'warning').length,
       infos: issues.filter((i) => i.severity === 'info').length,
+      ignored: 0,
       rulesRun: ['name/interactive-missing', 'contrast/text', 'target/size'],
     },
   };
@@ -190,6 +191,15 @@ describe('escapeHtml', () => {
     expect(escapeHtml(`<a href="x" title='y'>&</a>`)).toBe(
       '&lt;a href=&quot;x&quot; title=&#39;y&#39;&gt;&amp;&lt;/a&gt;',
     );
+  });
+});
+
+describe('ignored issues', () => {
+  it('says how many issues the config ignored, so the decision stays visible', () => {
+    const base = result([issue()]);
+    const html = renderReport({ result: { ...base, summary: { ...base.summary, ignored: 2 } }, screenshots });
+    expect(html).toContain("2 issues ignored by the project's config (pragu.config.ts), not counted above.");
+    expect(renderReport({ result: base, screenshots })).not.toContain('ignored by the project');
   });
 });
 

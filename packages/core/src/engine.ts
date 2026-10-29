@@ -59,11 +59,12 @@ export function analyze(input: AnalyzeInput): Issue[] {
   return issues;
 }
 
-export function summarize(issues: readonly Issue[], rules: readonly Rule[] = defaultRules): ScanSummary {
+export function summarize(issues: readonly Issue[], rules: readonly Rule[] = defaultRules, ignored = 0): ScanSummary {
   return {
     errors: issues.filter((issue) => issue.severity === 'error').length,
     warnings: issues.filter((issue) => issue.severity === 'warning').length,
     infos: issues.filter((issue) => issue.severity === 'info').length,
+    ignored,
     rulesRun: rules.map((rule) => rule.meta.id),
   };
 }

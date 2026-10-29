@@ -5,12 +5,13 @@ import { fileURLToPath } from 'node:url';
 import {
   RESULT_SCHEMA_VERSION,
   analyze,
-  defaultRules,
+  applyConfig,
+  enabledRules,
   normalizeAndroidCapture,
   parseAndroidCapture,
   summarize,
 } from '@pragu/core';
-import type { AndroidCapture, Issue, PamScreen, ScanResult, Severity } from '@pragu/core';
+import type { AndroidCapture, FailOn, Issue, PamScreen, PraguConfig, ScanResult, Severity } from '@pragu/core';
 import { renderReport } from '@pragu/report';
 import { PNG } from 'pngjs';
 import { Adb, findAdb, selectDevice } from './adb.js';
@@ -20,7 +21,7 @@ import { EXIT, PraguError } from './errors.js';
 import { LARGE_TEXT_SCALE, withFontScale } from './font-scale.js';
 import { toolVersion } from './version.js';
 
-export type FailOn = Severity | 'never';
+export type { FailOn };
 
 export interface ScanOptions {
   appId: string | undefined;
@@ -34,6 +35,8 @@ export interface ScanOptions {
   launch: boolean;
   /** Capture the screen again at 200% text (text/scaling-truncation). Changes, then restores, the device's font scale. */
   checkFontScale: boolean;
+  /** Rule settings and ignores from pragu.config.ts. */
+  config: PraguConfig;
 }
 
 export interface ScanOutcome {
@@ -248,11 +251,14 @@ export async function scan(options: ScanOptions, log: (line: string) => void): P
   const device = normalized.device;
   const screen = withLargeText(normalized.screen, raw.largeText);
   const decoded = PNG.sync.read(raw.png);
-  const issues = analyze({
+  const rules = enabledRules(options.config);
+  const found = analyze({
     device,
     screens: [screen],
     rasters: new Map([[SCREEN_ID, { width: decoded.width, height: decoded.height, data: decoded.data }]]),
+    rules,
   });
+  const { issues, ignored } = applyConfig(found, options.config, new Map([[screen.id, screen.name]]));
   const result: ScanResult = {
     schemaVersion: RESULT_SCHEMA_VERSION,
     tool: { name: 'pragu', version: toolVersion() },
@@ -261,7 +267,7 @@ export async function scan(options: ScanOptions, log: (line: string) => void): P
     app: { id: raw.capture.packageName },
     screens: [screen],
     issues,
-    summary: summarize(issues, defaultRules),
+    summary: summarize(issues, rules, ignored.length),
   };
 
   const resultFile = join(options.outDir, 'pragu-result.json');
