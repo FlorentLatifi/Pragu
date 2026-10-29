@@ -62,11 +62,21 @@ figcaption { margin-top: 12px; }
 .issue { padding: 16px; background: var(--surface); border-radius: 6px; scroll-margin-top: 16px; }
 .issue:target { box-shadow: inset 4px 0 0 var(--signal), inset 6px 0 0 var(--halo); }
 .tags { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; margin: 12px 0; font: 12px/1.6 var(--font-mono); color: var(--muted); }
-.tags .severity { padding: 0 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; border: 2px solid var(--ink); color: var(--ink); }
-.tags .severity-error { background: var(--ink); color: var(--bg); }
+.severity { padding: 0 8px; font: 700 12px/1.6 var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; border: 2px solid var(--ink); color: var(--ink); }
+.severity-error { background: var(--ink); color: var(--bg); }
+.severity-info { border-color: var(--muted); border-width: 1px; color: var(--muted); }
+.by-rule { padding: 32px 0; border-bottom: 1px solid var(--line); }
+.rule-index { list-style: none; margin: 0 0 12px; padding: 0; }
+.rule-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px 16px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
+@media (min-width: 720px) { .rule-row { grid-template-columns: 96px minmax(0, 1fr) 88px minmax(0, auto); } }
+.rule-row .severity { justify-self: start; }
+.rule-title { font-weight: 700; }
+.rule-name code { color: var(--muted); overflow-wrap: anywhere; }
+.rule-count { font: 14px var(--font-mono); color: var(--muted); }
+.rule-links { display: flex; flex-wrap: wrap; gap: 8px; }
+.rule-links .plate { min-width: 32px; height: 32px; line-height: 28px; text-decoration: none; }
 .tags .in-baseline { padding: 0 8px; border: 1px dashed var(--muted); }
 .baseline { margin: 12px 0 0; padding: 8px 12px; background: var(--surface); font: 700 14px/1.5 var(--font-mono); }
-.tags .severity-info { border-color: var(--muted); border-width: 1px; color: var(--muted); }
 .message { margin: 0 0 12px; font-size: 16px; }
 .details { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px 24px; margin: 0 0 12px; font-size: 14px; }
 .details dt { font-weight: 700; margin-top: 8px; }
@@ -116,6 +126,24 @@ figcaption { margin-top: 12px; }
   <p class="rules">Rules run: <code>name/interactive-missing</code>, <code>contrast/text</code>, <code>target/size</code></p>
   
   
+</section>
+<section class="by-rule" aria-labelledby="by-rule-heading">
+  <h2 id="by-rule-heading">By rule</h2>
+  <ul class="rule-index">
+  <li class="rule-row">
+    <span class="severity severity-error">Error</span>
+    <span class="rule-name"><span class="rule-title">Interactive element has no accessible name</span> <code>name/interactive-missing</code></span>
+    <span class="rule-count">1 issue</span>
+    <span class="rule-links"><a class="plate" href="#issue-1" data-issue="1" aria-label="Issue 1">1</a></span>
+  </li>
+<li class="rule-row">
+    <span class="severity severity-warning">Warning</span>
+    <span class="rule-name"><span class="rule-title">Touch target is too small</span> <code>target/size</code></span>
+    <span class="rule-count">1 issue</span>
+    <span class="rule-links"><a class="plate" href="#issue-2" data-issue="2" aria-label="Issue 2">2</a></span>
+  </li>
+  </ul>
+  <p class="rules">1 other check found nothing.</p>
 </section>
 <section class="screen" aria-labelledby="screen-1-heading">
   <h2 id="screen-1-heading">Cart <span class="screen-app">dev.pragu.fixtures.rnshop</span></h2>

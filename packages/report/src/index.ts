@@ -15,6 +15,7 @@ export interface ReportInput {
 }
 
 const SEVERITY_LABEL: Record<Severity, string> = { error: 'Error', warning: 'Warning', info: 'Info' };
+const SEVERITY_ORDER: Record<Severity, number> = { error: 0, warning: 1, info: 2 };
 
 export function escapeHtml(value: string): string {
   return value
@@ -44,12 +45,17 @@ export function renderReport({ result, screenshots }: ReportInput): string {
     issues.length === 0
       ? `No barriers found by ${plural(summary.rulesRun.length, 'automated check', 'automated checks')}`
       : `${plural(issues.length, 'barrier', 'barriers')} found in ${app.id}`;
-  let number = 0;
+  const numbered = numberIssues(result);
   const screens = result.screens
     .map((screen) => {
-      const screenIssues = issues.filter((issue) => issue.screenId === screen.id);
-      const numbered = screenIssues.map((issue) => ({ issue, number: ++number }));
-      return renderScreen(screen, numbered, screenshots.get(screen.id), device.screenWidthPx, device.screenHeightPx);
+      const screenIssues = numbered.filter(({ issue }) => issue.screenId === screen.id);
+      return renderScreen(
+        screen,
+        screenIssues,
+        screenshots.get(screen.id),
+        device.screenWidthPx,
+        device.screenHeightPx,
+      );
     })
     .join('\n');
 
@@ -87,6 +93,7 @@ export function renderReport({ result, screenshots }: ReportInput): string {
   ${summary.baseline === null ? '' : `<p class="baseline">${escapeHtml(`Compared with ${summary.baseline.file}: ${String(summary.baseline.newIssues)} new · ${String(summary.baseline.known)} already in the baseline · ${String(summary.baseline.fixed)} fixed since`)}</p>`}
   ${summary.ignored === 0 ? '' : `<p class="rules">${escapeHtml(plural(summary.ignored, 'issue', 'issues'))} ignored by the project's config (pragu.config.ts), not counted above.</p>`}
 </section>
+${renderRuleIndex(numbered, summary.rulesRun)}
 ${screens}
 <section class="limits" aria-labelledby="limits-heading">
   <h2 id="limits-heading">What these checks cannot tell you</h2>
@@ -100,6 +107,68 @@ ${screens}
 </body>
 </html>
 `;
+}
+
+interface NumberedIssue {
+  issue: Issue;
+  number: number;
+}
+
+/** One number per issue across the whole report, screen by screen, matching the screenshot signs. */
+function numberIssues(result: ScanResult): NumberedIssue[] {
+  return result.screens
+    .flatMap((screen) => result.issues.filter((issue) => issue.screenId === screen.id))
+    .map((issue, index) => ({ issue, number: index + 1 }));
+}
+
+/**
+ * The same issues grouped by rule, worst first: when one rule fires several times, that is
+ * usually one fix in a shared component. Links back to the numbered cards rather than
+ * repeating them, so the file stays small.
+ */
+function renderRuleIndex(numbered: readonly NumberedIssue[], rulesRun: readonly string[]): string {
+  if (numbered.length === 0) return '';
+  const byRule = new Map<string, { first: Issue; entries: NumberedIssue[] }>();
+  for (const entry of numbered) {
+    const group = byRule.get(entry.issue.ruleId);
+    if (group === undefined) byRule.set(entry.issue.ruleId, { first: entry.issue, entries: [entry] });
+    else group.entries.push(entry);
+  }
+  const groups = [...byRule.values()].sort(
+    (a, b) =>
+      SEVERITY_ORDER[a.first.severity] - SEVERITY_ORDER[b.first.severity] ||
+      b.entries.length - a.entries.length ||
+      a.first.ruleId.localeCompare(b.first.ruleId),
+  );
+  const rows = groups.map(({ first, entries }) => renderRuleRow(first, entries)).join('\n');
+  const quiet = rulesRun.filter((id) => !byRule.has(id)).length;
+  const quietNote =
+    quiet === 0
+      ? ''
+      : `<p class="rules">${escapeHtml(plural(quiet, 'other check', 'other checks'))} found nothing.</p>`;
+  return `<section class="by-rule" aria-labelledby="by-rule-heading">
+  <h2 id="by-rule-heading">By rule</h2>
+  <ul class="rule-index">
+  ${rows}
+  </ul>
+  ${quietNote}
+</section>`;
+}
+
+function renderRuleRow(first: Issue, entries: readonly NumberedIssue[]): string {
+  const { ruleId, title, severity } = first;
+  const links = entries
+    .map(
+      ({ number }) =>
+        `<a class="plate" href="#issue-${String(number)}" data-issue="${String(number)}" aria-label="${escapeHtml(`Issue ${String(number)}`)}">${String(number)}</a>`,
+    )
+    .join('');
+  return `<li class="rule-row">
+    <span class="severity severity-${severity}">${SEVERITY_LABEL[severity]}</span>
+    <span class="rule-name"><span class="rule-title">${escapeHtml(title)}</span> <code>${escapeHtml(ruleId)}</code></span>
+    <span class="rule-count">${escapeHtml(plural(entries.length, 'issue', 'issues'))}</span>
+    <span class="rule-links">${links}</span>
+  </li>`;
 }
 
 /** What this screen's checks could not see, said plainly next to the results. */
@@ -150,11 +219,7 @@ function overlaps(a: PlacedSign, b: PlacedSign): boolean {
  * just above the marker (below it at the top of the screen). A sign that would cover
  * one already placed steps further away; its number still ties it to its marker.
  */
-function placeSigns(
-  numbered: readonly { issue: Issue; number: number }[],
-  screenWidthPx: number,
-  screenHeightPx: number,
-): PlacedSign[] {
+function placeSigns(numbered: readonly NumberedIssue[], screenWidthPx: number, screenHeightPx: number): PlacedSign[] {
   const frameHeightPx = (FRAME_WIDTH_PX * screenHeightPx) / screenWidthPx;
   const height = (SIGN_HEIGHT_PX / frameHeightPx) * 100;
   const gap = (SIGN_GAP_PX / frameHeightPx) * 100;
@@ -182,7 +247,7 @@ function placeSigns(
 
 function renderScreen(
   screen: PamScreen,
-  numbered: { issue: Issue; number: number }[],
+  numbered: readonly NumberedIssue[],
   screenshot: ReportScreenshot | undefined,
   screenWidthPx: number,
   screenHeightPx: number,
@@ -240,7 +305,7 @@ function renderScreen(
  * The screen as a TalkBack user hears it, swiping from start to end. Lines whose element has
  * a finding carry its number, so a barrier can be heard, not only seen.
  */
-function renderTranscript(screen: PamScreen, numbered: readonly { issue: Issue; number: number }[]): string {
+function renderTranscript(screen: PamScreen, numbered: readonly NumberedIssue[]): string {
   const headingId = `${screen.id}-transcript`;
   const lines = transcript(screen);
   const numbersFor = (nodeId: string) =>
@@ -401,11 +466,21 @@ figcaption { margin-top: 12px; }
 .issue { padding: 16px; background: var(--surface); border-radius: 6px; scroll-margin-top: 16px; }
 .issue:target { box-shadow: inset 4px 0 0 var(--signal), inset 6px 0 0 var(--halo); }
 .tags { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; margin: 12px 0; font: 12px/1.6 var(--font-mono); color: var(--muted); }
-.tags .severity { padding: 0 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; border: 2px solid var(--ink); color: var(--ink); }
-.tags .severity-error { background: var(--ink); color: var(--bg); }
+.severity { padding: 0 8px; font: 700 12px/1.6 var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; border: 2px solid var(--ink); color: var(--ink); }
+.severity-error { background: var(--ink); color: var(--bg); }
+.severity-info { border-color: var(--muted); border-width: 1px; color: var(--muted); }
+.by-rule { padding: 32px 0; border-bottom: 1px solid var(--line); }
+.rule-index { list-style: none; margin: 0 0 12px; padding: 0; }
+.rule-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px 16px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
+@media (min-width: 720px) { .rule-row { grid-template-columns: 96px minmax(0, 1fr) 88px minmax(0, auto); } }
+.rule-row .severity { justify-self: start; }
+.rule-title { font-weight: 700; }
+.rule-name code { color: var(--muted); overflow-wrap: anywhere; }
+.rule-count { font: 14px var(--font-mono); color: var(--muted); }
+.rule-links { display: flex; flex-wrap: wrap; gap: 8px; }
+.rule-links .plate { min-width: 32px; height: 32px; line-height: 28px; text-decoration: none; }
 .tags .in-baseline { padding: 0 8px; border: 1px dashed var(--muted); }
 .baseline { margin: 12px 0 0; padding: 8px 12px; background: var(--surface); font: 700 14px/1.5 var(--font-mono); }
-.tags .severity-info { border-color: var(--muted); border-width: 1px; color: var(--muted); }
 .message { margin: 0 0 12px; font-size: 16px; }
 .details { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px 24px; margin: 0 0 12px; font-size: 14px; }
 .details dt { font-weight: 700; margin-top: 8px; }

@@ -245,6 +245,30 @@ describe('screen-reader transcript', () => {
   });
 });
 
+describe('rule index', () => {
+  const contrast = (nodeId: string) =>
+    issue({ ruleId: 'contrast/text', title: 'Text contrast is too low', nodeId, wcag: ['1.4.3'] });
+  const warning = issue({ ruleId: 'target/size', title: 'Touch target is too small', severity: 'warning' });
+
+  it('groups issues by rule, errors first and the most frequent first, linking to each numbered card', () => {
+    const html = renderReport({ result: result([warning, issue(), contrast('0.4'), contrast('0.5')]), screenshots });
+    const start = html.indexOf('<section class="by-rule"');
+    const index = html.slice(start, html.indexOf('</section>', start));
+    const positions = ['contrast/text', 'name/interactive-missing', 'target/size'].map((id) =>
+      index.indexOf(`<code>${id}</code>`),
+    );
+    expect(positions.every((position) => position > 0)).toBe(true);
+    expect([...positions].sort((a, b) => a - b)).toEqual(positions);
+    expect(index).toContain('2 issues');
+    expect(index).toContain('<a class="plate" href="#issue-3" data-issue="3" aria-label="Issue 3">3</a>');
+  });
+
+  it('says how many checks found nothing, and is left out when nothing was found', () => {
+    expect(renderReport({ result: result([issue()]), screenshots })).toContain('2 other checks found nothing.');
+    expect(renderReport({ result: result([]), screenshots })).not.toContain('class="by-rule"');
+  });
+});
+
 describe('baseline', () => {
   it('says what is new, known and fixed, and tags issues the baseline accepts', () => {
     const base = result([issue({ inBaseline: true })]);
