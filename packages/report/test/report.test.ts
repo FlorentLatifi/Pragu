@@ -235,7 +235,9 @@ describe('screen-reader transcript', () => {
     expect(html).toContain('<h3 id="screen-1-transcript">What a screen reader says</h3>');
     expect(html).toContain("Pragu's approximation of TalkBack");
     expect(html).toContain('<li><span>Your cart, Heading</span></li>');
-    expect(html).toContain('<li><span class="plate" aria-label="Issue 1">1</span><span>Unlabelled, Button</span></li>');
+    expect(html).toContain(
+      '<li><span class="plate" data-issue="1" aria-label="Issue 1">1</span><span>Unlabelled, Button</span></li>',
+    );
   });
 
   it('says so when nothing reaches a screen reader', () => {
@@ -291,7 +293,7 @@ describe('filters', () => {
 
   it('adds "New only" when the scan used a baseline, and leaves filters out when nothing was found', () => {
     const base = result([issue({ inBaseline: true }), warning]);
-    const baseline = { file: 'pragu-baseline.json', newIssues: 1, known: 1, fixed: 0 };
+    const baseline = { file: 'pragu-baseline.json', newIssues: 1, known: 1, fixed: 0, fixedIssues: [] };
     const html = renderReport({ result: { ...base, summary: { ...base.summary, baseline } }, screenshots });
     expect(html).toContain('value="new"> New only <span class="filter-count">1</span>');
     expect(html).toContain('data-severity="error" data-baseline="known"');
@@ -303,11 +305,29 @@ describe('filters', () => {
 describe('baseline', () => {
   it('says what is new, known and fixed, and tags issues the baseline accepts', () => {
     const base = result([issue({ inBaseline: true })]);
-    const baseline = { file: 'pragu-baseline.json', newIssues: 0, known: 1, fixed: 2 };
+    const fixedIssues = [
+      { fingerprint: 'a', ruleId: 'contrast/text', screen: 'Cart', resourceId: 'total', message: 'Too pale <b>.' },
+      { fingerprint: 'b', ruleId: 'target/size', screen: 'Cart', resourceId: null, message: 'Too small.' },
+    ];
+    const baseline = { file: 'pragu-baseline.json', newIssues: 0, known: 1, fixed: 2, fixedIssues };
     const html = renderReport({ result: { ...base, summary: { ...base.summary, baseline } }, screenshots });
     expect(html).toContain('Compared with pragu-baseline.json: 0 new · 1 already in the baseline · 2 fixed since');
     expect(html).toContain('<span class="in-baseline">In baseline</span>');
     expect(renderReport({ result: result([issue()]), screenshots })).not.toContain('In baseline');
+    expect(html).toContain('<h2 id="fixed-heading">Fixed since the baseline</h2>');
+    expect(html).toContain('<code>contrast/text</code> · Cart · <code>total</code>');
+    expect(html).toContain('Too pale &lt;b&gt;.');
+  });
+
+  it('tags new issues only when there is a baseline to be new against', () => {
+    const base = result([issue()]);
+    const baseline = { file: 'pragu-baseline.json', newIssues: 1, known: 0, fixed: 0, fixedIssues: [] };
+    const html = renderReport({ result: { ...base, summary: { ...base.summary, baseline } }, screenshots });
+    expect(html).toContain('<span class="is-new">New</span>');
+    expect(html).toContain('None yet: every issue the baseline accepts on these screens is still there.');
+    const plain = renderReport({ result: base, screenshots });
+    expect(plain).not.toContain('<span class="is-new">');
+    expect(plain).not.toContain('Fixed since the baseline');
   });
 });
 

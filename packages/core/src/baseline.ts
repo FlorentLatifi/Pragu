@@ -31,6 +31,7 @@ export interface BaselineComparison {
   known: number;
   /** Baseline issues on the scanned screens that this scan no longer finds. */
   fixed: number;
+  fixedIssues: BaselineEntry[];
 }
 
 function screenNames(screens: readonly PamScreen[]): Map<string, string> {
@@ -98,7 +99,10 @@ export function compareWithBaseline(
   const marked = issues.map((issue) => ({ ...issue, inBaseline: accepted.has(issue.fingerprint) }));
   const found = new Set(issues.map((issue) => issue.fingerprint));
   const scanned = new Set(screens.map((screen) => screen.name));
-  const fixed = baseline.issues.filter((entry) => scanned.has(entry.screen) && !found.has(entry.fingerprint)).length;
+  const fixedIssues = baseline.issues.filter((entry) => scanned.has(entry.screen) && !found.has(entry.fingerprint));
   const known = marked.filter((issue) => issue.inBaseline).length;
-  return { issues: marked, comparison: { newIssues: marked.length - known, known, fixed } };
+  return {
+    issues: marked,
+    comparison: { newIssues: marked.length - known, known, fixed: fixedIssues.length, fixedIssues },
+  };
 }

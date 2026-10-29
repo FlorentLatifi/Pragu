@@ -1,13 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:pragu:result:0.8.0",
+  "$id": "urn:pragu:result:0.9.0",
   "title": "Pragu scan result",
   "description": "pragu-result.json: what one scan found. The stable machine contract; see packages/core/schema/README.md for the versioning policy.",
   "type": "object",
   "additionalProperties": false,
   "required": ["schemaVersion", "tool", "startedAt", "device", "app", "screens", "issues", "summary"],
   "properties": {
-    "schemaVersion": { "const": "0.8.0" },
+    "schemaVersion": { "const": "0.9.0" },
     "tool": {
       "type": "object",
       "additionalProperties": false,
@@ -44,12 +44,28 @@
             {
               "type": "object",
               "additionalProperties": false,
-              "required": ["file", "newIssues", "known", "fixed"],
+              "required": ["file", "newIssues", "known", "fixed", "fixedIssues"],
               "properties": {
                 "file": { "type": "string" },
                 "newIssues": { "type": "integer", "minimum": 0 },
                 "known": { "type": "integer", "minimum": 0 },
-                "fixed": { "type": "integer", "minimum": 0 }
+                "fixed": { "type": "integer", "minimum": 0 },
+                "fixedIssues": {
+                  "description": "Baseline issues on the scanned screens that this scan no longer finds, as the baseline recorded them.",
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "required": ["fingerprint", "ruleId", "screen", "resourceId", "message"],
+                    "properties": {
+                      "fingerprint": { "type": "string" },
+                      "ruleId": { "type": "string" },
+                      "screen": { "type": "string" },
+                      "resourceId": { "type": ["string", "null"] },
+                      "message": { "type": "string" }
+                    }
+                  }
+                }
               }
             }
           ]

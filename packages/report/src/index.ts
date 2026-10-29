@@ -1,5 +1,5 @@
 import { transcript } from '@pragu/core';
-import type { Issue, PamScreen, ScanResult, Severity } from '@pragu/core';
+import type { BaselineSummary, Issue, PamScreen, ScanResult, Severity } from '@pragu/core';
 import { FONT_FACES } from './fonts.js';
 import { themeCss } from './theme.js';
 
@@ -97,6 +97,7 @@ export function renderReport({ result, screenshots }: ReportInput): string {
 </section>
 ${renderRuleIndex(numbered, summary.rulesRun)}
 ${screens}
+${summary.baseline === null ? '' : renderFixed(summary.baseline)}
 <section class="limits" aria-labelledby="limits-heading">
   <h2 id="limits-heading">What these checks cannot tell you</h2>
   <p>Automated checks find some barriers, not all, and this report is not a compliance statement. Still check by hand: whether names are meaningful in context, the reading order across the whole screen, behaviour at 200% text size, gestures and timing, and the full journey with TalkBack switched on.</p>
@@ -317,7 +318,7 @@ function renderTranscript(screen: PamScreen, numbered: readonly NumberedIssue[])
       .filter(({ issue }) => issue.nodeId === nodeId)
       .map(
         ({ number }) =>
-          `<span class="plate" aria-label="${escapeHtml(`Issue ${String(number)}`)}">${String(number)}</span>`,
+          `<span class="plate" data-issue="${String(number)}" aria-label="${escapeHtml(`Issue ${String(number)}`)}">${String(number)}</span>`,
       )
       .join('');
   const body =
@@ -405,6 +406,30 @@ function renderFilters(issues: readonly Issue[], compared: boolean): string {
   </form>`;
 }
 
+/** With a baseline, every issue says which side of it it is on; without one, nothing. */
+function baselineTag(issue: Issue, compared: boolean): string {
+  if (issue.inBaseline) return '<span class="in-baseline">In baseline</span>';
+  return compared ? '<span class="is-new">New</span>' : '';
+}
+
+/** What got better since the baseline: issues it accepted that this scan no longer finds. */
+function renderFixed(baseline: BaselineSummary): string {
+  const body =
+    baseline.fixedIssues.length === 0
+      ? '<p class="empty">None yet: every issue the baseline accepts on these screens is still there.</p>'
+      : `<ul class="fixed-list">${baseline.fixedIssues
+          .map(
+            (entry) =>
+              `<li><p class="fixed-where"><code>${escapeHtml(entry.ruleId)}</code> · ${escapeHtml(entry.screen)}${entry.resourceId === null ? '' : ` · <code>${escapeHtml(entry.resourceId)}</code>`}</p><p class="fixed-message">${escapeHtml(entry.message)}</p></li>`,
+          )
+          .join('')}</ul>`;
+  return `<section class="fixed" aria-labelledby="fixed-heading">
+  <h2 id="fixed-heading">Fixed since the baseline</h2>
+  <p class="rules">${escapeHtml(`Accepted in ${baseline.file}, no longer found by this scan.`)} Run <code>pragu baseline update</code> to drop them from the baseline.</p>
+  ${body}
+</section>`;
+}
+
 function renderIssue(issue: Issue, number: number, compared: boolean): string {
   const evidence = Object.entries(issue.evidence)
     .map(([key, value]) => `<code>${escapeHtml(key)}: ${escapeHtml(String(value))}</code>`)
@@ -417,7 +442,7 @@ function renderIssue(issue: Issue, number: number, compared: boolean): string {
   const baseline = compared ? ` data-baseline="${issue.inBaseline ? 'known' : 'new'}"` : '';
   return `<li class="issue" id="issue-${String(number)}" tabindex="-1" data-issue="${String(number)}" data-severity="${issue.severity}"${baseline}>
   <h3><span class="plate" aria-hidden="true">${String(number)}</span>${escapeHtml(issue.title)}</h3>
-  <p class="tags"><span class="severity severity-${issue.severity}">${SEVERITY_LABEL[issue.severity]}</span>${standards.map((s) => `<span>${escapeHtml(s)}</span>`).join('')}<span>Confidence: ${issue.confidence}</span>${issue.inBaseline ? '<span class="in-baseline">In baseline</span>' : ''}</p>
+  <p class="tags"><span class="severity severity-${issue.severity}">${SEVERITY_LABEL[issue.severity]}</span>${standards.map((s) => `<span>${escapeHtml(s)}</span>`).join('')}<span>Confidence: ${issue.confidence}</span>${baselineTag(issue, compared)}</p>
   <p class="message">${escapeHtml(issue.message)}</p>
   <dl class="details">
     <dt>Who it affects</dt><dd>${escapeHtml(issue.whoIsAffected)}</dd>
@@ -466,7 +491,7 @@ const FILTER_SCRIPT = `(function () {
       if (visible) { shown[issue.getAttribute('data-issue')] = true; count++; }
     });
     each('.marker[data-issue], .rule-links [data-issue]', function (el) { el.hidden = !shown[el.getAttribute('data-issue')]; });
-    each('.screen-sign[data-issue]', function (el) { el.classList.toggle('is-dimmed', !shown[el.getAttribute('data-issue')]); });
+    each('.screen-sign[data-issue], .transcript-lines [data-issue]', function (el) { el.classList.toggle('is-dimmed', !shown[el.getAttribute('data-issue')]); });
     each('.rule-row', function (row) { row.hidden = !row.querySelector('.rule-links [data-issue]:not([hidden])'); });
     each('.issues', function (list) { list.nextElementSibling.hidden = !!list.querySelector('.issue:not([hidden])'); });
     status.textContent = count === issues.length ? 'Showing all ' + issues.length + ' issues.' : 'Showing ' + count + ' of ' + issues.length + ' issues.';
@@ -543,7 +568,7 @@ figcaption { margin-top: 12px; }
 .filter input { width: 20px; height: 20px; margin: 0; accent-color: var(--ink); }
 .filter-count { font: 400 14px var(--font-mono); color: var(--muted); }
 .filter-status { flex-basis: 100%; margin: 0; color: var(--muted); font-size: 14px; }
-.screen-sign.is-dimmed { background: var(--surface); color: var(--muted); border-style: dashed; border-color: var(--muted); z-index: 0; }
+.screen-sign.is-dimmed, .plate.is-dimmed { background: var(--surface); color: var(--muted); border-style: dashed; border-color: var(--muted); z-index: 0; }
 .screen-sign.is-dimmed .sign-measure { border-left-color: var(--muted); }
 .by-rule { padding: 32px 0; border-bottom: 1px solid var(--line); }
 .rule-index { list-style: none; margin: 0 0 12px; padding: 0; }
@@ -556,6 +581,14 @@ figcaption { margin-top: 12px; }
 .rule-links { display: flex; flex-wrap: wrap; gap: 8px; }
 .rule-links .plate { min-width: 32px; height: 32px; line-height: 28px; text-decoration: none; }
 .tags .in-baseline { padding: 0 8px; border: 1px dashed var(--muted); }
+.tags .is-new { padding: 0 8px; background: var(--signal); color: var(--on-signal); border: 2px solid var(--halo); font-weight: 700; }
+.fixed { padding: 32px 0; border-bottom: 1px solid var(--line); }
+.fixed .rules { margin-bottom: 16px; }
+.fixed-list { list-style: none; margin: 0; padding: 0; }
+.fixed-list li { padding: 12px 0 12px 16px; border-left: 4px solid var(--ink); }
+.fixed-list li + li { margin-top: 8px; }
+.fixed-where { margin: 0; font: 14px var(--font-mono); color: var(--muted); overflow-wrap: anywhere; }
+.fixed-message { margin: 4px 0 0; }
 .baseline { margin: 12px 0 0; padding: 8px 12px; background: var(--surface); font: 700 14px/1.5 var(--font-mono); }
 .message { margin: 0 0 12px; font-size: 16px; }
 .details { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px 24px; margin: 0 0 12px; font-size: 14px; }

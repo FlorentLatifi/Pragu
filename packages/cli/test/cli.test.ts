@@ -136,7 +136,7 @@ describe('scan --from-capture (whole pipeline, no device)', () => {
 
     expect(code).toBe(1);
     const result = JSON.parse(await readFile(join(out, 'pragu-result.json'), 'utf8')) as ScanResult;
-    expect(result.schemaVersion).toBe('0.8.0');
+    expect(result.schemaVersion).toBe('0.9.0');
     expect(result.issues.map((issue) => [issue.ruleId, issue.resourceId])).toEqual([
       ['target/size', 'seed-tiny-dismiss'],
       ['name/interactive-missing', 'seed-unlabeled-remove'],

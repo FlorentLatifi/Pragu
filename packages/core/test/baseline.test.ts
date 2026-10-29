@@ -52,7 +52,8 @@ describe('baselines', () => {
     });
     const { issues, comparison } = compareWithBaseline([issue('known'), issue('new')], [screen], baseline);
     expect(issues.map((found) => found.inBaseline)).toEqual([true, false]);
-    expect(comparison).toEqual({ newIssues: 1, known: 1, fixed: 1 });
+    expect(comparison).toMatchObject({ newIssues: 1, known: 1, fixed: 1 });
+    expect(comparison.fixedIssues.map((entry) => entry.fingerprint)).toEqual(['fixed']);
   });
 
   it.each([
