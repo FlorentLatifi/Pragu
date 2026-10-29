@@ -51,13 +51,14 @@ Walking skeleton on the emulator, CI, docs (PRD, technical design, ADR-001 to 00
   - Baselines: `pragu baseline create|update` and `--baseline`, so only new issues fail; fingerprint v1 with fast-check property tests (ADR-004).
   - SARIF: brief and test checklist ready for Florent's owner task (`docs/plans/owner-task-sarif.md`).
 - **CI on a real emulator** (work package 9): every push and PR records all bench screens live on a fresh API 36 emulator (`.github/workflows/e2e.yml`), and the bench must reproduce the published results exactly. This is the end-to-end test of the agent and capturer. Green on the first run. Budgets set from measurements: 20 s per scan (slowest measured 7.6 s), 300 KB per one-screen report; CLI cold start about 150 ms (docs/testing/strategy.md). Its first runs found two real problems, both fixed: an agent signed on another machine could not be updated in place (the CLI now reinstalls it; never the user's app), and a stopped agent showed as "unexpected error" (now a Pragu error with next steps; the recorder retries once visibly and CI keeps the device log).
-- Checks: 242 TypeScript tests (plus 8 SARIF todos), 26 JVM tests, lint, typecheck, bench gate.
+- **`name/duplicate`** (warning): several controls with the same name, like rows whose delete buttons are all "Remove". No false alarms on the eight existing screens; seeds and twins in Compose settings. The other M1 warning rules are Florent's owner tasks (briefs ready); `focus/order`, `name/role-in-label` and `structure/no-headings` moved to M2 per the plan.
+- Checks: 247 TypeScript tests (plus 18 owner-task todos), 26 JVM tests, lint, typecheck, bench gate.
 
 ## Bench results (8 screens: rn-shop, android-compose)
 
 | Rule | Severity | TP | FP | FN | TN | Precision | Recall |
 |---|---|---|---|---|---|---|---|
-| `name/interactive-missing` | error | 8 | 0 | 0 | 16 | 1.00 | 1.00 |
+| `name/interactive-missing` | error | 8 | 0 | 0 | 17 | 1.00 | 1.00 |
 | `name/image-missing` | error | 1 | 0 | 0 | 2 | 1.00 | 1.00 |
 | `input/missing-label` | error | 2 | 0 | 0 | 4 | 1.00 | 1.00 |
 | `state/not-exposed` | error | 2 | 0 | 2 | 5 | 1.00 | 0.50 |
@@ -65,13 +66,14 @@ Walking skeleton on the emulator, CI, docs (PRD, technical design, ADR-001 to 00
 | `text/scaling-truncation` | error | 2 | 0 | 2 | 6 | 1.00 | 0.50 |
 | `contrast/text` | error | 6 | 0 | 0 | 11 | 1.00 | 1.00 |
 | `target/size` | warning | 3 | 1 | 3 | 11 | 0.75 | 0.50 |
+| `name/duplicate` | warning | 2 | 0 | 0 | 2 | 1.00 | 1.00 |
 
 All error rules meet the 0.90 bar. Known misses stay published: home-made checkboxes with no role (`state/not-exposed`), Compose `hideFromAccessibility()` (`focus/unreachable`), text cut by fixed-height boxes (`text/scaling-truncation`), React Native `hitSlop` and crowded Compose targets (`target/size`). Small sample: early signals, not final quality figures. Full page: `docs/bench/results.md`.
 
 ## Next
 
-1. Rest of M1: warning and info rules (work package 4, some are owner tasks); the screen-reader transcript (work package 5).
-2. Owner tasks for Florent: SARIF writer (brief ready), `target/size` 48 dp platform tier, `name/generic`, `contrast/non-text`.
+1. Rest of M1: the screen-reader transcript (work package 5), then the M1 walkthrough, interview questions and owner-task review.
+2. Owner tasks for Florent, briefs ready: SARIF writer (`docs/plans/owner-task-sarif.md`); `target/size` platform tier, `name/generic`, `contrast/non-text` (`docs/plans/owner-tasks-rules.md`).
 
 ## Notes and risks
 
