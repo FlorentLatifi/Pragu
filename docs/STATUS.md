@@ -52,7 +52,7 @@ Walking skeleton on the emulator, CI, docs (PRD, technical design, ADR-001 to 00
   - SARIF: brief and test checklist ready for Florent's owner task (`docs/plans/owner-task-sarif.md`).
 - **CI on a real emulator** (work package 9): every push and PR records all bench screens live on a fresh API 36 emulator (`.github/workflows/e2e.yml`), and the bench must reproduce the published results exactly. This is the end-to-end test of the agent and capturer. Green on the first run. Budgets set from measurements: 20 s per scan (slowest measured 7.6 s), 300 KB per one-screen report; CLI cold start about 150 ms (docs/testing/strategy.md). Its first runs found two real problems, both fixed: an agent signed on another machine could not be updated in place (the CLI now reinstalls it; never the user's app), and a stopped agent showed as "unexpected error" (now a Pragu error with next steps; the recorder retries once visibly and CI keeps the device log).
 - **`name/duplicate`** (warning): several controls with the same name, like rows whose delete buttons are all "Remove". No false alarms on the eight existing screens; seeds and twins in Compose settings. The other M1 warning rules are Florent's owner tasks (briefs ready); `focus/order`, `name/role-in-label` and `structure/no-headings` moved to M2 per the plan.
-- **Screen-reader transcript** (work package 5): each report screen shows what TalkBack would say swiping through it, in order ("Gift wrap this order, Checkbox" where the state is missing; "Unlabelled" where a control is silent), labelled as an approximation, with finding numbers on the lines they affect. Checked against the fixtures by reading; not yet against real TalkBack, which is installed on the emulator image.
+- **Screen-reader transcript** (work package 5): each report screen shows what TalkBack would say swiping through it, in order ("Gift wrap this order, Checkbox" where the state is missing; "Unlabelled" where a control is silent), labelled as an approximation, with finding numbers on the lines they affect. Checked against the fixtures by reading. A comparison with real TalkBack 16 on the emulator (2026-10-29) did not get past the first stop: TalkBack's focus outline can be found in screenshots and matched to the recorded element, but neither `adb shell input` swipes (60–450 ms), chained motion events nor Alt+Right moved its focus, and TalkBack logs no speech. Order and wording are therefore still unverified; TalkBack was turned off and the original settings restored.
 - Checks: 261 TypeScript tests (plus 18 owner-task todos), 26 JVM tests, lint, typecheck, bench gate.
 
 ## Bench results (8 screens: rn-shop, android-compose)
@@ -73,7 +73,7 @@ All error rules meet the 0.90 bar. Known misses stay published: home-made checkb
 
 ## Next
 
-1. Compare the transcript with real TalkBack (emulator or phone), then the M1 walkthrough, interview questions and owner-task review.
+1. Compare the transcript with real TalkBack by hand on a phone (swipe through rn-shop cart and Compose checkout, note each spoken line); on the emulator the next thing to try is injecting the swipe through UiAutomation in the agent. Then the M1 walkthrough, interview questions and owner-task review.
 2. Owner tasks for Florent, briefs ready: SARIF writer (`docs/plans/owner-task-sarif.md`); `target/size` platform tier, `name/generic`, `contrast/non-text` (`docs/plans/owner-tasks-rules.md`).
 
 ## Notes and risks
