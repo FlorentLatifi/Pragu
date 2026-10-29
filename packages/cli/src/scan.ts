@@ -63,7 +63,13 @@ interface RawCapture {
 
 interface RawScreen extends RawCapture {
   /** The same screen at 200% text, when the scan asked for it. */
-  largeText: RawCapture | null;
+  largeText: LargeTextCapture | null;
+}
+
+/** The 200% capture; its screenshot is kept for people to look at, but no rule reads it. */
+interface LargeTextCapture {
+  capture: AndroidCapture;
+  png: Buffer | null;
 }
 
 const LARGE_TEXT_SUFFIX = '-large-text';
@@ -181,10 +187,12 @@ async function captureFromFile(file: string): Promise<RawScreen> {
   // A scan with --check-font-scale saved the 200% capture next to the first one.
   const largeFile = file.replace(/\.json$/, `${LARGE_TEXT_SUFFIX}.json`);
   const largePng = largeFile.replace(/\.json$/, '.png');
-  const largeText =
-    existsSync(largeFile) && existsSync(largePng)
-      ? { capture: parseAndroidCapture(JSON.parse(await readFile(largeFile, 'utf8'))), png: await readFile(largePng) }
-      : null;
+  const largeText = existsSync(largeFile)
+    ? {
+        capture: parseAndroidCapture(JSON.parse(await readFile(largeFile, 'utf8'))),
+        png: existsSync(largePng) ? await readFile(largePng) : null,
+      }
+    : null;
   return {
     capture: parseAndroidCapture(JSON.parse(await readFile(file, 'utf8'))),
     png: await readFile(pngFile),
@@ -192,7 +200,7 @@ async function captureFromFile(file: string): Promise<RawScreen> {
   };
 }
 
-function withLargeText(screen: PamScreen, largeText: RawCapture | null): PamScreen {
+function withLargeText(screen: PamScreen, largeText: LargeTextCapture | null): PamScreen {
   if (largeText === null) return screen;
   const large = normalizeAndroidCapture(largeText.capture, {
     screenId: screen.id,
@@ -228,7 +236,7 @@ export async function scan(options: ScanOptions, log: (line: string) => void): P
     if (raw.largeText !== null) {
       const base = join(captureDir, `${SCREEN_ID}${LARGE_TEXT_SUFFIX}`);
       await writeFile(`${base}.json`, `${JSON.stringify(raw.largeText.capture, null, 2)}\n`);
-      await writeFile(`${base}.png`, raw.largeText.png);
+      if (raw.largeText.png !== null) await writeFile(`${base}.png`, raw.largeText.png);
     }
   }
 

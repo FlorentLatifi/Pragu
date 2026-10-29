@@ -21,7 +21,7 @@ export interface RecordingFiles {
 
 export function recordingFiles(root: string, fixture: string, screenId: string): RecordingFiles {
   const base = join(root, 'bench', 'recordings', fixture, screenId);
-  return { json: `${base}.json`, png: `${base}.png`, largeTextJson: `${base}.large-text.json` };
+  return { json: `${base}.json`, png: `${base}.png`, largeTextJson: `${base}-large-text.json` };
 }
 
 /** Every fixture that has ground truth (fixtures/<name>/expected.json), in name order. */
