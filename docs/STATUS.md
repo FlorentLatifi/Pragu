@@ -19,7 +19,7 @@ Last updated: 2026-10-28, M1 session 3. **M0 approved. M1 in progress:** Pragu B
 
 ## Decisions needed (Florent)
 
-1. **Report v1 plan:** approve the build plan (proposed 2026-10-29).
+None open.
 
 ## Done
 
@@ -43,7 +43,8 @@ Walking skeleton on the emulator, CI, docs (PRD, technical design, ADR-001 to 00
 - **`name/image-missing`**: flags images TalkBack stops on but can only call "Image". Images it skips are left alone, since telling decoration from content would be a guess. Seed and twins (named, decorative) on the rn-shop product screen.
 - **`focus/unreachable`**: flags controls that work by touch but are hidden from assistive technology, unless a row around them is one accessible control. Compose's `hideFromAccessibility()` looks like off-screen content and stays a published miss.
 - **`text/scaling-truncation`** (ADR-011): `--check-font-scale` captures each screen again at 200% text and restores the setting (tested with 1.15 on the device). Protocol 4 reports characters an ellipsis hides. New `summary` screens in both fixtures; the bench records every screen at both sizes, and the recorder rejects blank screenshots.
-- Checks: 162 TypeScript tests, 26 JVM tests, lint, typecheck, bench gate.
+- **Report v1** in the Signal direction (DESIGN.md, ADR-003 amended): Atkinson Hyperlegible embedded, black-on-yellow signs carrying each marker's number and measurement, laid out so they never overlap, contrast-tested tokens in both themes. Reviewed in the browser in light and dark, at phone and desktop widths, and with the keyboard.
+- Checks: 184 TypeScript tests, 26 JVM tests, lint, typecheck, bench gate.
 
 ## Bench results (8 screens: rn-shop, android-compose)
 
@@ -62,7 +63,7 @@ All error rules meet the 0.90 bar. Known misses stay published: home-made checkb
 
 ## Next
 
-1. Rest of M1: report v1 (needs the design direction), config, JSON Schema and SARIF, `doctor` and baselines, the CI emulator job.
+1. Rest of M1: config, JSON Schema and SARIF, `doctor` and baselines, the CI emulator job.
 2. Agent hardening, last piece: instrumented tests of the capturer on an emulator (lands with the CI emulator job, work package 9).
 3. Report v1 once the design direction is chosen.
 4. Owner-implements for Florent: the `target/size` 48 dp platform tier (info for now, per ADR-007).
