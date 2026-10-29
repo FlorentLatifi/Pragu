@@ -12,7 +12,7 @@ Two questions, kept apart: **does the code do what we wrote?** (tests) and **are
 | Golden | Report HTML from fixed data compared to a committed file. Later: SARIF, PR comment, transcript | `packages/report/test/__snapshots__` | CI (update deliberately with `vitest -u`) |
 | Pipeline | `pragu scan --from-capture` from a synthetic capture to JSON, HTML and exit code | `packages/cli/test` | CI |
 | Agent JVM | Framing, request handling, peer check | `agents/android/agent/src/test` | CI |
-| Device end-to-end | Fixture APK on an emulator: `pnpm fixture:scan`; `pnpm bench:record` captures every labelled screen | Local now; CI with `reactivecircus/android-emulator-runner` in M1 | M1 CI |
+| Device end-to-end | Every bench screen recorded live on a fresh API 36 emulator (normal and 200% text); the bench must reproduce the published results exactly | Every push and PR: `.github/workflows/e2e.yml` (`reactivecircus/android-emulator-runner`, software rendering, cached snapshot) | Done (M1) |
 | Property-based | Fingerprint invariance and sensitivity; scoring monotonicity (fast-check) | M1 | CI |
 | Report accessibility | axe-core with Playwright, keyboard walk-through, screen-reader check before each release | M1–M2 | CI and release checklist |
 
@@ -26,4 +26,13 @@ Two questions, kept apart: **does the code do what we wrote?** (tests) and **are
 
 ## Performance budgets
 
-Measure first (M0 records the first numbers in `docs/STATUS.md`), then set the budgets in M1 and enforce them in CI: capture and analysis time per screen, CLI cold start, and report size per 20 screens.
+Measured in M1 (2026-10-29), then budgeted with margin:
+
+| What | Measured | Budget | Enforced by |
+|---|---|---|---|
+| One scan on a CI emulator (capture, analysis, report) | 2.1–7.6 s; 16 scans in 64.6 s | 20 s per scan | `e2e.yml`, `bench record --budget-seconds 20` |
+| Report size | 231 KB for one screen (screenshot 147 KB embedded, fonts 60 KB); about 3 MB projected for 20 screens | 300 KB per one-screen report | `packages/report/test/report.test.ts` (real recording) |
+| CLI cold start (`pragu --version`) | about 150 ms | 500 ms | Measured only: timing tests on shared runners would raise false alarms |
+| Re-analysis from a saved capture | about 260 ms | none yet | Measured only |
+
+The whole e2e job takes about 13 minutes: fixture builds 6.5 minutes, recording 2.4 minutes including boot.

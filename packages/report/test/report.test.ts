@@ -1,5 +1,6 @@
 import { RESULT_SCHEMA_VERSION } from '@pragu/core';
 import type { Issue, ScanResult } from '@pragu/core';
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { escapeHtml, measurement, renderReport, screenNotes } from '../src/index.js';
 
@@ -242,5 +243,14 @@ describe('measurement', () => {
     expect(tops).toHaveLength(3);
     expect(tops[1]).toBeLessThan(tops[0] ?? 0);
     expect(tops[2]).toBeGreaterThan(90 / 24);
+  });
+});
+
+describe('size budget', () => {
+  it('keeps a one-screen report with a real screenshot under 300 KB', () => {
+    const png = readFileSync(new URL('../../../bench/recordings/rn-shop/product.png', import.meta.url));
+    const real = new Map([['screen-1', { mimeType: 'image/png' as const, base64: png.toString('base64') }]]);
+    const html = renderReport({ result: result([issue()]), screenshots: real });
+    expect(Buffer.byteLength(html)).toBeLessThan(300_000);
   });
 });

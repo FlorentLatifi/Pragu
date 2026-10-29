@@ -19,8 +19,9 @@ concurrency:
 
 env:
   API_LEVEL: 36
-  # Seconds one scan may take on a CI emulator; measured, with margin (docs/testing/strategy.md).
-  SCAN_BUDGET_SECONDS: 90
+  # Seconds one scan may take on a CI emulator: the slowest measured scan was 7.6 s, so 20 s
+  # absorbs runner noise and still catches a real slowdown (docs/testing/strategy.md).
+  SCAN_BUDGET_SECONDS: 20
 
 jobs:
   bench-on-emulator:
