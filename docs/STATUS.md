@@ -73,8 +73,9 @@ All error rules meet the 0.90 bar. Known misses stay published: home-made checkb
 
 ## Next
 
-1. Compare the transcript with real TalkBack by hand on a phone (swipe through rn-shop cart and Compose checkout, note each spoken line); on the emulator the next thing to try is injecting the swipe through UiAutomation in the agent. Then the M1 walkthrough, interview questions and owner-task review.
-2. Owner tasks for Florent, briefs ready: SARIF writer (`docs/plans/owner-task-sarif.md`); `target/size` platform tier, `name/generic`, `contrast/non-text` (`docs/plans/owner-tasks-rules.md`).
+1. **Florent:** read the M1 walkthrough (`docs/plans/m1-walkthrough.md`) and answer its three interview questions. It also lists where M1 stands against its plan: 16 scans rather than 20 screens, and the report's rule and diff views, filtering and axe-core check are not built yet.
+2. Compare the transcript with real TalkBack by hand on a phone (swipe through rn-shop cart and Compose checkout, note each spoken line); on the emulator the next thing to try is injecting the swipe through UiAutomation in the agent.
+3. Owner tasks for Florent, briefs ready: SARIF writer (`docs/plans/owner-task-sarif.md`); `target/size` platform tier, `name/generic`, `contrast/non-text` (`docs/plans/owner-tasks-rules.md`).
 
 ## Notes and risks
 
