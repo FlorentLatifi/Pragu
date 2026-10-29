@@ -148,5 +148,22 @@ fun SettingsScreen() {
                 }
             }
         }
+
+        // Seeded barrier: two remove buttons both called just "Remove", so a screen reader
+        // user cannot tell which device each one removes. Twins: names that say which.
+        DeviceRow("Phone", "Remove", "seed-duplicate-remove-phone")
+        DeviceRow("Watch", "Remove", "seed-duplicate-remove-watch")
+        DeviceRow("Tablet", "Remove Tablet", "twin-unique-remove-tablet")
+        DeviceRow("Speaker", "Remove Speaker", "twin-unique-remove-speaker")
+    }
+}
+
+@Composable
+private fun DeviceRow(device: String, removeLabel: String, tag: String) {
+    Row(Modifier.fillMaxWidth().heightIn(min = 48.dp), verticalAlignment = Alignment.CenterVertically) {
+        Text(device, color = Ink, modifier = Modifier.weight(1f))
+        IconButton(onClick = {}, modifier = Modifier.testTag(tag)) {
+            Icon(Close, contentDescription = removeLabel)
+        }
     }
 }

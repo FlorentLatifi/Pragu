@@ -148,6 +148,7 @@ describe('summarize', () => {
         'contrast/text',
         'text/scaling-truncation',
         'target/size',
+        'name/duplicate',
       ],
     });
   });

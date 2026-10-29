@@ -25,6 +25,7 @@ export type { AnalyzeInput } from './engine.js';
 export { elementKey, fnv1a64, issueFingerprint } from './fingerprint.js';
 export {
   defaultRules,
+  duplicateName,
   focusUnreachable,
   imageMissingName,
   inScope,

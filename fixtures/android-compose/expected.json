@@ -10,6 +10,8 @@
       "url": "composeshop://settings",
       "marker": "screen-settings",
       "barriers": [
+        { "rule": "name/duplicate", "testID": "seed-duplicate-remove-phone", "note": "two buttons both called \"Remove\"" },
+        { "rule": "name/duplicate", "testID": "seed-duplicate-remove-watch", "note": "as the phone row" },
         { "rule": "name/interactive-missing", "testID": "seed-unlabeled-more", "note": "IconButton whose Icon has contentDescription = null" },
         { "rule": "name/interactive-missing", "testID": "seed-unlabeled-switch", "note": "the Text beside the Switch is not connected to it; TalkBack says only \"Off, Switch\"" },
         { "rule": "contrast/text", "testID": "seed-low-contrast-synced", "note": "#B0B0B0 on white is 2.1:1" },
@@ -18,6 +20,9 @@
         { "rule": "target/size", "testID": "seed-crowded-star-4", "note": "as star 2" }
       ],
       "correctTwins": [
+        { "rule": "name/duplicate", "testID": "twin-unique-remove-tablet", "note": "the name says which device" },
+        { "rule": "name/duplicate", "testID": "twin-unique-remove-speaker" },
+        { "rule": "name/interactive-missing", "testID": "seed-duplicate-remove-phone", "note": "named, just not uniquely" },
         { "rule": "name/interactive-missing", "testID": "twin-labeled-back" },
         { "rule": "name/interactive-missing", "testID": "twin-labeled-switch-row", "note": "toggleable Row: the Switch is named by the row's text" },
         { "rule": "state/not-exposed", "testID": "twin-labeled-switch-row" },

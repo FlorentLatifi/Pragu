@@ -1,3 +1,4 @@
+import { duplicateName } from './duplicate-name.js';
 import { focusUnreachable } from './focus-unreachable.js';
 import { imageMissingName } from './image-missing-name.js';
 import { inputMissingLabel } from './input-missing-label.js';
@@ -9,6 +10,7 @@ import { textScalingTruncation } from './text-scaling-truncation.js';
 import type { Rule } from './types.js';
 
 export {
+  duplicateName,
   focusUnreachable,
   imageMissingName,
   inputMissingLabel,
@@ -32,4 +34,5 @@ export const defaultRules: readonly Rule[] = [
   textContrast,
   textScalingTruncation,
   targetSize,
+  duplicateName,
 ];

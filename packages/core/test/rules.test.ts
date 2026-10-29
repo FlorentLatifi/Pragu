@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  duplicateName,
   focusUnreachable,
   imageMissingName,
   inputMissingLabel,
@@ -137,6 +138,54 @@ describe('text/scaling-truncation', () => {
     expect(check([{ id: '0' }], [{ id: '0', ...cutAt200, text: 'Ceramic mug' }])).toEqual([]);
     expect(check([{ id: '0' }], [{ id: '0', ...cutAt200, boundsDp: rect(20, 2390, 380, 2423) }])).toEqual([]);
     expect(check([{ id: '0' }], [{ id: '1', ...cutAt200 }])).toEqual([]);
+  });
+});
+
+describe('name/duplicate', () => {
+  const check = (nodes: Parameters<typeof screenOf>[0]) =>
+    duplicateName.check({ screen: screenOf(nodes), device, raster: null });
+
+  it('flags every control that shares its name, saying how many there are', () => {
+    const findings = check([
+      pamNode({ id: '0', name: 'Remove' }),
+      pamNode({ id: '1', name: 'remove ' }),
+      pamNode({ id: '2', name: 'Remove', role: 'link' }),
+      pamNode({ id: '3', name: 'Remove Linen tote bag' }),
+    ]);
+    expect(findings.map((finding) => finding.node.id)).toEqual(['0', '1', '2']);
+    expect(findings[0]?.message).toBe(
+      'This button has the same name as 2 other controls on this screen: "Remove". A screen reader user hears it 3 times and cannot tell which item each one acts on.',
+    );
+    expect(findings[0]?.evidence).toEqual({ name: 'Remove', sameName: 3 });
+    expect(findings[2]?.message).toContain('This link has');
+  });
+
+  it('accepts distinct names, a row and the control inside it, and controls in other windows', () => {
+    expect(
+      check([
+        pamNode({ id: '0', name: 'Remove Ceramic mug' }),
+        pamNode({ id: '1', name: 'Remove Linen tote bag' }),
+        pamNode({ id: '2', name: 'Notifications', childIds: ['2.0'] }),
+        pamNode({ id: '2.0', parentId: '2', name: 'Notifications', role: 'switch' }),
+        pamNode({ id: '3', name: 'Close' }),
+        pamNode({ id: '4', name: 'Close', window: 1 }),
+      ]),
+    ).toEqual([]);
+  });
+
+  it('skips unnamed controls, text fields, static, hidden and off-screen elements', () => {
+    expect(
+      check([
+        pamNode({ id: '0', name: null }),
+        pamNode({ id: '1', name: null }),
+        pamNode({ id: '2', name: 'Email', role: 'textfield' }),
+        pamNode({ id: '3', name: 'Email', role: 'textfield' }),
+        pamNode({ id: '4', name: 'Total', interactive: false }),
+        pamNode({ id: '5', name: 'Total', exposedToAssistiveTech: false }),
+        pamNode({ id: '6', name: 'Total', visible: false }),
+        pamNode({ id: '7', name: 'Total' }),
+      ]),
+    ).toEqual([]);
   });
 });
 
