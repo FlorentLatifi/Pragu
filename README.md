@@ -24,7 +24,7 @@ JSON:   reports/rn-shop/pragu-result.json
 ```
 
 - `pragu scan` launches your app on an emulator or phone and reads what TalkBack would see, plus a screenshot. There are no changes to your app's code.
-- Seven rules so far: missing names on controls and on images TalkBack stops on; text fields with no label; checkboxes, switches and radio buttons that never say whether they are on; controls that work by touch but are hidden from assistive technology; low text contrast (measured from the screenshot); and touch targets below 24 dp (with WCAG's spacing exception; a warning until Pragu can see React Native's `hitSlop`).
+- Eight rules so far: missing names on controls and on images TalkBack stops on; text fields with no label; checkboxes, switches and radio buttons that never say whether they are on; controls that work by touch but are hidden from assistive technology; low text contrast (measured from the screenshot); text that an ellipsis cuts short at 200% text size (with `--check-font-scale`, which changes your device's font size for a few seconds and always restores it); and touch targets below 24 dp (with WCAG's spacing exception; a warning until Pragu can see React Native's `hitSlop`).
 - [Pragu Bench](docs/bench/results.md) measures each rule's precision and recall on labelled screens, and CI re-checks it on every change.
 - One offline HTML report with numbered markers on the screenshot. Every issue says who it affects, what they experience, and how to fix it in React Native, Jetpack Compose and Android Views.
 - A versioned JSON result for machines.
