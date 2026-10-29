@@ -36,6 +36,10 @@ jobs:
       - run: pnpm build
       - name: Pragu Bench (rules re-scored on recorded fixture screens)
         run: pnpm bench
+      # Chrome is preinstalled on GitHub's Ubuntu runners; playwright-core downloads no browser.
+      - name: Report accessibility (axe-core in Chrome, light and dark, phone and desktop)
+        if: matrix.node == 24
+        run: pnpm report:a11y
 
   android-agent:
     name: Android agent

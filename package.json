@@ -20,7 +20,8 @@
     "fixture:scan": "node packages/cli/dist/bin.js scan --install fixtures/rn-shop/android/app/build/outputs/apk/release/app-release.apk --app dev.pragu.fixtures.rnshop --screen-name Cart --out reports/rn-shop",
     "bench": "node bench/dist/cli.js evaluate",
     "bench:update": "node bench/dist/cli.js evaluate --update",
-    "bench:record": "node bench/dist/cli.js record --install"
+    "bench:record": "node bench/dist/cli.js record --install",
+    "report:a11y": "node scripts/check-report-a11y.mjs"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
@@ -28,8 +29,10 @@
     "@types/pngjs": "6.0.5",
     "@vitest/coverage-v8": "5.0.5",
     "ajv": "8.20.0",
+    "axe-core": "4.14.0",
     "eslint": "10.13.0",
     "fast-check": "4.10.2",
+    "playwright-core": "1.64.1",
     "prettier": "3.9.10",
     "typescript": "6.0.3",
     "typescript-eslint": "8.72.0",
