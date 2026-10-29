@@ -50,8 +50,8 @@ describe('pragu command line', () => {
 
   it('is honest about commands planned for later milestones', async () => {
     const { io, sink } = capturingIo();
-    expect(await main(['doctor'], sink)).toBe(2);
-    expect(io.stderr).toContain('"pragu doctor" is planned for M1');
+    expect(await main(['report'], sink)).toBe(2);
+    expect(io.stderr).toContain('"pragu report" is planned for M1');
   });
 
   it('validates scan arguments before touching a device', async () => {

@@ -1,8 +1,12 @@
 import { parseArgs } from 'node:util';
 import type { Issue } from '@pragu/core';
+import { existsSync } from 'node:fs';
+import { relative } from 'node:path';
+import { Adb, findAdb } from './adb.js';
 import { initConfig, loadConfig } from './config.js';
+import { formatChecks, runDoctor } from './doctor.js';
 import { EXIT, PraguError, formatError } from './errors.js';
-import { scan } from './scan.js';
+import { agentApkPath, scan } from './scan.js';
 import type { FailOn } from './scan.js';
 import { toolVersion } from './version.js';
 
@@ -21,6 +25,7 @@ const HELP = `Pragu finds accessibility barriers in your mobile app.
 Usage
   pragu scan --app <applicationId> [options]
   pragu init               Write a starter pragu.config.ts
+  pragu doctor             Check Node, adb, the device and the agent, with exact fixes
   pragu --version
 
 Scan options
@@ -45,7 +50,7 @@ Exit codes
 Automated checks find some barriers, not all. Pragu never certifies compliance.
 `;
 
-const PLANNED = new Set(['doctor', 'report', 'baseline', 'rules']);
+const PLANNED = new Set(['report', 'baseline', 'rules']);
 const FAIL_ON: readonly FailOn[] = ['error', 'warning', 'info', 'never'];
 
 function parseScanArgs(args: string[]) {
@@ -149,6 +154,24 @@ export async function main(argv: string[], io: Io = defaultIo): Promise<number> 
       return EXIT.ok;
     }
     if (command === 'scan') return await runScan(rest, io);
+    if (command === 'doctor') {
+      const adbPath = findAdb();
+      const adb = new Adb(adbPath);
+      const agentApk = agentApkPath(undefined);
+      const checks = await runDoctor({
+        nodeVersion: process.versions.node,
+        adb: (args) => adb.run(args),
+        adbPath,
+        agentApk,
+        agentApkExists: existsSync(agentApk),
+        checkConfig: async () => {
+          const { file } = await loadConfig(process.cwd(), undefined);
+          return file === null ? null : relative(process.cwd(), file);
+        },
+      });
+      io.out(formatChecks(checks));
+      return checks.every((check) => check.ok) ? EXIT.ok : EXIT.environment;
+    }
     if (command === 'init') {
       const file = await initConfig(process.cwd());
       io.out(`Wrote ${file}. Set "app" to your applicationId, then run "pragu scan".\n`);

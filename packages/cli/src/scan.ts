@@ -53,6 +53,11 @@ const DEV_AGENT_APK = fileURLToPath(
   new URL('../../../agents/android/agent/build/outputs/apk/release/agent-release.apk', import.meta.url),
 );
 
+/** The agent APK a scan installs: --agent-apk, then PRAGU_AGENT_APK, then the one built in this repo. */
+export function agentApkPath(explicit: string | undefined): string {
+  return explicit ?? process.env.PRAGU_AGENT_APK ?? DEV_AGENT_APK;
+}
+
 export function exitCodeFor(issues: readonly Issue[], failOn: FailOn): number {
   if (failOn === 'never') return EXIT.ok;
   const threshold = SEVERITY_RANK[failOn];
@@ -142,7 +147,7 @@ async function captureFromDevice(options: ScanOptions, log: (line: string) => vo
     await device.run(['install', '-r', options.installApk], 180_000);
   }
 
-  const agentApk = options.agentApk ?? process.env.PRAGU_AGENT_APK ?? DEV_AGENT_APK;
+  const agentApk = agentApkPath(options.agentApk);
   if (!existsSync(agentApk)) {
     throw new PraguError(
       EXIT.environment,
