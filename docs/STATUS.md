@@ -50,7 +50,7 @@ Walking skeleton on the emulator, CI, docs (PRD, technical design, ADR-001 to 00
   - `pragu doctor`: Node, adb, device and API level, agent, config, each with an exact fix.
   - Baselines: `pragu baseline create|update` and `--baseline`, so only new issues fail; fingerprint v1 with fast-check property tests (ADR-004).
   - SARIF: brief and test checklist ready for Florent's owner task (`docs/plans/owner-task-sarif.md`).
-- **CI on a real emulator** (work package 9): every push and PR records all bench screens live on a fresh API 36 emulator (`.github/workflows/e2e.yml`), and the bench must reproduce the published results exactly. This is the end-to-end test of the agent and capturer. Green on the first run. Budgets set from measurements: 20 s per scan (slowest measured 7.6 s), 300 KB per one-screen report; CLI cold start about 150 ms (docs/testing/strategy.md).
+- **CI on a real emulator** (work package 9): every push and PR records all bench screens live on a fresh API 36 emulator (`.github/workflows/e2e.yml`), and the bench must reproduce the published results exactly. This is the end-to-end test of the agent and capturer. Green on the first run. Budgets set from measurements: 20 s per scan (slowest measured 7.6 s), 300 KB per one-screen report; CLI cold start about 150 ms (docs/testing/strategy.md). Its first runs found two real problems, both fixed: an agent signed on another machine could not be updated in place (the CLI now reinstalls it; never the user's app), and a stopped agent showed as "unexpected error" (now a Pragu error with next steps; the recorder retries once visibly and CI keeps the device log).
 - Checks: 242 TypeScript tests (plus 8 SARIF todos), 26 JVM tests, lint, typecheck, bench gate.
 
 ## Bench results (8 screens: rn-shop, android-compose)
@@ -76,6 +76,7 @@ All error rules meet the 0.90 bar. Known misses stay published: home-made checkb
 ## Notes and risks
 
 - `main` was rewritten on GitHub on 2026-10-28 (same content, new hashes). A clone made before then has no merge base: replay local work with `git rebase --onto origin/main <old tip>`, never force-push.
+- Once, on CI, the agent stopped mid-capture on the first React Native screen and has not recurred; if it does, the e2e artifact now holds the device log.
 - The local emulator's host-GPU driver crashes app render threads at random ("app died", black screenshots); it is not Pragu. Start it with `-gpu swiftshader_indirect`, as CI does.
 - The emulator died once while idle Gradle and Kotlin daemons held about 4 GB. Stop them after fixture builds. After a forced restart its graphics failed (black screenshots, apps dying in their render threads); a cold boot (`-no-snapshot-load`) fixed it, and it needs a few minutes before it is responsive.
 - Disk: about 15 GB free on `C:`.
