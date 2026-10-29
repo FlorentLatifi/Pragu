@@ -14,7 +14,7 @@ Two questions, kept apart: **does the code do what we wrote?** (tests) and **are
 | Agent JVM | Framing, request handling, peer check | `agents/android/agent/src/test` | CI |
 | Device end-to-end | Every bench screen recorded live on a fresh API 36 emulator (normal and 200% text); the bench must reproduce the published results exactly | Every push and PR: `.github/workflows/e2e.yml` (`reactivecircus/android-emulator-runner`, software rendering, cached snapshot) | Done (M1) |
 | Property-based | Fingerprint invariance and sensitivity; scoring monotonicity (fast-check) | M1 | CI |
-| Report accessibility | axe-core with Playwright, keyboard walk-through, screen-reader check before each release | M1–M2 | CI and release checklist |
+| Report accessibility | `pnpm report:a11y`: axe-core (WCAG 2.2 A/AA) in Chrome on real reports, light and dark, phone and desktop, filtered and not, plus the filters' behaviour. Keyboard walk-through and screen-reader check before each release | `scripts/check-report-a11y.mjs` | CI (axe); release checklist (manual) |
 
 ## Evaluation: Pragu Bench
 

@@ -80,7 +80,7 @@ Not done, or done differently:
 
 - **Exit criterion "20 screens within budget":** CI scans 8 screens at two text sizes (16 scans, slowest 7.6 s against a 20 s budget). There are not yet 20 distinct screens. Either add screens or agree that 16 scans count.
 - **Transcript vs real TalkBack:** not verified (STATUS, 2026-10-29).
-- **Report:** one screen view only. The plan's rule view, diff view, filtering, `pnpm design` playground and axe-core check in CI are not built. Preact and Vite were dropped with your approval (ADR-003 amendment).
+- **Report:** rule index, baseline diff, filters and the axe-core check in CI landed after this walkthrough was written (ADR-003, second amendment). Preact, Vite and the `pnpm design` playground were dropped with your approval.
 - **Owner tasks:** SARIF, `target/size` platform tier, `name/generic`, `contrast/non-text` (yours, briefs ready).
 - `focus/order`, `name/role-in-label` and `structure/no-headings` moved to M2, as the plan allowed.
 

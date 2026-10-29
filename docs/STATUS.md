@@ -1,6 +1,6 @@
 # Pragu status
 
-Last updated: 2026-10-28, M1 session 3. **M0 approved. M1 in progress:** Pragu Bench covers two fixtures (React Native and Jetpack Compose); agent hardening mostly done; all five planned M1 error rules have landed (`input/missing-label`, `state/not-exposed`, `name/image-missing`, `focus/unreachable`, `text/scaling-truncation`).
+Last updated: 2026-10-29, M1 session 4. **M0 approved. M1 in progress:** Pragu Bench covers two fixtures (React Native and Jetpack Compose); agent hardening mostly done; all five planned M1 error rules have landed (`input/missing-label`, `state/not-exposed`, `name/image-missing`, `focus/unreachable`, `text/scaling-truncation`).
 
 ## Decisions made
 
@@ -46,14 +46,20 @@ Walking skeleton on the emulator, CI, docs (PRD, technical design, ADR-001 to 00
 - **Report v1** in the Signal direction (DESIGN.md, ADR-003 amended): Atkinson Hyperlegible embedded, black-on-yellow signs carrying each marker's number and measurement, laid out so they never overlap, contrast-tested tokens in both themes. Reviewed in the browser in light and dark, at phone and desktop widths, and with the keyboard.
 - **Config, schema, doctor, baselines** (rest of work packages 7 and 8):
   - `pragu.config.ts` with `defineConfig()` and `pragu init`: rule off/severity, ignores with a required reason (counted in reports), defaults that flags override; loaded with Node's own type stripping (Node 22.18+).
-  - `pragu-result.schema.json` (JSON Schema 2020-12, strict), validated in tests against every bench result; result schema 0.8.0.
+  - `pragu-result.schema.json` (JSON Schema 2020-12, strict), validated in tests against every bench result; result schema 0.9.0 (0.9.0 added the fixed issues to the baseline summary).
   - `pragu doctor`: Node, adb, device and API level, agent, config, each with an exact fix.
   - Baselines: `pragu baseline create|update` and `--baseline`, so only new issues fail; fingerprint v1 with fast-check property tests (ADR-004).
   - SARIF: brief and test checklist ready for Florent's owner task (`docs/plans/owner-task-sarif.md`).
 - **CI on a real emulator** (work package 9): every push and PR records all bench screens live on a fresh API 36 emulator (`.github/workflows/e2e.yml`), and the bench must reproduce the published results exactly. This is the end-to-end test of the agent and capturer. Green on the first run. Budgets set from measurements: 20 s per scan (slowest measured 7.6 s), 300 KB per one-screen report; CLI cold start about 150 ms (docs/testing/strategy.md). Its first runs found two real problems, both fixed: an agent signed on another machine could not be updated in place (the CLI now reinstalls it; never the user's app), and a stopped agent showed as "unexpected error" (now a Pragu error with next steps; the recorder retries once visibly and CI keeps the device log).
 - **`name/duplicate`** (warning): several controls with the same name, like rows whose delete buttons are all "Remove". No false alarms on the eight existing screens; seeds and twins in Compose settings. The other M1 warning rules are Florent's owner tasks (briefs ready); `focus/order`, `name/role-in-label` and `structure/no-headings` moved to M2 per the plan.
 - **Screen-reader transcript** (work package 5): each report screen shows what TalkBack would say swiping through it, in order ("Gift wrap this order, Checkbox" where the state is missing; "Unlabelled" where a control is silent), labelled as an approximation, with finding numbers on the lines they affect. Checked against the fixtures by reading. A comparison with real TalkBack 16 on the emulator (2026-10-29) did not get past the first stop: TalkBack's focus outline can be found in screenshots and matched to the recorded element, but neither `adb shell input` swipes (60–450 ms), chained motion events nor Alt+Right moved its focus, and TalkBack logs no speech. Order and wording are therefore still unverified; TalkBack was turned off and the original settings restored.
-- Checks: 261 TypeScript tests (plus 18 owner-task todos), 26 JVM tests, lint, typecheck, bench gate.
+- **Report views** (rest of work package 6, ADR-003 second amendment):
+  - a rule index, worst and most frequent first, linking to the numbered cards;
+  - filters by severity and, with a baseline, "New only". Filtered cards and outlines hide and their signs turn grey and dashed; without scripts everything shows;
+  - a baseline diff: "New" and "In baseline" tags, and a "Fixed since the baseline" list (result schema 0.9.0).
+  - `pnpm report:a11y` runs axe-core (WCAG 2.2 A/AA) in Chrome on real reports in CI: 20 runs over light and dark, phone and desktop, filtered and not. Its first run found three real problems in the report; the numbered signs are now the links and the outlines only drawings.
+  - New dev dependencies: `axe-core` 4.14.0 and `playwright-core` 1.64.1 (uses the browser on the runner; full Playwright would download one each run).
+- Checks: 267 TypeScript tests (plus 18 owner-task todos), 26 JVM tests, lint, typecheck, bench gate, report axe check.
 
 ## Bench results (8 screens: rn-shop, android-compose)
 
@@ -73,7 +79,7 @@ All error rules meet the 0.90 bar. Known misses stay published: home-made checkb
 
 ## Next
 
-1. **Florent:** read the M1 walkthrough (`docs/plans/m1-walkthrough.md`) and answer its three interview questions. It also lists where M1 stands against its plan: 16 scans rather than 20 screens, and the report's rule and diff views, filtering and axe-core check are not built yet.
+1. **Florent:** read the M1 walkthrough (`docs/plans/m1-walkthrough.md`) and answer its three interview questions. It also lists where M1 stands against its plan; the one open exit-criterion question is 16 scans rather than 20 distinct screens.
 2. Compare the transcript with real TalkBack by hand on a phone (swipe through rn-shop cart and Compose checkout, note each spoken line); on the emulator the next thing to try is injecting the swipe through UiAutomation in the agent.
 3. Owner tasks for Florent, briefs ready: SARIF writer (`docs/plans/owner-task-sarif.md`); `target/size` platform tier, `name/generic`, `contrast/non-text` (`docs/plans/owner-tasks-rules.md`).
 

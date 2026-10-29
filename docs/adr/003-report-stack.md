@@ -1,6 +1,6 @@
 # ADR-003: Report stack
 
-- Status: Accepted, amended 2026-10-29: report v1 keeps the typed templates (see Amendment).
+- Status: Accepted, amended 2026-10-29: report v1 keeps the typed templates, including its views (see Amendments).
 - Date: 2026-10-27
 
 ## Context
@@ -37,3 +37,14 @@ Report v1 was built in the chosen design direction (Signal, DESIGN.md) without P
 - Fonts (Atkinson Hyperlegible Next and Mono, OFL) are embedded by `scripts/embed-fonts.mjs` into a generated module, so the report stays one offline file.
 
 Revisit when the report gains filters, rule and diff views (baselines, M2). The Preact plan above remains the default then.
+
+## Amendment (2026-10-29): views and filters without a framework
+
+The rule index, the baseline diff and the filters landed in M1, still on typed templates (plan approved by Florent).
+
+- The views are server-rendered HTML: the rule index links to the numbered cards instead of repeating them, and the diff is a list. Neither needs client-side state.
+- The filters are about 30 lines of plain JavaScript that toggle `hidden` and one class. The form starts hidden, so without scripts every issue shows and no dead control appears.
+- The `pnpm design` playground is dropped: re-rendering a recording and serving `reports/` covers design sessions.
+- `scripts/check-report-a11y.mjs` (`pnpm report:a11y`, CI) runs axe-core (WCAG 2.2 A/AA) in Chrome on real reports: light and dark, phone and desktop, filtered and not, and checks that the filters do what they say. It uses `playwright-core` with the browser already on the runner. Its first run found three real problems (screenshot markers under 24 px, markers overlapping, sign names not containing their visible text); the numbered signs are now the links and the outlines only drawings.
+
+Revisit when the report needs real client-side state: several screens with navigation (M3 flows), sorting, or search. Preact remains the first candidate then.
