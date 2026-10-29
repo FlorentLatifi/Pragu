@@ -206,6 +206,7 @@ const SIGN_GAP_PX = 4;
 
 interface PlacedSign {
   number: number;
+  title: string;
   measure: string | null;
   left: number;
   top: number;
@@ -213,8 +214,14 @@ interface PlacedSign {
   height: number;
 }
 
-function overlaps(a: PlacedSign, b: PlacedSign): boolean {
-  return a.left < b.left + b.width && b.left < a.left + a.width && a.top < b.top + b.height && b.top < a.top + a.height;
+/** Signs are links, so they keep a gap: on a narrower screenshot the percentages shrink but the signs do not. */
+function overlaps(a: PlacedSign, b: PlacedSign, gapX: number, gapY: number): boolean {
+  return (
+    a.left < b.left + b.width + gapX &&
+    b.left < a.left + a.width + gapX &&
+    a.top < b.top + b.height + gapY &&
+    b.top < a.top + a.height + gapY
+  );
 }
 
 /**
@@ -226,6 +233,7 @@ function placeSigns(numbered: readonly NumberedIssue[], screenWidthPx: number, s
   const frameHeightPx = (FRAME_WIDTH_PX * screenHeightPx) / screenWidthPx;
   const height = (SIGN_HEIGHT_PX / frameHeightPx) * 100;
   const gap = (SIGN_GAP_PX / frameHeightPx) * 100;
+  const gapX = (SIGN_GAP_PX / FRAME_WIDTH_PX) * 100;
   const placed: PlacedSign[] = [];
   for (const { issue, number } of numbered) {
     const measure = measurement(issue);
@@ -236,13 +244,14 @@ function placeSigns(numbered: readonly NumberedIssue[], screenWidthPx: number, s
     const below = top / screenHeightPx < 0.05;
     const sign: PlacedSign = {
       number,
+      title: issue.title,
       measure,
       width,
       height,
       left: Math.min(Math.max((left / screenWidthPx) * 100, 0), 100 - width),
       top: below ? (bottom / screenHeightPx) * 100 + gap : (top / screenHeightPx) * 100 - gap - height,
     };
-    while (placed.some((other) => overlaps(sign, other))) sign.top += below ? height : -height;
+    while (placed.some((other) => overlaps(sign, other, gapX, gap))) sign.top += below ? height + gap : -(height + gap);
     placed.push(sign);
   }
   return placed;
@@ -260,8 +269,10 @@ function renderScreen(
   const markers = numbered
     .map(({ issue, number }) => {
       const { left, top, right, bottom } = issue.boundsPx;
-      const style = `left:${percent(left, screenWidthPx)};top:${percent(top, screenHeightPx)};width:${percent(right - left, screenWidthPx)};height:${percent(bottom - top, screenHeightPx)}`;
-      return `<a class="marker" href="#issue-${String(number)}" data-issue="${String(number)}" style="${style}" aria-label="${escapeHtml(`Issue ${String(number)}: ${issue.title}`)}"></a>`;
+      const box = `left:${percent(left, screenWidthPx)};top:${percent(top, screenHeightPx)};width:${percent(right - left, screenWidthPx)};height:${percent(bottom - top, screenHeightPx)}`;
+      // Only a drawing: barriers are often small and close together, so the outline cannot
+      // be a 24 px target (WCAG 2.5.8). The numbered sign beside it is the link.
+      return `<span class="marker-box" data-issue="${String(number)}" style="${box}" aria-hidden="true"></span>`;
     })
     .join('');
   const placed = placeSigns(numbered, screenWidthPx, screenHeightPx);
@@ -272,7 +283,7 @@ function renderScreen(
   const signs = placed
     .map((sign) => {
       const measure = sign.measure === null ? '' : `<span class="sign-measure">${escapeHtml(sign.measure)}</span>`;
-      return `<span class="screen-sign" data-issue="${String(sign.number)}" style="left:${sign.left.toFixed(3)}%;top:${sign.top.toFixed(3)}%" aria-hidden="true"><span class="sign-number">${String(sign.number)}</span>${measure}</span>`;
+      return `<a class="screen-sign" href="#issue-${String(sign.number)}" data-issue="${String(sign.number)}" style="left:${sign.left.toFixed(3)}%;top:${sign.top.toFixed(3)}%" aria-label="${escapeHtml(`Issue ${String(sign.number)}${sign.measure === null ? '' : `, ${sign.measure}`}: ${sign.title}`)}"><span class="sign-number">${String(sign.number)}</span> ${measure}</a>`;
     })
     .join('');
   const figure =
@@ -490,8 +501,12 @@ const FILTER_SCRIPT = `(function () {
       issue.hidden = !visible;
       if (visible) { shown[issue.getAttribute('data-issue')] = true; count++; }
     });
-    each('.marker[data-issue], .rule-links [data-issue]', function (el) { el.hidden = !shown[el.getAttribute('data-issue')]; });
+    each('.marker-box[data-issue], .rule-links [data-issue]', function (el) { el.hidden = !shown[el.getAttribute('data-issue')]; });
     each('.screen-sign[data-issue], .transcript-lines [data-issue]', function (el) { el.classList.toggle('is-dimmed', !shown[el.getAttribute('data-issue')]); });
+    each('.screen-sign[data-issue]', function (el) {
+      var off = !shown[el.getAttribute('data-issue')];
+      if (off) { el.setAttribute('tabindex', '-1'); el.setAttribute('aria-hidden', 'true'); } else { el.removeAttribute('tabindex'); el.removeAttribute('aria-hidden'); }
+    });
     each('.rule-row', function (row) { row.hidden = !row.querySelector('.rule-links [data-issue]:not([hidden])'); });
     each('.issues', function (list) { list.nextElementSibling.hidden = !!list.querySelector('.issue:not([hidden])'); });
     status.textContent = count === issues.length ? 'Showing all ' + issues.length + ' issues.' : 'Showing ' + count + ' of ' + issues.length + ' issues.';
@@ -547,11 +562,11 @@ h3 { font-size: 16px; line-height: 1.4; margin: 0; display: flex; gap: 12px; ali
 .shot-frame img { width: 100%; height: auto; display: block; }
 figcaption { margin-top: 12px; }
 .plate { flex: none; display: inline-block; min-width: 24px; height: 24px; padding: 0 4px; background: var(--signal); color: var(--on-signal); border: 2px solid var(--halo); font: 700 13px/20px var(--font-mono); text-align: center; }
-.marker { position: absolute; border: 3px solid var(--signal); box-shadow: 0 0 0 2px var(--halo), inset 0 0 0 1px var(--halo); text-decoration: none; }
-.screen-sign { position: absolute; display: flex; align-items: stretch; height: 24px; background: var(--signal); color: var(--on-signal); border: 2px solid var(--halo); white-space: nowrap; pointer-events: none; z-index: 1; }
+.marker-box { position: absolute; border: 3px solid var(--signal); box-shadow: 0 0 0 2px var(--halo), inset 0 0 0 1px var(--halo); pointer-events: none; }
+.screen-sign { position: absolute; display: flex; align-items: stretch; height: 24px; background: var(--signal); color: var(--on-signal); border: 2px solid var(--halo); white-space: nowrap; min-width: 24px; text-decoration: none; z-index: 1; }
 .sign-number { padding: 0 5px; font: 700 13px/20px var(--font-mono); }
 .sign-measure { padding: 0 5px; border-left: 2px solid var(--halo); font: 700 11px/20px var(--font-mono); }
-.marker:focus-visible { outline-offset: 4px; }
+.screen-sign:focus-visible { outline-offset: 2px; z-index: 2; }
 .no-shot, .empty { margin: 0; padding: 16px; background: var(--surface); }
 .empty { border-left: 4px solid var(--ink); }
 .issues { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
@@ -570,6 +585,7 @@ figcaption { margin-top: 12px; }
 .filter-status { flex-basis: 100%; margin: 0; color: var(--muted); font-size: 14px; }
 .screen-sign.is-dimmed, .plate.is-dimmed { background: var(--surface); color: var(--muted); border-style: dashed; border-color: var(--muted); z-index: 0; }
 .screen-sign.is-dimmed .sign-measure { border-left-color: var(--muted); }
+.screen-sign.is-dimmed { pointer-events: none; }
 .by-rule { padding: 32px 0; border-bottom: 1px solid var(--line); }
 .rule-index { list-style: none; margin: 0 0 12px; padding: 0; }
 .rule-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px 16px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
@@ -609,7 +625,7 @@ figcaption { margin-top: 12px; }
 @media print {
   .toggle, .skip, .filters { display: none; }
   :root { --bg: #ffffff; --surface: #ffffff; --ink: #000000; --muted: #333333; }
-  .sign, .plate, .marker, .screen-sign { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .sign, .plate, .marker-box, .screen-sign { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   .shot { position: static; }
   .issue { break-inside: avoid; border: 1px solid #999999; }
 }

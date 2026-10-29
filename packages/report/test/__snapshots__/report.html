@@ -52,11 +52,11 @@ h3 { font-size: 16px; line-height: 1.4; margin: 0; display: flex; gap: 12px; ali
 .shot-frame img { width: 100%; height: auto; display: block; }
 figcaption { margin-top: 12px; }
 .plate { flex: none; display: inline-block; min-width: 24px; height: 24px; padding: 0 4px; background: var(--signal); color: var(--on-signal); border: 2px solid var(--halo); font: 700 13px/20px var(--font-mono); text-align: center; }
-.marker { position: absolute; border: 3px solid var(--signal); box-shadow: 0 0 0 2px var(--halo), inset 0 0 0 1px var(--halo); text-decoration: none; }
-.screen-sign { position: absolute; display: flex; align-items: stretch; height: 24px; background: var(--signal); color: var(--on-signal); border: 2px solid var(--halo); white-space: nowrap; pointer-events: none; z-index: 1; }
+.marker-box { position: absolute; border: 3px solid var(--signal); box-shadow: 0 0 0 2px var(--halo), inset 0 0 0 1px var(--halo); pointer-events: none; }
+.screen-sign { position: absolute; display: flex; align-items: stretch; height: 24px; background: var(--signal); color: var(--on-signal); border: 2px solid var(--halo); white-space: nowrap; min-width: 24px; text-decoration: none; z-index: 1; }
 .sign-number { padding: 0 5px; font: 700 13px/20px var(--font-mono); }
 .sign-measure { padding: 0 5px; border-left: 2px solid var(--halo); font: 700 11px/20px var(--font-mono); }
-.marker:focus-visible { outline-offset: 4px; }
+.screen-sign:focus-visible { outline-offset: 2px; z-index: 2; }
 .no-shot, .empty { margin: 0; padding: 16px; background: var(--surface); }
 .empty { border-left: 4px solid var(--ink); }
 .issues { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
@@ -75,6 +75,7 @@ figcaption { margin-top: 12px; }
 .filter-status { flex-basis: 100%; margin: 0; color: var(--muted); font-size: 14px; }
 .screen-sign.is-dimmed, .plate.is-dimmed { background: var(--surface); color: var(--muted); border-style: dashed; border-color: var(--muted); z-index: 0; }
 .screen-sign.is-dimmed .sign-measure { border-left-color: var(--muted); }
+.screen-sign.is-dimmed { pointer-events: none; }
 .by-rule { padding: 32px 0; border-bottom: 1px solid var(--line); }
 .rule-index { list-style: none; margin: 0 0 12px; padding: 0; }
 .rule-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px 16px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
@@ -114,7 +115,7 @@ figcaption { margin-top: 12px; }
 @media print {
   .toggle, .skip, .filters { display: none; }
   :root { --bg: #ffffff; --surface: #ffffff; --ink: #000000; --muted: #333333; }
-  .sign, .plate, .marker, .screen-sign { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+  .sign, .plate, .marker-box, .screen-sign { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   .shot { position: static; }
   .issue { break-inside: avoid; border: 1px solid #999999; }
 }
@@ -178,7 +179,7 @@ figcaption { margin-top: 12px; }
     <figure class="shot">
       <div class="shot-frame">
         <img src="data:image/png;base64,iVBORw0KGgo=" alt="Screenshot of the Cart screen, with 2 numbered markers.">
-        <a class="marker" href="#issue-1" data-issue="1" style="left:10.000%;top:10.000%;width:10.000%;height:10.000%" aria-label="Issue 1: Interactive element has no accessible name"></a><a class="marker" href="#issue-2" data-issue="2" style="left:10.000%;top:10.000%;width:10.000%;height:10.000%" aria-label="Issue 2: Touch target is too small"></a><span class="screen-sign" data-issue="1" style="left:10.000%;top:6.500%" aria-hidden="true"><span class="sign-number">1</span><span class="sign-measure">no name</span></span><span class="screen-sign" data-issue="2" style="left:10.000%;top:3.500%" aria-hidden="true"><span class="sign-number">2</span></span>
+        <span class="marker-box" data-issue="1" style="left:10.000%;top:10.000%;width:10.000%;height:10.000%" aria-hidden="true"></span><span class="marker-box" data-issue="2" style="left:10.000%;top:10.000%;width:10.000%;height:10.000%" aria-hidden="true"></span><a class="screen-sign" href="#issue-1" data-issue="1" style="left:10.000%;top:6.500%" aria-label="Issue 1, no name: Interactive element has no accessible name"><span class="sign-number">1</span> <span class="sign-measure">no name</span></a><a class="screen-sign" href="#issue-2" data-issue="2" style="left:10.000%;top:3.000%" aria-label="Issue 2: Touch target is too small"><span class="sign-number">2</span> </a>
       </div>
       <figcaption>Numbers on the screenshot match the list.</figcaption>
     </figure>
@@ -260,8 +261,12 @@ figcaption { margin-top: 12px; }
       issue.hidden = !visible;
       if (visible) { shown[issue.getAttribute('data-issue')] = true; count++; }
     });
-    each('.marker[data-issue], .rule-links [data-issue]', function (el) { el.hidden = !shown[el.getAttribute('data-issue')]; });
+    each('.marker-box[data-issue], .rule-links [data-issue]', function (el) { el.hidden = !shown[el.getAttribute('data-issue')]; });
     each('.screen-sign[data-issue], .transcript-lines [data-issue]', function (el) { el.classList.toggle('is-dimmed', !shown[el.getAttribute('data-issue')]); });
+    each('.screen-sign[data-issue]', function (el) {
+      var off = !shown[el.getAttribute('data-issue')];
+      if (off) { el.setAttribute('tabindex', '-1'); el.setAttribute('aria-hidden', 'true'); } else { el.removeAttribute('tabindex'); el.removeAttribute('aria-hidden'); }
+    });
     each('.rule-row', function (row) { row.hidden = !row.querySelector('.rule-links [data-issue]:not([hidden])'); });
     each('.issues', function (list) { list.nextElementSibling.hidden = !!list.querySelector('.issue:not([hidden])'); });
     status.textContent = count === issues.length ? 'Showing all ' + issues.length + ' issues.' : 'Showing ' + count + ' of ' + issues.length + ' issues.';

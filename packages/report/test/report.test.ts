@@ -99,9 +99,14 @@ describe('renderReport', () => {
 
   it('places numbered markers in screenshot percentages', () => {
     const html = renderReport({ result: result([issue()]), screenshots });
-    expect(html).toContain('style="left:10.000%;top:10.000%;width:10.000%;height:10.000%"');
-    expect(html).toContain('href="#issue-1"');
-    expect(html).toContain('aria-label="Issue 1: Interactive element has no accessible name"');
+    expect(html).toContain(
+      'class="marker-box" data-issue="1" style="left:10.000%;top:10.000%;width:10.000%;height:10.000%"',
+    );
+    // The outline is only a drawing; the numbered sign is the link to the card.
+    expect(html).not.toContain('class="marker"');
+    expect(html).toContain(
+      '<a class="screen-sign" href="#issue-1" data-issue="1" style="left:10.000%;top:6.500%" aria-label="Issue 1, no name: Interactive element has no accessible name">',
+    );
     expect(html).toContain('id="issue-1"');
   });
 
@@ -286,8 +291,8 @@ describe('filters', () => {
   it('ties cards, markers and signs together by issue number so the script can filter them', () => {
     const html = renderReport({ result: result([issue(), warning]), screenshots });
     expect(html).toContain('data-issue="2" data-severity="warning"');
-    expect(html).toContain('<a class="marker" href="#issue-2" data-issue="2"');
-    expect(html).toContain('<span class="screen-sign" data-issue="2"');
+    expect(html).toContain('<span class="marker-box" data-issue="2"');
+    expect(html).toContain('<a class="screen-sign" href="#issue-2" data-issue="2"');
     expect(html).toContain('The filters hide every issue on this screen.');
   });
 
@@ -359,10 +364,10 @@ describe('measurement', () => {
     const near = issue({ boundsPx: { left: 120, top: 240, right: 228, bottom: 480 } });
     const top = issue({ boundsPx: { left: 100, top: 20, right: 300, bottom: 90 } });
     const html = renderReport({ result: result([issue(), near, top]), screenshots });
-    expect(html).toContain('<span class="sign-number">1</span><span class="sign-measure">no name</span>');
-    const tops = [...html.matchAll(/class="screen-sign" data-issue="\d+" style="left:[\d.]+%;top:([\d.-]+)%"/g)].map(
-      (m) => Number(m[1]),
-    );
+    expect(html).toContain('<span class="sign-number">1</span> <span class="sign-measure">no name</span>');
+    const tops = [
+      ...html.matchAll(/class="screen-sign" href="#issue-\d+" data-issue="\d+" style="left:[\d.]+%;top:([\d.-]+)%"/g),
+    ].map((m) => Number(m[1]));
     expect(tops).toHaveLength(3);
     expect(tops[1]).toBeLessThan(tops[0] ?? 0);
     expect(tops[2]).toBeGreaterThan(90 / 24);
