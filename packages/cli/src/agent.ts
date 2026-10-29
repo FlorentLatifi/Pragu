@@ -32,7 +32,13 @@ class AgentClient {
       this.fail(error);
     });
     socket.on('close', () => {
-      this.fail(new Error('The agent closed the connection.'));
+      this.fail(
+        new PraguError(
+          EXIT.environment,
+          'The Pragu agent stopped in the middle of a capture.',
+          'Run "pragu doctor", then scan again. If it keeps happening, look in "adb logcat" for a crash of dev.pragu.agent or of the app.',
+        ),
+      );
     });
   }
 

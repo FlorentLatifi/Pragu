@@ -99,7 +99,8 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
-          script: node bench/dist/cli.js record --install --budget-seconds ${{ env.SCAN_BUDGET_SECONDS }}
+          # On failure, keep the device log with the recordings, since the emulator is gone afterwards.
+          script: node bench/dist/cli.js record --install --budget-seconds ${{ env.SCAN_BUDGET_SECONDS }} || { adb logcat -d > bench/recordings/logcat.txt; exit 1; }
       - name: The live recordings reproduce the published bench results
         run: pnpm bench
 

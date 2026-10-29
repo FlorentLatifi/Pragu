@@ -82,14 +82,23 @@ async function recordScreen(
     try {
       const scanArgs = ['scan', '--app', truth.appId, '--no-launch', '--screen-name', screen.name];
       const started = performance.now();
-      await run(
-        process.execPath,
-        [context.cli, ...scanArgs, '--out', out, '--fail-on', 'never', ...context.serialArgs],
-        {
-          timeout: 180_000,
-          windowsHide: true,
-        },
-      );
+      try {
+        await run(
+          process.execPath,
+          [context.cli, ...scanArgs, '--out', out, '--fail-on', 'never', ...context.serialArgs],
+          {
+            timeout: 180_000,
+            windowsHide: true,
+          },
+        );
+      } catch (error) {
+        // One retry absorbs emulator hiccups on CI; the log names it, so a real problem stays visible.
+        if (attempt === ATTEMPTS) throw error;
+        const lines = String(error).split('\n');
+        const reason = lines.find((line) => line.startsWith('pragu:')) ?? lines[0] ?? '';
+        context.log(`${truth.fixture} › ${screen.id}: scan failed, retrying (attempt ${String(attempt)}): ${reason}`);
+        continue;
+      }
       const seconds = (performance.now() - started) / 1000;
       const captureDir = join(out, 'capture');
       const capture = parseAndroidCapture(JSON.parse(await readFile(join(captureDir, 'screen-1.json'), 'utf8')));
