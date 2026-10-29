@@ -144,7 +144,8 @@ describe('scan --from-capture (whole pipeline, no device)', () => {
     ]);
     const report = await readFile(join(out, 'pragu-report.html'), 'utf8');
     expect(report).toContain('<h1>3 barriers found in com.example.shop</h1>');
-    expect(report.match(/class="marker"/g)).toHaveLength(3);
+    expect(report.match(/class="marker-box"/g)).toHaveLength(3);
+    expect(report.match(/<a class="screen-sign"/g)).toHaveLength(3);
     expect(io.stdout).toContain('3 barriers: 2 errors, 1 warning, 0 info');
     expect(io.stdout).toContain('1. Warning: Touch target is too small · seed-tiny-dismiss (WCAG 2.5.8)');
   });
