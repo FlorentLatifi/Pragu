@@ -269,6 +269,37 @@ describe('rule index', () => {
   });
 });
 
+describe('filters', () => {
+  const warning = issue({ ruleId: 'target/size', severity: 'warning', nodeId: '0.4' });
+
+  it('offers one checkbox per severity that has issues, hidden until the script runs', () => {
+    const html = renderReport({ result: result([issue(), warning]), screenshots });
+    expect(html).toContain('<form class="filters" id="filters" hidden>');
+    expect(html).toContain('value="error" checked> Error <span class="filter-count">1</span>');
+    expect(html).toContain('value="warning" checked> Warning');
+    expect(html).not.toContain('value="info"');
+    expect(html).not.toContain('type="radio"');
+  });
+
+  it('ties cards, markers and signs together by issue number so the script can filter them', () => {
+    const html = renderReport({ result: result([issue(), warning]), screenshots });
+    expect(html).toContain('data-issue="2" data-severity="warning"');
+    expect(html).toContain('<a class="marker" href="#issue-2" data-issue="2"');
+    expect(html).toContain('<span class="screen-sign" data-issue="2"');
+    expect(html).toContain('The filters hide every issue on this screen.');
+  });
+
+  it('adds "New only" when the scan used a baseline, and leaves filters out when nothing was found', () => {
+    const base = result([issue({ inBaseline: true }), warning]);
+    const baseline = { file: 'pragu-baseline.json', newIssues: 1, known: 1, fixed: 0 };
+    const html = renderReport({ result: { ...base, summary: { ...base.summary, baseline } }, screenshots });
+    expect(html).toContain('value="new"> New only <span class="filter-count">1</span>');
+    expect(html).toContain('data-severity="error" data-baseline="known"');
+    expect(html).toContain('data-severity="warning" data-baseline="new"');
+    expect(renderReport({ result: result([]), screenshots })).not.toContain('id="filters"');
+  });
+});
+
 describe('baseline', () => {
   it('says what is new, known and fixed, and tags issues the baseline accepts', () => {
     const base = result([issue({ inBaseline: true })]);
@@ -309,8 +340,8 @@ describe('measurement', () => {
     const top = issue({ boundsPx: { left: 100, top: 20, right: 300, bottom: 90 } });
     const html = renderReport({ result: result([issue(), near, top]), screenshots });
     expect(html).toContain('<span class="sign-number">1</span><span class="sign-measure">no name</span>');
-    const tops = [...html.matchAll(/class="screen-sign" style="left:[\d.]+%;top:([\d.-]+)%"/g)].map((m) =>
-      Number(m[1]),
+    const tops = [...html.matchAll(/class="screen-sign" data-issue="\d+" style="left:[\d.]+%;top:([\d.-]+)%"/g)].map(
+      (m) => Number(m[1]),
     );
     expect(tops).toHaveLength(3);
     expect(tops[1]).toBeLessThan(tops[0] ?? 0);

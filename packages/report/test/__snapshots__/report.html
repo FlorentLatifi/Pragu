@@ -14,6 +14,7 @@
   --font-mono: "Atkinson Hyperlegible Mono", ui-monospace, monospace;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 var(--font-text); }
 a { color: inherit; }
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
@@ -65,6 +66,15 @@ figcaption { margin-top: 12px; }
 .severity { padding: 0 8px; font: 700 12px/1.6 var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; border: 2px solid var(--ink); color: var(--ink); }
 .severity-error { background: var(--ink); color: var(--bg); }
 .severity-info { border-color: var(--muted); border-width: 1px; color: var(--muted); }
+.filters { display: flex; flex-wrap: wrap; gap: 8px 32px; align-items: flex-end; margin: 16px 0 0; }
+.filters fieldset { display: flex; flex-wrap: wrap; gap: 0 16px; margin: 0; padding: 0; border: 0; }
+.filters legend { padding: 0; font: 700 12px/1.4 var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.filter { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-weight: 700; cursor: pointer; }
+.filter input { width: 20px; height: 20px; margin: 0; accent-color: var(--ink); }
+.filter-count { font: 400 14px var(--font-mono); color: var(--muted); }
+.filter-status { flex-basis: 100%; margin: 0; color: var(--muted); font-size: 14px; }
+.screen-sign.is-dimmed { background: var(--surface); color: var(--muted); border-style: dashed; border-color: var(--muted); z-index: 0; }
+.screen-sign.is-dimmed .sign-measure { border-left-color: var(--muted); }
 .by-rule { padding: 32px 0; border-bottom: 1px solid var(--line); }
 .rule-index { list-style: none; margin: 0 0 12px; padding: 0; }
 .rule-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px 16px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
@@ -94,7 +104,7 @@ figcaption { margin-top: 12px; }
 .footer { padding-top: 24px; padding-bottom: 48px; border-top: 1px solid var(--line); }
 .footer p { color: var(--muted); font-size: 14px; margin: 0; }
 @media print {
-  .toggle, .skip { display: none; }
+  .toggle, .skip, .filters { display: none; }
   :root { --bg: #ffffff; --surface: #ffffff; --ink: #000000; --muted: #333333; }
   .sign, .plate, .marker, .screen-sign { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   .shot { position: static; }
@@ -126,6 +136,14 @@ figcaption { margin-top: 12px; }
   <p class="rules">Rules run: <code>name/interactive-missing</code>, <code>contrast/text</code>, <code>target/size</code></p>
   
   
+  <form class="filters" id="filters" hidden>
+    <fieldset>
+      <legend>Severity</legend>
+      <label class="filter"><input type="checkbox" name="severity" value="error" checked> Error <span class="filter-count">1</span></label><label class="filter"><input type="checkbox" name="severity" value="warning" checked> Warning <span class="filter-count">1</span></label>
+    </fieldset>
+    
+    <p class="filter-status" id="filter-status" role="status"></p>
+  </form>
 </section>
 <section class="by-rule" aria-labelledby="by-rule-heading">
   <h2 id="by-rule-heading">By rule</h2>
@@ -152,12 +170,12 @@ figcaption { margin-top: 12px; }
     <figure class="shot">
       <div class="shot-frame">
         <img src="data:image/png;base64,iVBORw0KGgo=" alt="Screenshot of the Cart screen, with 2 numbered markers.">
-        <a class="marker" href="#issue-1" style="left:10.000%;top:10.000%;width:10.000%;height:10.000%" aria-label="Issue 1: Interactive element has no accessible name"></a><a class="marker" href="#issue-2" style="left:10.000%;top:10.000%;width:10.000%;height:10.000%" aria-label="Issue 2: Touch target is too small"></a><span class="screen-sign" style="left:10.000%;top:6.500%" aria-hidden="true"><span class="sign-number">1</span><span class="sign-measure">no name</span></span><span class="screen-sign" style="left:10.000%;top:3.500%" aria-hidden="true"><span class="sign-number">2</span></span>
+        <a class="marker" href="#issue-1" data-issue="1" style="left:10.000%;top:10.000%;width:10.000%;height:10.000%" aria-label="Issue 1: Interactive element has no accessible name"></a><a class="marker" href="#issue-2" data-issue="2" style="left:10.000%;top:10.000%;width:10.000%;height:10.000%" aria-label="Issue 2: Touch target is too small"></a><span class="screen-sign" data-issue="1" style="left:10.000%;top:6.500%" aria-hidden="true"><span class="sign-number">1</span><span class="sign-measure">no name</span></span><span class="screen-sign" data-issue="2" style="left:10.000%;top:3.500%" aria-hidden="true"><span class="sign-number">2</span></span>
       </div>
       <figcaption>Numbers on the screenshot match the list.</figcaption>
     </figure>
     <div>
-    <ol class="issues"><li class="issue" id="issue-1" tabindex="-1">
+    <ol class="issues"><li class="issue" id="issue-1" tabindex="-1" data-issue="1" data-severity="error">
   <h3><span class="plate" aria-hidden="true">1</span>Interactive element has no accessible name</h3>
   <p class="tags"><span class="severity severity-error">Error</span><span>WCAG 4.1.2</span><span>EN 301 549 11.4.1.2</span><span>Confidence: high</span></p>
   <p class="message">This button has no accessible name. A screen reader can only announce &quot;Button&quot;.</p>
@@ -171,7 +189,7 @@ figcaption { margin-top: 12px; }
   </dl>
   <p class="where">Element <code>seed-unlabeled-remove</code> · Rule <code>name/interactive-missing</code></p>
 </li>
-<li class="issue" id="issue-2" tabindex="-1">
+<li class="issue" id="issue-2" tabindex="-1" data-issue="2" data-severity="warning">
   <h3><span class="plate" aria-hidden="true">2</span>Touch target is too small</h3>
   <p class="tags"><span class="severity severity-warning">Warning</span><span>WCAG 2.5.8</span><span>Confidence: medium</span></p>
   <p class="message">This button has no accessible name. A screen reader can only announce &quot;Button&quot;.</p>
@@ -185,6 +203,7 @@ figcaption { margin-top: 12px; }
   </dl>
   <p class="where">Rule <code>target/size</code></p>
 </li></ol>
+    <p class="empty filtered-empty" hidden>The filters hide every issue on this screen.</p>
     <section class="transcript" aria-labelledby="screen-1-transcript">
       <h3 id="screen-1-transcript">What a screen reader says</h3>
       <p class="transcript-note">Pragu's approximation of TalkBack swiping through this screen, in order. A real device can word or order it differently, so check with TalkBack on.</p>
@@ -216,6 +235,31 @@ figcaption { margin-top: 12px; }
   });
   media.addEventListener('change', sync);
   sync();
+})();(function () {
+  var form = document.getElementById('filters');
+  if (!form) return;
+  var status = document.getElementById('filter-status');
+  var issues = Array.prototype.slice.call(document.querySelectorAll('.issue[data-issue]'));
+  function each(selector, fn) { Array.prototype.forEach.call(document.querySelectorAll(selector), fn); }
+  function apply() {
+    var severities = Array.prototype.map.call(form.querySelectorAll('input[name="severity"]:checked'), function (input) { return input.value; });
+    var newOnly = !!form.querySelector('input[name="baseline"][value="new"]:checked');
+    var shown = {};
+    var count = 0;
+    issues.forEach(function (issue) {
+      var visible = severities.indexOf(issue.getAttribute('data-severity')) !== -1 && (!newOnly || issue.getAttribute('data-baseline') === 'new');
+      issue.hidden = !visible;
+      if (visible) { shown[issue.getAttribute('data-issue')] = true; count++; }
+    });
+    each('.marker[data-issue], .rule-links [data-issue]', function (el) { el.hidden = !shown[el.getAttribute('data-issue')]; });
+    each('.screen-sign[data-issue]', function (el) { el.classList.toggle('is-dimmed', !shown[el.getAttribute('data-issue')]); });
+    each('.rule-row', function (row) { row.hidden = !row.querySelector('.rule-links [data-issue]:not([hidden])'); });
+    each('.issues', function (list) { list.nextElementSibling.hidden = !!list.querySelector('.issue:not([hidden])'); });
+    status.textContent = count === issues.length ? 'Showing all ' + issues.length + ' issues.' : 'Showing ' + count + ' of ' + issues.length + ' issues.';
+  }
+  form.hidden = false;
+  form.addEventListener('change', apply);
+  apply();
 })();</script>
 </body>
 </html>

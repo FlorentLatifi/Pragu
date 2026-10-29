@@ -55,6 +55,7 @@ export function renderReport({ result, screenshots }: ReportInput): string {
         screenshots.get(screen.id),
         device.screenWidthPx,
         device.screenHeightPx,
+        summary.baseline !== null,
       );
     })
     .join('\n');
@@ -92,6 +93,7 @@ export function renderReport({ result, screenshots }: ReportInput): string {
   <p class="rules">Rules run: ${summary.rulesRun.map((id) => `<code>${escapeHtml(id)}</code>`).join(', ')}</p>
   ${summary.baseline === null ? '' : `<p class="baseline">${escapeHtml(`Compared with ${summary.baseline.file}: ${String(summary.baseline.newIssues)} new · ${String(summary.baseline.known)} already in the baseline · ${String(summary.baseline.fixed)} fixed since`)}</p>`}
   ${summary.ignored === 0 ? '' : `<p class="rules">${escapeHtml(plural(summary.ignored, 'issue', 'issues'))} ignored by the project's config (pragu.config.ts), not counted above.</p>`}
+  ${renderFilters(issues, summary.baseline !== null)}
 </section>
 ${renderRuleIndex(numbered, summary.rulesRun)}
 ${screens}
@@ -103,7 +105,7 @@ ${screens}
 <footer class="footer">
   <p>${escapeHtml(`Pragu ${result.tool.version} · result schema ${result.schemaVersion}`)} · Generated on this machine; nothing was uploaded.</p>
 </footer>
-<script>${SCRIPT}</script>
+<script>${SCRIPT}${FILTER_SCRIPT}</script>
 </body>
 </html>
 `;
@@ -251,13 +253,14 @@ function renderScreen(
   screenshot: ReportScreenshot | undefined,
   screenWidthPx: number,
   screenHeightPx: number,
+  compared: boolean,
 ): string {
   const headingId = `${screen.id}-heading`;
   const markers = numbered
     .map(({ issue, number }) => {
       const { left, top, right, bottom } = issue.boundsPx;
       const style = `left:${percent(left, screenWidthPx)};top:${percent(top, screenHeightPx)};width:${percent(right - left, screenWidthPx)};height:${percent(bottom - top, screenHeightPx)}`;
-      return `<a class="marker" href="#issue-${String(number)}" style="${style}" aria-label="${escapeHtml(`Issue ${String(number)}: ${issue.title}`)}"></a>`;
+      return `<a class="marker" href="#issue-${String(number)}" data-issue="${String(number)}" style="${style}" aria-label="${escapeHtml(`Issue ${String(number)}: ${issue.title}`)}"></a>`;
     })
     .join('');
   const placed = placeSigns(numbered, screenWidthPx, screenHeightPx);
@@ -268,7 +271,7 @@ function renderScreen(
   const signs = placed
     .map((sign) => {
       const measure = sign.measure === null ? '' : `<span class="sign-measure">${escapeHtml(sign.measure)}</span>`;
-      return `<span class="screen-sign" style="left:${sign.left.toFixed(3)}%;top:${sign.top.toFixed(3)}%" aria-hidden="true"><span class="sign-number">${String(sign.number)}</span>${measure}</span>`;
+      return `<span class="screen-sign" data-issue="${String(sign.number)}" style="left:${sign.left.toFixed(3)}%;top:${sign.top.toFixed(3)}%" aria-hidden="true"><span class="sign-number">${String(sign.number)}</span>${measure}</span>`;
     })
     .join('');
   const figure =
@@ -284,7 +287,8 @@ function renderScreen(
   const list =
     numbered.length === 0
       ? '<p class="empty">Nothing found on this screen by these checks. That is a good start, not proof of accessibility: try it with TalkBack next.</p>'
-      : `<ol class="issues">${numbered.map(({ issue, number }) => renderIssue(issue, number)).join('\n')}</ol>`;
+      : `<ol class="issues">${numbered.map(({ issue, number }) => renderIssue(issue, number, compared)).join('\n')}</ol>
+    <p class="empty filtered-empty" hidden>The filters hide every issue on this screen.</p>`;
   const notes = screenNotes(screen);
   const notesList =
     notes.length === 0 ? '' : `<ul class="notes">${notes.map((note) => `<li>${escapeHtml(note)}</li>`).join('')}</ul>`;
@@ -369,7 +373,39 @@ export function measurement(issue: Issue): string | null {
   }
 }
 
-function renderIssue(issue: Issue, number: number): string {
+/**
+ * Filters for severity and, with a baseline, for new issues only. The form starts hidden
+ * and the script reveals it, so a reader without scripts never sees controls that do nothing.
+ */
+function renderFilters(issues: readonly Issue[], compared: boolean): string {
+  if (issues.length === 0) return '';
+  const severities = (['error', 'warning', 'info'] as const)
+    .map((severity) => ({ severity, count: issues.filter((issue) => issue.severity === severity).length }))
+    .filter(({ count }) => count > 0)
+    .map(
+      ({ severity, count }) =>
+        `<label class="filter"><input type="checkbox" name="severity" value="${severity}" checked> ${SEVERITY_LABEL[severity]} <span class="filter-count">${String(count)}</span></label>`,
+    )
+    .join('');
+  const newCount = issues.filter((issue) => !issue.inBaseline).length;
+  const baseline = compared
+    ? `<fieldset>
+      <legend>Baseline</legend>
+      <label class="filter"><input type="radio" name="baseline" value="all" checked> All issues</label>
+      <label class="filter"><input type="radio" name="baseline" value="new"> New only <span class="filter-count">${String(newCount)}</span></label>
+    </fieldset>`
+    : '';
+  return `<form class="filters" id="filters" hidden>
+    <fieldset>
+      <legend>Severity</legend>
+      ${severities}
+    </fieldset>
+    ${baseline}
+    <p class="filter-status" id="filter-status" role="status"></p>
+  </form>`;
+}
+
+function renderIssue(issue: Issue, number: number, compared: boolean): string {
   const evidence = Object.entries(issue.evidence)
     .map(([key, value]) => `<code>${escapeHtml(key)}: ${escapeHtml(String(value))}</code>`)
     .join(' ');
@@ -378,7 +414,8 @@ function renderIssue(issue: Issue, number: number): string {
     ...issue.en301549.map((clause) => `EN 301 549 ${clause}`),
   ];
   const element = issue.resourceId === null ? '' : `Element <code>${escapeHtml(issue.resourceId)}</code> · `;
-  return `<li class="issue" id="issue-${String(number)}" tabindex="-1">
+  const baseline = compared ? ` data-baseline="${issue.inBaseline ? 'known' : 'new'}"` : '';
+  return `<li class="issue" id="issue-${String(number)}" tabindex="-1" data-issue="${String(number)}" data-severity="${issue.severity}"${baseline}>
   <h3><span class="plate" aria-hidden="true">${String(number)}</span>${escapeHtml(issue.title)}</h3>
   <p class="tags"><span class="severity severity-${issue.severity}">${SEVERITY_LABEL[issue.severity]}</span>${standards.map((s) => `<span>${escapeHtml(s)}</span>`).join('')}<span>Confidence: ${issue.confidence}</span>${issue.inBaseline ? '<span class="in-baseline">In baseline</span>' : ''}</p>
   <p class="message">${escapeHtml(issue.message)}</p>
@@ -410,6 +447,35 @@ const SCRIPT = `(function () {
   sync();
 })();`;
 
+// Filters hide issue cards and their markers, and dim their signs on the screenshot, so the
+// numbers that stay bright are the ones being looked at.
+const FILTER_SCRIPT = `(function () {
+  var form = document.getElementById('filters');
+  if (!form) return;
+  var status = document.getElementById('filter-status');
+  var issues = Array.prototype.slice.call(document.querySelectorAll('.issue[data-issue]'));
+  function each(selector, fn) { Array.prototype.forEach.call(document.querySelectorAll(selector), fn); }
+  function apply() {
+    var severities = Array.prototype.map.call(form.querySelectorAll('input[name="severity"]:checked'), function (input) { return input.value; });
+    var newOnly = !!form.querySelector('input[name="baseline"][value="new"]:checked');
+    var shown = {};
+    var count = 0;
+    issues.forEach(function (issue) {
+      var visible = severities.indexOf(issue.getAttribute('data-severity')) !== -1 && (!newOnly || issue.getAttribute('data-baseline') === 'new');
+      issue.hidden = !visible;
+      if (visible) { shown[issue.getAttribute('data-issue')] = true; count++; }
+    });
+    each('.marker[data-issue], .rule-links [data-issue]', function (el) { el.hidden = !shown[el.getAttribute('data-issue')]; });
+    each('.screen-sign[data-issue]', function (el) { el.classList.toggle('is-dimmed', !shown[el.getAttribute('data-issue')]); });
+    each('.rule-row', function (row) { row.hidden = !row.querySelector('.rule-links [data-issue]:not([hidden])'); });
+    each('.issues', function (list) { list.nextElementSibling.hidden = !!list.querySelector('.issue:not([hidden])'); });
+    status.textContent = count === issues.length ? 'Showing all ' + issues.length + ' issues.' : 'Showing ' + count + ' of ' + issues.length + ' issues.';
+  }
+  form.hidden = false;
+  form.addEventListener('change', apply);
+  apply();
+})();`;
+
 // Direction "Signal" (DESIGN.md). Tokens come from theme.ts; this sheet only uses the variables.
 const STYLES = `${FONT_FACES}
 ${themeCss()}
@@ -418,6 +484,7 @@ ${themeCss()}
   --font-mono: "Atkinson Hyperlegible Mono", ui-monospace, monospace;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 var(--font-text); }
 a { color: inherit; }
 :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
@@ -469,6 +536,15 @@ figcaption { margin-top: 12px; }
 .severity { padding: 0 8px; font: 700 12px/1.6 var(--font-mono); text-transform: uppercase; letter-spacing: 0.06em; border: 2px solid var(--ink); color: var(--ink); }
 .severity-error { background: var(--ink); color: var(--bg); }
 .severity-info { border-color: var(--muted); border-width: 1px; color: var(--muted); }
+.filters { display: flex; flex-wrap: wrap; gap: 8px 32px; align-items: flex-end; margin: 16px 0 0; }
+.filters fieldset { display: flex; flex-wrap: wrap; gap: 0 16px; margin: 0; padding: 0; border: 0; }
+.filters legend { padding: 0; font: 700 12px/1.4 var(--font-mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.filter { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; font-weight: 700; cursor: pointer; }
+.filter input { width: 20px; height: 20px; margin: 0; accent-color: var(--ink); }
+.filter-count { font: 400 14px var(--font-mono); color: var(--muted); }
+.filter-status { flex-basis: 100%; margin: 0; color: var(--muted); font-size: 14px; }
+.screen-sign.is-dimmed { background: var(--surface); color: var(--muted); border-style: dashed; border-color: var(--muted); z-index: 0; }
+.screen-sign.is-dimmed .sign-measure { border-left-color: var(--muted); }
 .by-rule { padding: 32px 0; border-bottom: 1px solid var(--line); }
 .rule-index { list-style: none; margin: 0 0 12px; padding: 0; }
 .rule-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px 16px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
@@ -498,7 +574,7 @@ figcaption { margin-top: 12px; }
 .footer { padding-top: 24px; padding-bottom: 48px; border-top: 1px solid var(--line); }
 .footer p { color: var(--muted); font-size: 14px; margin: 0; }
 @media print {
-  .toggle, .skip { display: none; }
+  .toggle, .skip, .filters { display: none; }
   :root { --bg: #ffffff; --surface: #ffffff; --ink: #000000; --muted: #333333; }
   .sign, .plate, .marker, .screen-sign { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
   .shot { position: static; }
