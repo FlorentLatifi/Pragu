@@ -1,6 +1,6 @@
 # Pragu status
 
-Last updated: 2026-10-28, M1 session 3. **M0 approved. M1 in progress:** Pragu Bench covers two fixtures (React Native and Jetpack Compose); agent hardening mostly done; four M1 rules have landed (`input/missing-label`, `state/not-exposed`, `name/image-missing`, `focus/unreachable`).
+Last updated: 2026-10-28, M1 session 3. **M0 approved. M1 in progress:** Pragu Bench covers two fixtures (React Native and Jetpack Compose); agent hardening mostly done; all five planned M1 error rules have landed (`input/missing-label`, `state/not-exposed`, `name/image-missing`, `focus/unreachable`, `text/scaling-truncation`).
 
 ## Decisions made
 
@@ -13,6 +13,7 @@ Last updated: 2026-10-28, M1 session 3. **M0 approved. M1 in progress:** Pragu B
 - Compose is read the way TalkBack reads it: a role on a child is not a control of its own, text size is bounded by the element's height, and `target/size` stays silent where two Compose touch areas meet (ADR-009).
 - Protocol 3 captures `labeledBy`. `input/missing-label` reports fields with no label at all. Placeholder-only labels wait for `input/placeholder-label`, which needs typing during a crawl (ADR-010).
 - `state/not-exposed` reports controls whose role promises a state they do not expose. Home-made toggles with no role need a tap to see and wait for the crawler (M3).
+- `text/scaling-truncation` runs only with `--check-font-scale`, which changes and always restores the device's font scale (Florent chose opt-in, ADR-011). It reports the ellipsis only; boxed text is a known miss.
 - Commits carry no AI attribution lines (Florent rewrote `main` to remove them).
 
 ## Decisions needed (Florent)
@@ -40,9 +41,10 @@ Walking skeleton on the emulator, CI, docs (PRD, technical design, ADR-001 to 00
 - **`state/not-exposed`**: flags a checkbox, switch or radio button that never says whether it is checked or on (a role with no state). Seeds and twins on the rn-shop cart and Compose checkout. The two home-made checkboxes with no role stay published as misses.
 - **`name/image-missing`**: flags images TalkBack stops on but can only call "Image". Images it skips are left alone, since telling decoration from content would be a guess. Seed and twins (named, decorative) on the rn-shop product screen.
 - **`focus/unreachable`**: flags controls that work by touch but are hidden from assistive technology, unless a row around them is one accessible control. Compose's `hideFromAccessibility()` looks like off-screen content and stays a published miss.
-- Checks: 152 TypeScript tests, 26 JVM tests, lint, typecheck, bench gate.
+- **`text/scaling-truncation`** (ADR-011): `--check-font-scale` captures each screen again at 200% text and restores the setting (tested with 1.15 on the device). Protocol 4 reports characters an ellipsis hides. New `summary` screens in both fixtures; the bench records every screen at both sizes, and the recorder rejects blank screenshots.
+- Checks: 162 TypeScript tests, 26 JVM tests, lint, typecheck, bench gate.
 
-## Bench results (6 screens: rn-shop, android-compose)
+## Bench results (8 screens: rn-shop, android-compose)
 
 | Rule | Severity | TP | FP | FN | TN | Precision | Recall |
 |---|---|---|---|---|---|---|---|
@@ -51,14 +53,15 @@ Walking skeleton on the emulator, CI, docs (PRD, technical design, ADR-001 to 00
 | `input/missing-label` | error | 2 | 0 | 0 | 4 | 1.00 | 1.00 |
 | `state/not-exposed` | error | 2 | 0 | 2 | 5 | 1.00 | 0.50 |
 | `focus/unreachable` | error | 1 | 0 | 1 | 3 | 1.00 | 0.50 |
+| `text/scaling-truncation` | error | 2 | 0 | 2 | 6 | 1.00 | 0.50 |
 | `contrast/text` | error | 6 | 0 | 0 | 11 | 1.00 | 1.00 |
 | `target/size` | warning | 3 | 1 | 3 | 11 | 0.75 | 0.50 |
 
-All error rules meet the 0.90 bar. Known misses stay published: home-made checkboxes with no role (`state/not-exposed`), Compose `hideFromAccessibility()` (`focus/unreachable`), React Native `hitSlop` and crowded Compose targets (`target/size`). Small sample: early signals, not final quality figures. Full page: `docs/bench/results.md`.
+All error rules meet the 0.90 bar. Known misses stay published: home-made checkboxes with no role (`state/not-exposed`), Compose `hideFromAccessibility()` (`focus/unreachable`), text cut by fixed-height boxes (`text/scaling-truncation`), React Native `hitSlop` and crowded Compose targets (`target/size`). Small sample: early signals, not final quality figures. Full page: `docs/bench/results.md`.
 
 ## Next
 
-1. Last M1 error rule: `text/scaling-truncation`, which needs a second capture at font scale 2.0 (CLI and agent work).
+1. Rest of M1: report v1 (needs the design direction), config, JSON Schema and SARIF, `doctor` and baselines, the CI emulator job.
 2. Agent hardening, last piece: instrumented tests of the capturer on an emulator (lands with the CI emulator job, work package 9).
 3. Report v1 once the design direction is chosen.
 4. Owner-implements for Florent: the `target/size` 48 dp platform tier (info for now, per ADR-007).
@@ -66,7 +69,7 @@ All error rules meet the 0.90 bar. Known misses stay published: home-made checkb
 ## Notes and risks
 
 - `main` was rewritten on GitHub on 2026-10-28 (same content, new hashes). A clone made before then has no merge base: replay local work with `git rebase --onto origin/main <old tip>`, never force-push.
-- The emulator died once while idle Gradle and Kotlin daemons held about 4 GB. Stop them after fixture builds.
+- The emulator died once while idle Gradle and Kotlin daemons held about 4 GB. Stop them after fixture builds. After a forced restart its graphics failed (black screenshots, apps dying in their render threads); a cold boot (`-no-snapshot-load`) fixed it, and it needs a few minutes before it is responsive.
 - Disk: about 15 GB free on `C:`.
 - Agent lint warnings to clear: compile and target SDK 37 available; `dataExtractionRules`; app icon.
 - Dependabot PR #1 (TypeScript 7, `@types/node` 26) is ruled out by ADR-002; Florent can close it.
