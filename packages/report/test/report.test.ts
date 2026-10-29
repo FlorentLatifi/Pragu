@@ -1,7 +1,7 @@
 import { RESULT_SCHEMA_VERSION } from '@pragu/core';
 import type { Issue, ScanResult } from '@pragu/core';
 import { describe, expect, it } from 'vitest';
-import { escapeHtml, renderReport, screenNotes } from '../src/index.js';
+import { escapeHtml, measurement, renderReport, screenNotes } from '../src/index.js';
 
 function issue(overrides: Partial<Issue> = {}): Issue {
   return {
@@ -123,7 +123,8 @@ describe('renderReport', () => {
   it('is self-contained: no external scripts, styles, fonts or images', () => {
     const html = renderReport({ result: result([issue()]), screenshots });
     expect(html).not.toMatch(/(src|href)="https?:/);
-    expect(html).not.toMatch(/@import|url\(/);
+    // Fonts are embedded as data: URLs; anything else would be a network request.
+    expect(html).not.toMatch(/@import|url\((?!data:)/);
     expect(html).toContain('src="data:image/png;base64,iVBORw0KGgo="');
   });
 
@@ -189,5 +190,34 @@ describe('escapeHtml', () => {
     expect(escapeHtml(`<a href="x" title='y'>&</a>`)).toBe(
       '&lt;a href=&quot;x&quot; title=&#39;y&#39;&gt;&amp;&lt;/a&gt;',
     );
+  });
+});
+
+describe('measurement', () => {
+  it('prints the evidence a developer needs on the screenshot, like a dimension on a drawing', () => {
+    expect(measurement(issue({ ruleId: 'target/size', evidence: { widthDp: 16, heightDp: 16 } }))).toBe('16 × 16 dp');
+    expect(measurement(issue({ ruleId: 'contrast/text', evidence: { ratio: 2.52 } }))).toBe('2.52 : 1');
+    expect(measurement(issue({ ruleId: 'name/interactive-missing' }))).toBe('no name');
+    expect(measurement(issue({ ruleId: 'state/not-exposed' }))).toBe('no state');
+    expect(measurement(issue({ ruleId: 'text/scaling-truncation' }))).toBe('cut at 200%');
+  });
+
+  it('prints nothing when the evidence is missing or the rule has nothing to measure', () => {
+    expect(measurement(issue({ ruleId: 'target/size', evidence: {} }))).toBeNull();
+    expect(measurement(issue({ ruleId: 'contrast/text', evidence: {} }))).toBeNull();
+    expect(measurement(issue({ ruleId: 'some/future-rule' }))).toBeNull();
+  });
+
+  it('gives each marker one sign with its number and measurement, never on top of another', () => {
+    const near = issue({ boundsPx: { left: 120, top: 240, right: 228, bottom: 480 } });
+    const top = issue({ boundsPx: { left: 100, top: 20, right: 300, bottom: 90 } });
+    const html = renderReport({ result: result([issue(), near, top]), screenshots });
+    expect(html).toContain('<span class="sign-number">1</span><span class="sign-measure">no name</span>');
+    const tops = [...html.matchAll(/class="screen-sign" style="left:[\d.]+%;top:([\d.-]+)%"/g)].map((m) =>
+      Number(m[1]),
+    );
+    expect(tops).toHaveLength(3);
+    expect(tops[1]).toBeLessThan(tops[0] ?? 0);
+    expect(tops[2]).toBeGreaterThan(90 / 24);
   });
 });

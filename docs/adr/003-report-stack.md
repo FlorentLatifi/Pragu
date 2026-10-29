@@ -1,6 +1,6 @@
 # ADR-003: Report stack
 
-- Status: M0 accepted. M1 proposed, to be confirmed with the design direction.
+- Status: Accepted, amended 2026-10-29: report v1 keeps the typed templates (see Amendment).
 - Date: 2026-10-27
 
 ## Context
@@ -26,3 +26,14 @@ The HTML report is the product's face. It must be one file that works offline an
 - Svelte: small output, but a second component model to learn.
 - Lit or web components: standard, but more boilerplate for this much UI.
 - Plain templates forever: fine for M0, too costly for filters and views.
+
+## Amendment (2026-10-29): report v1 stays on typed templates
+
+Report v1 was built in the chosen design direction (Signal, DESIGN.md) without Preact or Vite, with Florent's approval.
+
+- The report is still static: one page, a theme toggle and anchor links. Nothing yet needs components or client-side state.
+- Zero dependencies keeps the supply chain small, the output deterministic, and the golden test simple.
+- Design sessions work without a dev server: `pragu scan --from-capture` re-renders a real recording in a second, and `node scripts/serve-reports.mjs` serves it in the browser pane.
+- Fonts (Atkinson Hyperlegible Next and Mono, OFL) are embedded by `scripts/embed-fonts.mjs` into a generated module, so the report stays one offline file.
+
+Revisit when the report gains filters, rule and diff views (baselines, M2). The Preact plan above remains the default then.

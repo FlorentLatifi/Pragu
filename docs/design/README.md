@@ -21,7 +21,7 @@ The report is the product's face: it's what people screenshot and share. This is
 
 ## Decision
 
-Direction **B, Signal**, with **A's measurement labels** on the callouts ("16 × 16 dp", "2.52 : 1"). Chosen by Florent on 2026-10-29. Next: converge on the real report, then lock the tokens.
+Direction **B, Signal**, with **A's measurement labels** on the callouts ("16 × 16 dp", "2.52 : 1"). Chosen by Florent on 2026-10-29. Built as report v1: tokens in `packages/report/src/theme.ts` (contrast-tested in both themes), the project `DESIGN.md`, and embedded Atkinson Hyperlegible fonts. Each marker carries one sign with its number and measurement ("1 · no name", "2.52 : 1"), laid out so signs never cover each other.
 
 ## Rules that do not bend
 
