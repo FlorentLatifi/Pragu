@@ -4,7 +4,7 @@ Last updated: 2026-10-28, M1 session 3. **M0 approved. M1 in progress:** Pragu B
 
 ## Decisions made
 
-- Repo `FlorentLatifi/Pragu`; free options only; Apache-2.0 with DCO; pnpm 12, TypeScript 6.0.3, Node >= 22.13 (ADR-002, ADR-005).
+- Repo `FlorentLatifi/Pragu`; free options only; Apache-2.0 with DCO; pnpm 12, TypeScript 6.0.3, Node >= 22.18 for TypeScript config loading (ADR-002, ADR-005).
 - Capture via Instrumentation + UiAutomation; the agent talks only through adb (ADR-001, ADR-006).
 - Label suggestions (M4): local by default, own API key only as an opt-in. No Mac, so iOS waits.
 - M1 plan approved (`docs/plans/m1.md`).
@@ -44,7 +44,13 @@ Walking skeleton on the emulator, CI, docs (PRD, technical design, ADR-001 to 00
 - **`focus/unreachable`**: flags controls that work by touch but are hidden from assistive technology, unless a row around them is one accessible control. Compose's `hideFromAccessibility()` looks like off-screen content and stays a published miss.
 - **`text/scaling-truncation`** (ADR-011): `--check-font-scale` captures each screen again at 200% text and restores the setting (tested with 1.15 on the device). Protocol 4 reports characters an ellipsis hides. New `summary` screens in both fixtures; the bench records every screen at both sizes, and the recorder rejects blank screenshots.
 - **Report v1** in the Signal direction (DESIGN.md, ADR-003 amended): Atkinson Hyperlegible embedded, black-on-yellow signs carrying each marker's number and measurement, laid out so they never overlap, contrast-tested tokens in both themes. Reviewed in the browser in light and dark, at phone and desktop widths, and with the keyboard.
-- Checks: 184 TypeScript tests, 26 JVM tests, lint, typecheck, bench gate.
+- **Config, schema, doctor, baselines** (rest of work packages 7 and 8):
+  - `pragu.config.ts` with `defineConfig()` and `pragu init`: rule off/severity, ignores with a required reason (counted in reports), defaults that flags override; loaded with Node's own type stripping (Node 22.18+).
+  - `pragu-result.schema.json` (JSON Schema 2020-12, strict), validated in tests against every bench result; result schema 0.8.0.
+  - `pragu doctor`: Node, adb, device and API level, agent, config, each with an exact fix.
+  - Baselines: `pragu baseline create|update` and `--baseline`, so only new issues fail; fingerprint v1 with fast-check property tests (ADR-004).
+  - SARIF: brief and test checklist ready for Florent's owner task (`docs/plans/owner-task-sarif.md`).
+- Checks: 239 TypeScript tests (plus 8 SARIF todos), 26 JVM tests, lint, typecheck, bench gate.
 
 ## Bench results (8 screens: rn-shop, android-compose)
 
@@ -63,10 +69,9 @@ All error rules meet the 0.90 bar. Known misses stay published: home-made checkb
 
 ## Next
 
-1. Rest of M1: config, JSON Schema and SARIF, `doctor` and baselines, the CI emulator job.
-2. Agent hardening, last piece: instrumented tests of the capturer on an emulator (lands with the CI emulator job, work package 9).
-3. Report v1 once the design direction is chosen.
-4. Owner-implements for Florent: the `target/size` 48 dp platform tier (info for now, per ADR-007).
+1. Rest of M1: the CI emulator job and budgets (work package 9); warning and info rules (work package 4, some are owner tasks); the screen-reader transcript (work package 5).
+2. Owner tasks for Florent: SARIF writer (brief ready), `target/size` 48 dp platform tier, `name/generic`, `contrast/non-text`.
+3. Agent hardening, last piece: instrumented tests of the capturer on an emulator (lands with the CI emulator job, work package 9).
 
 ## Notes and risks
 

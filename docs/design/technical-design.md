@@ -30,6 +30,8 @@ Device / emulator                         Developer machine or CI
 8. Validate the capture (`parseAndroidCapture`), normalise it to PAM, decode the PNG, run the rules, and write `pragu-result.json`, `pragu-report.html` and the raw capture.
 9. Exit 0, or 1 when issues reach `--fail-on` (default: error).
 
+Around the scan: `pragu.config.ts` (`defineConfig()`, loaded with Node's own type stripping) turns rules off or changes their severity, ignores issues with a reason (counted in `summary.ignored`), and sets defaults that flags override. `pragu init` writes a starter config; `pragu doctor` checks Node, adb, the device, the agent and the config with exact fixes. With `--baseline <file>` (from `pragu baseline create --from <pragu-result.json>`), only issues not in the baseline fail the scan; results mark `inBaseline` and summarise new, known and fixed (ADR-004).
+
 `--from-capture` re-runs steps 8–9 from a saved capture. Tests use it to cover the whole pipeline without a device.
 
 ## Pragu Accessibility Model (PAM)
@@ -75,4 +77,4 @@ Every user-facing error is a `PraguError` with what happened and the exact fix. 
 
 ## Not done yet
 
-Scrolling and off-screen content, flows and crawling, baselines, SARIF, config, scoring, transcript, iOS. See `docs/plans/m1.md` and `ROADMAP.md`. Windows, dialogs, the keyboard and WebViews arrived in M1 (ADR-008).
+Scrolling and off-screen content, flows and crawling, fuzzy baseline matching, SARIF (owner task), scoring, transcript, iOS. See `docs/plans/m1.md` and `ROADMAP.md`. Windows, dialogs, the keyboard and WebViews arrived in M1 (ADR-008).
