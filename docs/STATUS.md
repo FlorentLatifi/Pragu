@@ -14,11 +14,12 @@ Last updated: 2026-10-28, M1 session 3. **M0 approved. M1 in progress:** Pragu B
 - Protocol 3 captures `labeledBy`. `input/missing-label` reports fields with no label at all. Placeholder-only labels wait for `input/placeholder-label`, which needs typing during a crawl (ADR-010).
 - `state/not-exposed` reports controls whose role promises a state they do not expose. Home-made toggles with no role need a tap to see and wait for the crawler (M3).
 - `text/scaling-truncation` runs only with `--check-font-scale`, which changes and always restores the device's font scale (Florent chose opt-in, ADR-011). It reports the ellipsis only; boxed text is a known miss.
+- Report design: direction B (Signal: Atkinson Hyperlegible, black-on-yellow plates) with A's measurement labels on callouts (Florent, 2026-10-29).
 - Commits carry no AI attribution lines (Florent rewrote `main` to remove them).
 
 ## Decisions needed (Florent)
 
-1. **Report design direction:** A, B, C or a mix (`docs/design/directions.html`).
+1. **Report v1 plan:** approve the build plan (proposed 2026-10-29).
 
 ## Done
 

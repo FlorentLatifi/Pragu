@@ -19,6 +19,10 @@ The report is the product's face: it's what people screenshot and share. This is
 | 5. Build | Both | Report v1 in M1 (ADR-003). `pnpm design` serves sample results with hot reload, so a design session is live changes in the browser pane |
 | 6. Check | CI | Contrast test over every token pair, axe-core, keyboard walk-through, print to PDF, screen reader before release |
 
+## Decision
+
+Direction **B, Signal**, with **A's measurement labels** on the callouts ("16 × 16 dp", "2.52 : 1"). Chosen by Florent on 2026-10-29. Next: converge on the real report, then lock the tokens.
+
 ## Rules that do not bend
 
 - WCAG 2.2 AA in both themes: text ≥ 4.5:1, UI parts and callouts ≥ 3:1 against both light and dark app screenshots, hence the halo on every callout.
