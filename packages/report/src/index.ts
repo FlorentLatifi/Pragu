@@ -109,6 +109,11 @@ export function screenNotes(screen: PamScreen): string[] {
       'This screen contains web content (a WebView). Pragu checks native UI only; test web content with a web tool such as axe-core.',
     );
   }
+  if (screen.largeText !== null) {
+    notes.push(
+      `Also captured at ${String(Math.round(screen.largeText.fontScale * 100))}% text size, to find text that gets cut off.`,
+    );
+  }
   return notes;
 }
 

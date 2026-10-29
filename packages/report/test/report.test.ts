@@ -58,6 +58,7 @@ function result(issues: Issue[]): ScanResult {
           { kind: 'app', title: 'rn-shop', boundsPx: { left: 0, top: 0, right: 1080, bottom: 2400 }, foreground: true },
         ],
         nodes: [],
+        largeText: null,
       },
     ],
     issues,
@@ -172,6 +173,14 @@ describe('renderReport', () => {
     const html = renderReport({ result: { ...base, screens: [limited] }, screenshots });
     expect(html).toContain('<ul class="notes"><li>A dialog or popup was open');
     expect(screenNotes(screen)).toEqual([]);
+  });
+
+  it('says when the screen was also checked at 200% text size', () => {
+    const screen = result([issue()]).screens[0];
+    if (screen === undefined) throw new Error('fixture has a screen');
+    expect(screenNotes({ ...screen, largeText: { fontScale: 2, windows: [], nodes: [] } })).toEqual([
+      'Also captured at 200% text size, to find text that gets cut off.',
+    ]);
   });
 });
 

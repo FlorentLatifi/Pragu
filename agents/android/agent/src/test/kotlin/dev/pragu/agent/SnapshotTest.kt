@@ -39,6 +39,7 @@ fun snapshot(
     screenReaderFocusable = false,
     actions = listOf(16),
     textSizePx = 36.75f,
+    textCollapsedChars = null,
     children = children,
 )
 
@@ -48,7 +49,7 @@ class SnapshotTest {
         "className", "packageName", "resourceId", "text", "contentDescription", "hintText", "labeledBy",
         "stateDescription", "roleDescription", "bounds", "clickable", "longClickable", "focusable", "checkable", "checked", "enabled",
         "editable", "visibleToUser", "importantForAccessibility", "heading", "screenReaderFocusable", "actions",
-        "textSizePx", "children",
+        "textSizePx", "textCollapsedChars", "children",
     )
 
     @Test
@@ -110,7 +111,7 @@ class SnapshotTest {
         val windows = listOf(window("application", 0, snapshot()), window("input_method", 1, null))
         val capture = Capture("com.example.shop", null, "2026-10-27T12:00:00Z", 1080, 2400, windows, byteArrayOf())
         val json = capture.toJson(device, "0.0.2")
-        assertEquals(3, PROTOCOL_VERSION)
+        assertEquals(4, PROTOCOL_VERSION)
         assertEquals(PROTOCOL_VERSION, json.getInt("protocol"))
         assertFalse(json.has("root"))
         assertTrue(json.isNull("windowTitle"))

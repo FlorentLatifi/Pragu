@@ -34,6 +34,7 @@ export function rawNode(overrides: Partial<AndroidRawNode> = {}): AndroidRawNode
     screenReaderFocusable: false,
     actions: [],
     textSizePx: null,
+    textCollapsedChars: null,
     children: [],
     ...overrides,
   };
@@ -60,8 +61,8 @@ export function captureOf(
   windows: AndroidRawWindow[] = [windowOf(root)],
 ): AndroidCapture {
   return {
-    protocol: 3,
-    agentVersion: '0.0.3',
+    protocol: 4,
+    agentVersion: '0.0.4',
     capturedAt: '2026-10-27T12:00:00.000Z',
     packageName: 'com.example.shop',
     windowTitle: 'Shop',
@@ -121,18 +122,24 @@ export function pamNode(overrides: Partial<PamNode> & { id: string }): PamNode {
     checked: null,
     stateDescription: null,
     textSizeDp: null,
+    textEllipsized: null,
     ...overrides,
   };
 }
 
-export function screenOf(nodes: PamNode[]): PamScreen {
+/** A screen; pass `largeTextNodes` for its second capture at 200% text. */
+export function screenOf(nodes: PamNode[], largeTextNodes: PamNode[] | null = null): PamScreen {
+  const windows: PamScreen['windows'] = [
+    { kind: 'app', title: 'Shop', boundsPx: rect(0, 0, 1080, 2400), foreground: true },
+  ];
   return {
     id: 'screen-1',
     name: 'Cart',
     appId: 'com.example.shop',
     screenshot: null,
-    windows: [{ kind: 'app', title: 'Shop', boundsPx: rect(0, 0, 1080, 2400), foreground: true }],
+    windows,
     nodes,
+    largeText: largeTextNodes === null ? null : { fontScale: 2, windows, nodes: largeTextNodes },
   };
 }
 

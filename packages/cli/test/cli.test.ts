@@ -134,7 +134,7 @@ describe('scan --from-capture (whole pipeline, no device)', () => {
 
     expect(code).toBe(1);
     const result = JSON.parse(await readFile(join(out, 'pragu-result.json'), 'utf8')) as ScanResult;
-    expect(result.schemaVersion).toBe('0.5.0');
+    expect(result.schemaVersion).toBe('0.6.0');
     expect(result.issues.map((issue) => [issue.ruleId, issue.resourceId])).toEqual([
       ['target/size', 'seed-tiny-dismiss'],
       ['name/interactive-missing', 'seed-unlabeled-remove'],
@@ -163,6 +163,31 @@ describe('scan --from-capture (whole pipeline, no device)', () => {
       await main(['scan', '--from-capture', captureFile, '--out', join(dir, 'o'), '--fail-on', 'never'], sink),
     ).toBe(0);
     expect(existsSync(join(dir, 'o', 'pragu-report.html'))).toBe(true);
+  });
+
+  it('compares with the 200% capture saved next to the first, and keeps it in the result', async () => {
+    const captureFile = await writeFixtureCapture();
+    const capture = JSON.parse(await readFile(captureFile, 'utf8')) as ReturnType<typeof captureOf>;
+    const free = capture.windows[0]?.root?.children[3];
+    if (free === undefined) throw new Error('fixture has the shipping text');
+    free.textCollapsedChars = 0;
+    const large = structuredClone(capture);
+    const freeLarge = large.windows[0]?.root?.children[3];
+    if (freeLarge === undefined) throw new Error('fixture has the shipping text');
+    freeLarge.textCollapsedChars = 3;
+    large.device.fontScale = 2;
+    await writeFile(captureFile, JSON.stringify(capture));
+    await writeFile(join(dir, 'screen-1-large-text.json'), JSON.stringify(large));
+    await writeFile(join(dir, 'screen-1-large-text.png'), await readFile(join(dir, 'screen-1.png')));
+    const { sink } = capturingIo();
+
+    await main(['scan', '--from-capture', captureFile, '--out', join(dir, 'large'), '--fail-on', 'never'], sink);
+
+    const result = JSON.parse(await readFile(join(dir, 'large', 'pragu-result.json'), 'utf8')) as ScanResult;
+    expect(result.screens[0]?.largeText?.fontScale).toBe(2);
+    expect(result.issues.find((issue) => issue.ruleId === 'text/scaling-truncation')?.resourceId).toBe(
+      'seed-low-contrast',
+    );
   });
 
   it('explains a missing capture file', async () => {

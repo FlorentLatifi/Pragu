@@ -30,5 +30,6 @@ export {
   stateNotExposed,
   targetSize,
   textContrast,
+  textScalingTruncation,
 } from './rules/index.js';
 export type { Finding, Rule, RuleContext, RuleMeta } from './rules/index.js';

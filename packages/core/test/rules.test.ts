@@ -8,6 +8,7 @@ import {
   stateNotExposed,
   targetSize,
   textContrast,
+  textScalingTruncation,
 } from '../src/index.js';
 import { createRaster, device, paintText, pamNode, rect, screenOf } from './helpers.js';
 
@@ -91,6 +92,51 @@ describe('input/missing-label', () => {
         field({ id: '3', inWebView: true }),
       ]),
     ).toEqual([]);
+  });
+});
+
+describe('text/scaling-truncation', () => {
+  const words = 'Ceramic mug, sage green, 350 ml';
+  const text = (overrides: Partial<Parameters<typeof pamNode>[0]> = {}) =>
+    pamNode({
+      id: '0',
+      role: 'text',
+      interactive: false,
+      text: words,
+      name: words,
+      boundsDp: rect(20, 300, 380, 319),
+      textEllipsized: false,
+      ...overrides,
+    });
+  const check = (normal: Parameters<typeof pamNode>[0][], large: Parameters<typeof pamNode>[0][] | null) =>
+    textScalingTruncation.check({
+      screen: screenOf(normal.map(text), large === null ? null : large.map(text)),
+      device,
+      raster: null,
+    });
+  const cutAt200 = { textEllipsized: true, boundsDp: rect(20, 400, 380, 433) };
+
+  it('flags text that an ellipsis cuts short only at 200%', () => {
+    const findings = check([{ id: '0' }], [{ id: '0', ...cutAt200 }]);
+    expect(findings).toHaveLength(1);
+    expect(findings[0]?.message).toBe(
+      'At 200% text size, "Ceramic mug, sage green, 350 ml" is cut short with an ellipsis, so the end of it cannot be read.',
+    );
+    expect(findings[0]?.evidence).toEqual({ fontScale: 2 });
+  });
+
+  it('accepts text that still fits, and stays silent when it cannot tell', () => {
+    expect(check([{ id: '0' }], [{ id: '0', boundsDp: rect(20, 400, 380, 466) }])).toEqual([]);
+    expect(check([{ id: '0' }], [{ id: '0', ...cutAt200, textEllipsized: null }])).toEqual([]);
+    expect(check([{ id: '0', textEllipsized: null }], [{ id: '0', ...cutAt200 }])).toEqual([]);
+  });
+
+  it('only judges text it can compare: same element and words, on screen in full at 200%', () => {
+    expect(check([{ id: '0' }], null)).toEqual([]);
+    expect(check([{ id: '0', textEllipsized: true }], [{ id: '0', ...cutAt200 }])).toEqual([]);
+    expect(check([{ id: '0' }], [{ id: '0', ...cutAt200, text: 'Ceramic mug' }])).toEqual([]);
+    expect(check([{ id: '0' }], [{ id: '0', ...cutAt200, boundsDp: rect(20, 2390, 380, 2423) }])).toEqual([]);
+    expect(check([{ id: '0' }], [{ id: '1', ...cutAt200 }])).toEqual([]);
   });
 });
 

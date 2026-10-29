@@ -8,7 +8,7 @@ import java.io.InputStream
 import java.io.OutputStream
 
 /** Wire protocol version, shared with the CLI (packages/cli/src/protocol.ts). */
-const val PROTOCOL_VERSION = 3
+const val PROTOCOL_VERSION = 4
 
 private const val MAX_REQUEST_BYTES = 64 * 1024
 

@@ -7,6 +7,8 @@ A small Jetpack Compose app for Pragu Bench. Each screen seeds accessibility bar
 | `composeshop://settings` | An `IconButton` whose `Icon` has `contentDescription = null`; a `Switch` whose label is not connected to it; pale text; touching 16 dp stars. Twins: a labelled `IconButton`, a toggleable row that names its `Switch`, readable and large text, and two 20 dp icons that Compose enlarges enough. |
 | `composeshop://checkout` | A home-made checkbox with no name, role or state; a text field labelled only by its placeholder; a field whose visible label is not connected to it; a `clickable(role = Role.Checkbox)` row with no state; a button hidden with `hideFromAccessibility()`. Twins: a toggleable checkbox row, a labelled field, a button, and a disabled button. |
 
+| `composeshop://summary` | A `maxLines = 1` product name that an ellipsis cuts at 200% text; text in a fixed-height box. Twins: the same name allowed to wrap, a short one-line label, and a box that grows. |
+
 Ground truth is in `expected.json`, keyed by `testTag`. `testTagsAsResourceId = true` exposes each tag as the element's resource id.
 
 ## Build and record

@@ -383,7 +383,7 @@ describe('parseAndroidCapture', () => {
   });
 
   it('rejects another protocol version with advice', () => {
-    expect(() => parseAndroidCapture({ ...valid(), protocol: 2 })).toThrow(/protocol 2.*protocol 3/);
+    expect(() => parseAndroidCapture({ ...valid(), protocol: 3 })).toThrow(/protocol 3.*protocol 4/);
   });
 
   it('rejects values that are not objects', () => {

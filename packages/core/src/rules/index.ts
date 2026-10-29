@@ -5,6 +5,7 @@ import { interactiveMissingName } from './interactive-missing-name.js';
 import { stateNotExposed } from './state-not-exposed.js';
 import { targetSize } from './target-size.js';
 import { textContrast } from './text-contrast.js';
+import { textScalingTruncation } from './text-scaling-truncation.js';
 import type { Rule } from './types.js';
 
 export {
@@ -15,6 +16,7 @@ export {
   stateNotExposed,
   targetSize,
   textContrast,
+  textScalingTruncation,
 };
 export { requiredTextRatio } from './text-contrast.js';
 export { inScope } from './scope.js';
@@ -28,5 +30,6 @@ export const defaultRules: readonly Rule[] = [
   stateNotExposed,
   focusUnreachable,
   textContrast,
+  textScalingTruncation,
   targetSize,
 ];

@@ -10,12 +10,14 @@ import {
   parseAndroidCapture,
   summarize,
 } from '@pragu/core';
-import type { AndroidCapture, Issue, ScanResult, Severity } from '@pragu/core';
+import type { AndroidCapture, Issue, PamScreen, ScanResult, Severity } from '@pragu/core';
 import { renderReport } from '@pragu/report';
 import { PNG } from 'pngjs';
 import { Adb, findAdb, selectDevice } from './adb.js';
 import { AGENT_PACKAGE, startAgentSession } from './agent.js';
+import type { AgentSession } from './agent.js';
 import { EXIT, PraguError } from './errors.js';
+import { LARGE_TEXT_SCALE, withFontScale } from './font-scale.js';
 import { toolVersion } from './version.js';
 
 export type FailOn = Severity | 'never';
@@ -30,6 +32,8 @@ export interface ScanOptions {
   failOn: FailOn;
   fromCapture: string | undefined;
   launch: boolean;
+  /** Capture the screen again at 200% text (text/scaling-truncation). Changes, then restores, the device's font scale. */
+  checkFontScale: boolean;
 }
 
 export interface ScanOutcome {
@@ -52,9 +56,56 @@ export function exitCodeFor(issues: readonly Issue[], failOn: FailOn): number {
   return issues.some((issue) => SEVERITY_RANK[issue.severity] <= threshold) ? EXIT.issuesFound : EXIT.ok;
 }
 
-interface RawScreen {
+interface RawCapture {
   capture: AndroidCapture;
   png: Buffer;
+}
+
+interface RawScreen extends RawCapture {
+  /** The same screen at 200% text, when the scan asked for it. */
+  largeText: RawCapture | null;
+}
+
+const LARGE_TEXT_SUFFIX = '-large-text';
+
+async function captureOnce(session: AgentSession, appId: string): Promise<RawCapture> {
+  const frame = await session.request({ cmd: 'capture', packageName: appId, timeoutMs: 30_000 }, 45_000);
+  const tree = frame.payloads.get('tree');
+  const png = frame.payloads.get('screenshot');
+  if (tree === undefined || png === undefined) {
+    throw new PraguError(EXIT.environment, 'The agent answered without a tree or a screenshot.');
+  }
+  return { capture: parseAndroidCapture(JSON.parse(tree.toString('utf8'))), png };
+}
+
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/** Apps lay text out again after the font scale changes; wait until the capture shows the new scale. */
+async function captureAtScale(session: AgentSession, appId: string, scale: number): Promise<RawCapture> {
+  for (const waitMs of [1_000, 1_500, 2_500]) {
+    await delay(waitMs);
+    const raw = await captureAfterSwitch(session, appId, scale);
+    if (Math.abs(raw.capture.device.fontScale - scale) < 0.01) return raw;
+  }
+  throw new PraguError(
+    EXIT.environment,
+    `The device did not switch to font scale ${String(scale)}.`,
+    'Check that the device allows changing system settings over adb, or scan without --check-font-scale.',
+  );
+}
+
+/** Some apps crash or close when the text size changes; say that instead of a generic capture error. */
+async function captureAfterSwitch(session: AgentSession, appId: string, scale: number): Promise<RawCapture> {
+  try {
+    return await captureOnce(session, appId);
+  } catch (error) {
+    if (!(error instanceof PraguError)) throw error;
+    throw new PraguError(
+      EXIT.environment,
+      `${appId} left the screen when the text size changed to ${String(scale * 100)}%; it may have crashed. Your font size setting is restored.`,
+      'Try the app with large text by hand, since a crash there is a barrier too. Scan without --check-font-scale to run the other checks.',
+    );
+  }
 }
 
 /** Captures one screen through the agent: launch the app, wait for it to settle, take tree and screenshot. */
@@ -106,13 +157,13 @@ async function captureFromDevice(options: ScanOptions, log: (line: string) => vo
   log(`Capturing ${appId} on ${device.serial ?? 'device'}`);
   const session = await startAgentSession(device);
   try {
-    const frame = await session.request({ cmd: 'capture', packageName: appId, timeoutMs: 30_000 }, 45_000);
-    const tree = frame.payloads.get('tree');
-    const png = frame.payloads.get('screenshot');
-    if (tree === undefined || png === undefined) {
-      throw new PraguError(EXIT.environment, 'The agent answered without a tree or a screenshot.');
-    }
-    return { capture: parseAndroidCapture(JSON.parse(tree.toString('utf8'))), png };
+    const normal = await captureOnce(session, appId);
+    if (!options.checkFontScale) return { ...normal, largeText: null };
+    log(`Capturing again at ${String(LARGE_TEXT_SCALE * 100)}% text; your font size setting is restored afterwards`);
+    const largeText = await withFontScale(device, LARGE_TEXT_SCALE, () =>
+      captureAtScale(session, appId, LARGE_TEXT_SCALE),
+    );
+    return { ...normal, largeText };
   } finally {
     await session.close();
   }
@@ -127,9 +178,30 @@ async function captureFromFile(file: string): Promise<RawScreen> {
       'Point it at a capture JSON written by an earlier scan.',
     );
   }
+  // A scan with --check-font-scale saved the 200% capture next to the first one.
+  const largeFile = file.replace(/\.json$/, `${LARGE_TEXT_SUFFIX}.json`);
+  const largePng = largeFile.replace(/\.json$/, '.png');
+  const largeText =
+    existsSync(largeFile) && existsSync(largePng)
+      ? { capture: parseAndroidCapture(JSON.parse(await readFile(largeFile, 'utf8'))), png: await readFile(largePng) }
+      : null;
   return {
     capture: parseAndroidCapture(JSON.parse(await readFile(file, 'utf8'))),
     png: await readFile(pngFile),
+    largeText,
+  };
+}
+
+function withLargeText(screen: PamScreen, largeText: RawCapture | null): PamScreen {
+  if (largeText === null) return screen;
+  const large = normalizeAndroidCapture(largeText.capture, {
+    screenId: screen.id,
+    screenName: screen.name,
+    screenshotFile: null,
+  }).screen;
+  return {
+    ...screen,
+    largeText: { fontScale: largeText.capture.device.fontScale, windows: large.windows, nodes: large.nodes },
   };
 }
 
@@ -153,13 +225,20 @@ export async function scan(options: ScanOptions, log: (line: string) => void): P
   if (options.fromCapture === undefined) {
     await writeFile(join(captureDir, `${SCREEN_ID}.json`), `${JSON.stringify(raw.capture, null, 2)}\n`);
     await writeFile(screenshotFile, raw.png);
+    if (raw.largeText !== null) {
+      const base = join(captureDir, `${SCREEN_ID}${LARGE_TEXT_SUFFIX}`);
+      await writeFile(`${base}.json`, `${JSON.stringify(raw.largeText.capture, null, 2)}\n`);
+      await writeFile(`${base}.png`, raw.largeText.png);
+    }
   }
 
-  const { screen, device } = normalizeAndroidCapture(raw.capture, {
+  const normalized = normalizeAndroidCapture(raw.capture, {
     screenId: SCREEN_ID,
     screenName: options.screenName ?? raw.capture.windowTitle ?? 'Screen 1',
     screenshotFile: relative(options.outDir, screenshotFile).replaceAll('\\', '/'),
   });
+  const device = normalized.device;
+  const screen = withLargeText(normalized.screen, raw.largeText);
   const decoded = PNG.sync.read(raw.png);
   const issues = analyze({
     device,

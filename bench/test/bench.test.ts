@@ -6,7 +6,7 @@ import { evaluate } from '../src/evaluate.js';
 import type { BenchResult } from '../src/evaluate.js';
 import { compareWithBaseline, errorRulesBelowBar } from '../src/gate.js';
 import { f1, formatMetric, mcc, precision, recall, truncate } from '../src/metrics.js';
-import { containsResourceId } from '../src/record.js';
+import { containsResourceId, isBlank } from '../src/record.js';
 import { analyzeRecording } from '../src/recordings.js';
 import { renderMarkdown } from '../src/report.js';
 import { parseGroundTruth } from '../src/truth.js';
@@ -270,5 +270,20 @@ describe('markdown report', () => {
     );
     expect(markdown).toContain('- `state/not-exposed`: 1 barriers, 0 correct twins labelled');
     expect(renderMarkdown({ ...result, falsePositives: [], falseNegatives: [], awaiting: [] })).toContain('None.');
+  });
+});
+
+describe('isBlank', () => {
+  const png = (paint: boolean) => {
+    const raster = createRaster(40, 20, 0x000000);
+    if (paint) paintText(raster, rect(2, 2, 38, 18), 0xffffff, 0x808080);
+    const image = new PNG({ width: 40, height: 20 });
+    image.data = Buffer.from(raster.data);
+    return PNG.sync.write(image);
+  };
+
+  it('spots a screenshot the device drew nothing into', () => {
+    expect(isBlank(png(false))).toBe(true);
+    expect(isBlank(png(true))).toBe(false);
   });
 });

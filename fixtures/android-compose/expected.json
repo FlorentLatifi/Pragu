@@ -55,6 +55,21 @@
         { "rule": "contrast/text", "testID": "twin-disabled-text", "note": "inactive components have no contrast requirement (WCAG 1.4.3)" },
         { "rule": "target/size", "testID": "twin-pay-button" }
       ]
+    },
+    {
+      "id": "summary",
+      "name": "Order summary",
+      "url": "composeshop://summary",
+      "marker": "screen-summary",
+      "barriers": [
+        { "rule": "text/scaling-truncation", "testID": "seed-truncated-name", "note": "one line only: at 200% an ellipsis hides the end" },
+        { "rule": "text/scaling-truncation", "testID": "seed-clipped-box-text", "note": "fixed-height box: at 200% the text is cut at its edges. Android keeps the positions of characters a box cuts off and grows large text far less than 2x, so Pragu cannot tell this from text that fits: a known miss" }
+      ],
+      "correctTwins": [
+        { "rule": "text/scaling-truncation", "testID": "twin-wrapping-name", "note": "the same name, allowed to wrap" },
+        { "rule": "text/scaling-truncation", "testID": "twin-short-line", "note": "one line, but short enough to fit at 200%" },
+        { "rule": "text/scaling-truncation", "testID": "twin-growing-box-text", "note": "box with a minimum height that grows" }
+      ]
     }
   ]
 }

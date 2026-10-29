@@ -4,7 +4,7 @@
     "android-compose",
     "rn-shop"
   ],
-  "screens": 6,
+  "screens": 8,
   "rules": [
     {
       "rule": "name/interactive-missing",
@@ -79,6 +79,18 @@
       "mcc": 1
     },
     {
+      "rule": "text/scaling-truncation",
+      "severity": "error",
+      "tp": 2,
+      "fp": 0,
+      "fn": 2,
+      "tn": 6,
+      "precision": 1,
+      "recall": 0.5,
+      "f1": 0.6666,
+      "mcc": 0.6123
+    },
+    {
       "rule": "target/size",
       "severity": "warning",
       "tp": 3,
@@ -138,11 +150,25 @@
       "note": "as star 2"
     },
     {
+      "fixture": "android-compose",
+      "screen": "summary",
+      "rule": "text/scaling-truncation",
+      "element": "seed-clipped-box-text",
+      "note": "fixed-height box: at 200% the text is cut at its edges. Android keeps the positions of characters a box cuts off and grows large text far less than 2x, so Pragu cannot tell this from text that fits: a known miss"
+    },
+    {
       "fixture": "rn-shop",
       "screen": "form",
       "rule": "state/not-exposed",
       "element": "seed-unlabeled-checkbox",
       "note": "no role either: nothing in the tree says it is a checkbox, so a scan cannot tell it from a button. Seeing it needs a tap (crawler, M3)"
+    },
+    {
+      "fixture": "rn-shop",
+      "screen": "summary",
+      "rule": "text/scaling-truncation",
+      "element": "seed-clipped-box-text",
+      "note": "fixed-height box: at 200% the text is cut at its edges. Android keeps the positions of characters a box cuts off and grows large text far less than 2x, so Pragu cannot tell this from text that fits: a known miss"
     }
   ],
   "awaiting": [

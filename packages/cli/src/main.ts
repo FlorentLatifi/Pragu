@@ -29,6 +29,8 @@ Scan options
   --screen-name <name>   Name for the screen in the report
   --fail-on <level>      Exit 1 on issues at this severity or worse: error, warning, info, never (default: error)
   --no-launch            Scan whatever is on screen instead of launching the app
+  --check-font-scale     Also capture at 200% text to find text that is cut off; changes the
+                         device's font size for a few seconds and always restores it
   --from-capture <json>  Re-analyse a capture saved by an earlier scan, without a device
   --agent-apk <path>     Use this agent APK instead of the bundled one
 
@@ -55,6 +57,7 @@ function parseScanArgs(args: string[]) {
         'screen-name': { type: 'string' },
         'fail-on': { type: 'string', default: 'error' },
         'no-launch': { type: 'boolean', default: false },
+        'check-font-scale': { type: 'boolean', default: false },
         'from-capture': { type: 'string' },
         'agent-apk': { type: 'string' },
         help: { type: 'boolean', short: 'h', default: false },
@@ -104,6 +107,7 @@ async function runScan(args: string[], io: Io): Promise<number> {
       failOn,
       fromCapture: values['from-capture'],
       launch: !values['no-launch'],
+      checkFontScale: values['check-font-scale'],
     },
     (line) => {
       io.err(`${line}\n`);

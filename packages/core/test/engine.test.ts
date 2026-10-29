@@ -144,6 +144,7 @@ describe('summarize', () => {
         'state/not-exposed',
         'focus/unreachable',
         'contrast/text',
+        'text/scaling-truncation',
         'target/size',
       ],
     });

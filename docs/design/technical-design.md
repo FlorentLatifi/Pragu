@@ -25,7 +25,7 @@ Device / emulator                         Developer machine or CI
 3. Launch the app with `monkey -p <id> -c android.intent.category.LAUNCHER 1`.
 4. `am instrument -w -e socket pragu-<random> dev.pragu.agent/.PraguInstrumentation`, then `adb forward tcp:0 localabstract:pragu-<random>`.
 5. Connect, and retry `hello` until it answers. adb accepts the connection before the agent listens.
-6. `capture {packageName, timeoutMs}`. The agent polls until the app's topmost window is on screen and every window is the same twice, with content in the app. It returns all windows as JSON (protocol 3: trees only for the app's own windows, and each node's `labeledBy` label) and the screenshot as PNG.
+6. `capture {packageName, timeoutMs}`. The agent polls until the app's topmost window is on screen and every window is the same twice, with content in the app. It returns all windows as JSON (protocol 4: trees only for the app's own windows, each node's `labeledBy` label, and characters an ellipsis hides) and the screenshot as PNG.
 7. `shutdown`, then remove the forward.
 8. Validate the capture (`parseAndroidCapture`), normalise it to PAM, decode the PNG, run the rules, and write `pragu-result.json`, `pragu-report.html` and the raw capture.
 9. Exit 0, or 1 when issues reach `--fail-on` (default: error).
@@ -36,9 +36,9 @@ Device / emulator                         Developer machine or CI
 
 Defined in `packages/core/src/model.ts`. It is platform-neutral, so rules never see Android types.
 
-- **Node:** normalised `role` plus `platformRole`, accessible `name`, `text`, `hint`, `resourceId`, bounds in px and dp, `boundsAreTouchArea` (Compose reports touch areas, ADR-009), `interactive`, `focusable` (gets its own screen-reader focus stop), `exposedToAssistiveTech`, `visible`, `obscured`, `inWebView`, `window`, `enabled`, `checked` (null when no checked state is exposed), `stateDescription`, `textSizeDp`. Ids are tree paths whose first segment numbers the app's windows from the bottom (`0.3.1`, `1.0`).
+- **Node:** normalised `role` plus `platformRole`, accessible `name`, `text`, `hint`, `resourceId`, bounds in px and dp, `boundsAreTouchArea` (Compose reports touch areas, ADR-009), `interactive`, `focusable` (gets its own screen-reader focus stop), `exposedToAssistiveTech`, `visible`, `obscured`, `inWebView`, `window`, `enabled`, `checked` (null when no checked state is exposed), `stateDescription`, `textSizeDp`, `textEllipsized`. Ids are tree paths whose first segment numbers the app's windows from the bottom (`0.3.1`, `1.0`).
 - **Window:** kind (`app`, `keyboard`, `system`, `other-app`, `overlay`), title, bounds, and whether it is the app's topmost (`foreground`) window.
-- **Screen:** app id, name, screenshot reference, windows bottom first, nodes depth-first per app window.
+- **Screen:** app id, name, screenshot reference, `largeText` (the same screen at 200% text, with `--check-font-scale`, ADR-011), windows bottom first, nodes depth-first per app window.
 - **What rules judge** (ADR-008): visible elements of the app's topmost window, not fully covered by another window, and not web content. Contrast also skips partly covered (`obscured`) elements.
 - **Issue:** rule metadata copied in (WCAG/EN mappings, who is affected, fix guidance), evidence, confidence, fingerprint (ADR-004).
 
@@ -61,6 +61,7 @@ Defined in `packages/core/src/model.ts`. It is platform-neutral, so rules never 
 | `state/not-exposed` | Interactive checkbox, switch or radio button with no checked state and no state description | Catches a role without a state, e.g. React Native `accessibilityRole="checkbox"` without `aria-checked`, or Compose `clickable(role = Role.Checkbox)`. A home-made toggle with no role at all looks like a button in the tree; seeing it needs a tap (crawler, M3). |
 | `focus/unreachable` | Enabled interactive element hidden from accessibility (not important), with no exposed actionable ancestor | A hidden control inside a row that is itself one accessible control is a correct pattern and stays silent. Compose's `hideFromAccessibility()` reports the node as not visible to the user, like off-screen content, so it is not judged. |
 | `contrast/text` | Per visible text node, estimate text and background colours from the screenshot. 4.5:1 for normal text, 3:1 for large | Background is the dominant colour. Text is the frequent colour with the highest contrast against it, so anti-aliased edges never win. A busy background returns nothing, to avoid false alarms. Text size from `ExtraRenderingInfo` (API 30+). Compose reports none: the element's height then bounds the size, with medium confidence (ADR-009). |
+| `text/scaling-truncation` | Text with no ellipsis at the normal size that has one at 200% (`--check-font-scale`), fully on screen in both captures | Text cut off by a fixed-height box looks the same as text that fits, and since Android 14 large text grows far less than 2x, so it is a known miss (ADR-011). |
 | `target/size` | Interactive targets under 24×24 dp, unless WCAG's spacing exception applies | The exception: a 24 dp circle around the target touches no other target and no other undersized target's circle. Parent and child targets are not counted as neighbours. Silent where two Compose touch areas meet, because the real split is invisible (ADR-009). Medium confidence, and a warning rather than an error, because `hitSlop` and `TouchDelegate` are invisible to the tree (ADR-007). |
 
 ### WCAG CSS pixels in dp and pt

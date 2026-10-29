@@ -1,7 +1,7 @@
 {
-  "protocol": 3,
-  "agentVersion": "0.0.3",
-  "capturedAt": "2026-10-28T14:54:13.653326Z",
+  "protocol": 4,
+  "agentVersion": "0.0.4",
+  "capturedAt": "2026-10-29T12:05:47.505960Z",
   "packageName": "dev.pragu.fixtures.rnshop",
   "windowTitle": "rn-shop",
   "screenWidthPx": 1080,
@@ -63,6 +63,7 @@
           16908342
         ],
         "textSizePx": null,
+        "textCollapsedChars": null,
         "children": [
           {
             "className": "android.widget.LinearLayout",
@@ -98,6 +99,7 @@
               16908342
             ],
             "textSizePx": null,
+            "textCollapsedChars": null,
             "children": [
               {
                 "className": "android.widget.FrameLayout",
@@ -133,6 +135,7 @@
                   16908342
                 ],
                 "textSizePx": null,
+                "textCollapsedChars": null,
                 "children": [
                   {
                     "className": "android.widget.LinearLayout",
@@ -168,6 +171,7 @@
                       16908342
                     ],
                     "textSizePx": null,
+                    "textCollapsedChars": null,
                     "children": [
                       {
                         "className": "android.widget.FrameLayout",
@@ -203,6 +207,7 @@
                           16908342
                         ],
                         "textSizePx": null,
+                        "textCollapsedChars": null,
                         "children": [
                           {
                             "className": "android.widget.FrameLayout",
@@ -238,6 +243,7 @@
                               16908342
                             ],
                             "textSizePx": null,
+                            "textCollapsedChars": null,
                             "children": [
                               {
                                 "className": "android.view.ViewGroup",
@@ -273,6 +279,7 @@
                                   16908342
                                 ],
                                 "textSizePx": null,
+                                "textCollapsedChars": null,
                                 "children": []
                               },
                               {
@@ -312,6 +319,7 @@
                                   16908342
                                 ],
                                 "textSizePx": 74,
+                                "textCollapsedChars": 0,
                                 "children": []
                               },
                               {
@@ -351,6 +359,7 @@
                                   16908342
                                 ],
                                 "textSizePx": 37,
+                                "textCollapsedChars": 0,
                                 "children": []
                               },
                               {
@@ -391,6 +400,7 @@
                                   16908342
                                 ],
                                 "textSizePx": 42,
+                                "textCollapsedChars": null,
                                 "children": []
                               },
                               {
@@ -431,6 +441,7 @@
                                   16908342
                                 ],
                                 "textSizePx": 42,
+                                "textCollapsedChars": null,
                                 "children": []
                               },
                               {
@@ -470,6 +481,7 @@
                                   16908342
                                 ],
                                 "textSizePx": 37,
+                                "textCollapsedChars": 0,
                                 "children": []
                               },
                               {
@@ -510,6 +522,7 @@
                                   16908342
                                 ],
                                 "textSizePx": null,
+                                "textCollapsedChars": null,
                                 "children": []
                               },
                               {
@@ -549,6 +562,7 @@
                                   16908342
                                 ],
                                 "textSizePx": 37,
+                                "textCollapsedChars": 0,
                                 "children": []
                               },
                               {
@@ -589,6 +603,7 @@
                                   16908342
                                 ],
                                 "textSizePx": null,
+                                "textCollapsedChars": null,
                                 "children": []
                               },
                               {
@@ -627,6 +642,7 @@
                                   16908342
                                 ],
                                 "textSizePx": null,
+                                "textCollapsedChars": null,
                                 "children": []
                               },
                               {
@@ -666,6 +682,7 @@
                                   16908342
                                 ],
                                 "textSizePx": 42,
+                                "textCollapsedChars": 0,
                                 "children": []
                               },
                               {
@@ -705,6 +722,7 @@
                                   16908342
                                 ],
                                 "textSizePx": 42,
+                                "textCollapsedChars": 0,
                                 "children": []
                               },
                               {
@@ -743,6 +761,7 @@
                                   16908342
                                 ],
                                 "textSizePx": null,
+                                "textCollapsedChars": null,
                                 "children": []
                               },
                               {
@@ -780,6 +799,7 @@
                                   16908342
                                 ],
                                 "textSizePx": null,
+                                "textCollapsedChars": null,
                                 "children": [
                                   {
                                     "className": "android.widget.TextView",
@@ -818,6 +838,7 @@
                                       16908342
                                     ],
                                     "textSizePx": 42,
+                                    "textCollapsedChars": 0,
                                     "children": []
                                   }
                                 ]
@@ -858,6 +879,7 @@
                                   16908342
                                 ],
                                 "textSizePx": null,
+                                "textCollapsedChars": null,
                                 "children": [
                                   {
                                     "className": "android.widget.TextView",
@@ -896,6 +918,7 @@
                                       16908342
                                     ],
                                     "textSizePx": 42,
+                                    "textCollapsedChars": 0,
                                     "children": []
                                   }
                                 ]

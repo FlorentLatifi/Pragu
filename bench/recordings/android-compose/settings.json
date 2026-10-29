@@ -1,7 +1,7 @@
 {
-  "protocol": 3,
-  "agentVersion": "0.0.3",
-  "capturedAt": "2026-10-28T14:53:32.763660Z",
+  "protocol": 4,
+  "agentVersion": "0.0.4",
+  "capturedAt": "2026-10-29T12:05:05.798337Z",
   "packageName": "dev.pragu.fixtures.compose",
   "windowTitle": "Compose shop",
   "screenWidthPx": 1080,
@@ -63,6 +63,7 @@
           16908342
         ],
         "textSizePx": null,
+        "textCollapsedChars": null,
         "children": [
           {
             "className": "android.widget.LinearLayout",
@@ -98,6 +99,7 @@
               16908342
             ],
             "textSizePx": null,
+            "textCollapsedChars": null,
             "children": [
               {
                 "className": "android.widget.FrameLayout",
@@ -133,6 +135,7 @@
                   16908342
                 ],
                 "textSizePx": null,
+                "textCollapsedChars": null,
                 "children": [
                   {
                     "className": "androidx.compose.ui.platform.ComposeView",
@@ -168,6 +171,7 @@
                       16908342
                     ],
                     "textSizePx": null,
+                    "textCollapsedChars": null,
                     "children": [
                       {
                         "className": "android.view.View",
@@ -200,6 +204,7 @@
                           64
                         ],
                         "textSizePx": null,
+                        "textCollapsedChars": null,
                         "children": [
                           {
                             "className": "android.view.View",
@@ -232,6 +237,7 @@
                               64
                             ],
                             "textSizePx": null,
+                            "textCollapsedChars": null,
                             "children": [
                               {
                                 "className": "android.view.View",
@@ -266,6 +272,7 @@
                                   16
                                 ],
                                 "textSizePx": null,
+                                "textCollapsedChars": null,
                                 "children": [
                                   {
                                     "className": "android.view.View",
@@ -301,6 +308,7 @@
                                       131072
                                     ],
                                     "textSizePx": null,
+                                    "textCollapsedChars": null,
                                     "children": []
                                   },
                                   {
@@ -334,6 +342,7 @@
                                       64
                                     ],
                                     "textSizePx": null,
+                                    "textCollapsedChars": null,
                                     "children": []
                                   }
                                 ]
@@ -372,6 +381,7 @@
                                   131072
                                 ],
                                 "textSizePx": null,
+                                "textCollapsedChars": 0,
                                 "children": []
                               },
                               {
@@ -407,6 +417,7 @@
                                   16
                                 ],
                                 "textSizePx": null,
+                                "textCollapsedChars": null,
                                 "children": []
                               },
                               {
@@ -442,6 +453,7 @@
                                   16
                                 ],
                                 "textSizePx": null,
+                                "textCollapsedChars": null,
                                 "children": [
                                   {
                                     "className": "android.widget.TextView",
@@ -477,6 +489,7 @@
                                       131072
                                     ],
                                     "textSizePx": null,
+                                    "textCollapsedChars": 0,
                                     "children": []
                                   },
                                   {
@@ -510,6 +523,7 @@
                                       64
                                     ],
                                     "textSizePx": null,
+                                    "textCollapsedChars": null,
                                     "children": [
                                       {
                                         "className": "android.view.View",
@@ -542,6 +556,7 @@
                                           64
                                         ],
                                         "textSizePx": null,
+                                        "textCollapsedChars": null,
                                         "children": []
                                       }
                                     ]
@@ -577,6 +592,7 @@
                                       64
                                     ],
                                     "textSizePx": null,
+                                    "textCollapsedChars": null,
                                     "children": []
                                   }
                                 ]
@@ -615,6 +631,7 @@
                                   131072
                                 ],
                                 "textSizePx": null,
+                                "textCollapsedChars": 0,
                                 "children": []
                               },
                               {
@@ -650,6 +667,7 @@
                                   16
                                 ],
                                 "textSizePx": null,
+                                "textCollapsedChars": null,
                                 "children": [
                                   {
                                     "className": "android.view.View",
@@ -682,6 +700,7 @@
                                       64
                                     ],
                                     "textSizePx": null,
+                                    "textCollapsedChars": null,
                                     "children": []
                                   },
                                   {
@@ -715,6 +734,7 @@
                                       64
                                     ],
                                     "textSizePx": null,
+                                    "textCollapsedChars": null,
                                     "children": []
                                   }
                                 ]
@@ -753,6 +773,7 @@
                                   131072
                                 ],
                                 "textSizePx": null,
+                                "textCollapsedChars": 0,
                                 "children": []
                               },
                               {
@@ -789,6 +810,7 @@
                                   131072
                                 ],
                                 "textSizePx": null,
+                                "textCollapsedChars": 0,
                                 "children": []
                               },
                               {
@@ -825,6 +847,7 @@
                                   131072
                                 ],
                                 "textSizePx": null,
+                                "textCollapsedChars": 0,
                                 "children": []
                               },
                               {
@@ -861,6 +884,7 @@
                                   131072
                                 ],
                                 "textSizePx": null,
+                                "textCollapsedChars": 0,
                                 "children": []
                               },
                               {
@@ -899,6 +923,7 @@
                                   131072
                                 ],
                                 "textSizePx": null,
+                                "textCollapsedChars": null,
                                 "children": []
                               },
                               {
@@ -937,6 +962,7 @@
                                   131072
                                 ],
                                 "textSizePx": null,
+                                "textCollapsedChars": null,
                                 "children": []
                               },
                               {
@@ -973,6 +999,7 @@
                                   131072
                                 ],
                                 "textSizePx": null,
+                                "textCollapsedChars": 0,
                                 "children": []
                               },
                               {
@@ -1011,6 +1038,7 @@
                                   131072
                                 ],
                                 "textSizePx": null,
+                                "textCollapsedChars": null,
                                 "children": []
                               },
                               {
@@ -1049,6 +1077,7 @@
                                   131072
                                 ],
                                 "textSizePx": null,
+                                "textCollapsedChars": null,
                                 "children": []
                               },
                               {
@@ -1087,6 +1116,7 @@
                                   131072
                                 ],
                                 "textSizePx": null,
+                                "textCollapsedChars": null,
                                 "children": []
                               },
                               {
@@ -1125,6 +1155,7 @@
                                   131072
                                 ],
                                 "textSizePx": null,
+                                "textCollapsedChars": null,
                                 "children": []
                               },
                               {
@@ -1163,6 +1194,7 @@
                                   131072
                                 ],
                                 "textSizePx": null,
+                                "textCollapsedChars": null,
                                 "children": []
                               }
                             ]

@@ -15,7 +15,7 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 
 // Pragu fixture "android-compose": Jetpack Compose screens that seed accessibility
 // barriers next to correct twins. Pragu Bench opens them by deep link
-// (composeshop://settings, composeshop://checkout) and checks the scan against
+// (composeshop://settings, composeshop://checkout, composeshop://summary) and checks the scan against
 // expected.json, keyed by testTag.
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalComposeUiApi::class)
@@ -28,6 +28,7 @@ class MainActivity : ComponentActivity() {
                 Surface(Modifier.fillMaxSize().semantics { testTagsAsResourceId = true }, color = Color.White) {
                     when (screen) {
                         "checkout" -> CheckoutScreen()
+                        "summary" -> SummaryScreen()
                         else -> SettingsScreen()
                     }
                 }

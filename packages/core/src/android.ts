@@ -5,8 +5,8 @@
 import { containsRect, rectsOverlap, scaleRect } from './geometry.js';
 import type { DeviceInfo, PamNode, PamScreen, PamWindow, Rect, Role } from './model.js';
 
-/** The agent protocol version this adapter understands. 2 added windows; 3 added labeledBy. */
-export const ANDROID_AGENT_PROTOCOL = 3;
+/** The agent protocol version this adapter understands. 2 added windows; 3 labeledBy; 4 text layout. */
+export const ANDROID_AGENT_PROTOCOL = 4;
 
 /** AccessibilityWindowInfo types, as the agent names them. */
 export type AndroidWindowType =
@@ -56,6 +56,8 @@ export interface AndroidRawNode {
   /** AccessibilityAction ids, e.g. 16 for ACTION_CLICK. */
   actions: number[];
   textSizePx: number | null;
+  /** Visible characters laid out with no width or no position, as an ellipsis leaves them. */
+  textCollapsedChars: number | null;
   children: AndroidRawNode[];
 }
 
@@ -260,6 +262,14 @@ function rectFrom([left, top, right, bottom]: [number, number, number, number]):
   return { left, top, right, bottom };
 }
 
+/**
+ * An ellipsis leaves the characters it hides with no width. Characters a container cuts
+ * off keep positions clipped to the visible area, so that kind of clipping is invisible here.
+ */
+function isEllipsized(raw: AndroidRawNode): boolean | null {
+  return raw.textCollapsedChars === null ? null : raw.textCollapsedChars > 0;
+}
+
 /** Web content is the job of web tools such as axe-core; Pragu checks native UI only. */
 function isWebView(raw: AndroidRawNode): boolean {
   const className = raw.className ?? '';
@@ -337,6 +347,7 @@ export function normalizeAndroidCapture(
       checked: raw.checkable ? raw.checked : null,
       stateDescription: nonBlank(raw.stateDescription),
       textSizeDp: raw.textSizePx === null ? null : round1(raw.textSizePx / density),
+      textEllipsized: isEllipsized(raw),
     };
     nodes.push(node);
     raw.children.forEach((child, index) => {
@@ -368,6 +379,7 @@ export function normalizeAndroidCapture(
         : { file: options.screenshotFile, widthPx: capture.screenWidthPx, heightPx: capture.screenHeightPx },
     windows,
     nodes,
+    largeText: null,
   };
   const device: DeviceInfo = {
     platform: 'android',
@@ -483,6 +495,9 @@ function validateNode(value: unknown, path: string): void {
   }
   if (node.textSizePx !== null && typeof node.textSizePx !== 'number') {
     throw new Error(`${path}.textSizePx must be a number or null.`);
+  }
+  if (node.textCollapsedChars !== null && typeof node.textCollapsedChars !== 'number') {
+    throw new Error(`${path}.textCollapsedChars must be a number or null.`);
   }
   if (!Array.isArray(node.children)) throw new Error(`${path}.children must be an array.`);
   node.children.forEach((child, index) => {

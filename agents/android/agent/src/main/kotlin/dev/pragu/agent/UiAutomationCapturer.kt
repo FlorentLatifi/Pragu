@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Rect
+import android.graphics.RectF
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
@@ -21,6 +22,8 @@ private const val ROLE_DESCRIPTION_KEY = "AccessibilityNodeInfo.roleDescription"
 private const val SETTLE_POLL_MS = 400L
 private const val IDLE_QUIET_MS = 300L
 private const val IDLE_TIMEOUT_MS = 3_000L
+// Labels and paragraphs are far shorter; a long article only needs its start checked.
+private const val MAX_CHARACTERS_CHECKED = 2_000
 
 /** Reads the foreground app's accessibility tree and a screenshot through UiAutomation. */
 class UiAutomationCapturer(private val ui: UiAutomation, private val context: Context) : ScreenCapturer {
@@ -165,6 +168,7 @@ class UiAutomationCapturer(private val ui: UiAutomation, private val context: Co
             screenReaderFocusable = Build.VERSION.SDK_INT >= 28 && node.isScreenReaderFocusable,
             actions = node.actionList.map { it.id },
             textSizePx = textSizePx(node),
+            textCollapsedChars = collapsedCharacters(node),
             children = children,
         )
     }
@@ -178,6 +182,36 @@ class UiAutomationCapturer(private val ui: UiAutomation, private val context: Co
         val label = node.labeledBy ?: return null
         return (label.text ?: label.contentDescription)?.toString()
     }
+
+    /**
+     * Counts visible characters that Android lays out with no width or no position: an
+     * ellipsis leaves the characters it hides that way. Null when the app does not report
+     * character positions. Characters a container cuts off keep positions clipped to the
+     * visible area, so they cannot be told apart this way.
+     */
+    private fun collapsedCharacters(node: AccessibilityNodeInfo): Int? {
+        val text = node.text
+        val key = AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTER_LOCATION_KEY
+        if (text.isNullOrEmpty() || key !in node.availableExtraData) return null
+        val length = minOf(text.length, MAX_CHARACTERS_CHECKED)
+        val args = Bundle().apply {
+            putInt(AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTER_LOCATION_ARG_START_INDEX, 0)
+            putInt(AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTER_LOCATION_ARG_LENGTH, length)
+        }
+        if (!node.refreshWithExtraData(key, args)) return null
+        val boxes = characterBoxes(node, key) ?: return null
+        return (0 until length).count { index ->
+            val visible = !text[index].isWhitespace()
+            visible && hasNoArea(boxes.getOrNull(index) as? RectF)
+        }
+    }
+
+    private fun hasNoArea(box: RectF?): Boolean = box == null || box.width() < 0.5f || box.height() < 0.5f
+
+    // The typed getParcelableArray arrived in API 33; the untyped one still works below it.
+    @Suppress("DEPRECATION")
+    private fun characterBoxes(node: AccessibilityNodeInfo, key: String): Array<out android.os.Parcelable?>? =
+        node.extras.getParcelableArray(key)
 
     /** Rendered text size (API 30+), which decides between WCAG's normal and large text thresholds. */
     private fun textSizePx(node: AccessibilityNodeInfo): Float? {

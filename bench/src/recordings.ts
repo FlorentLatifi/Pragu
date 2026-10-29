@@ -12,9 +12,16 @@ import type { GroundTruth, TruthScreen } from './truth.js';
 // re-measure every rule on every PR without an emulator. They are refreshed with
 // `pnpm bench:record` whenever a fixture changes.
 
-export function recordingFiles(root: string, fixture: string, screenId: string): { json: string; png: string } {
+export interface RecordingFiles {
+  json: string;
+  png: string;
+  /** The same screen at 200% text (pragu scan --check-font-scale). */
+  largeTextJson: string;
+}
+
+export function recordingFiles(root: string, fixture: string, screenId: string): RecordingFiles {
   const base = join(root, 'bench', 'recordings', fixture, screenId);
-  return { json: `${base}.json`, png: `${base}.png` };
+  return { json: `${base}.json`, png: `${base}.png`, largeTextJson: `${base}.large-text.json` };
 }
 
 /** Every fixture that has ground truth (fixtures/<name>/expected.json), in name order. */
@@ -38,13 +45,24 @@ export async function loadFixtures(root: string): Promise<GroundTruth[]> {
 }
 
 /** Runs the same pipeline as `pragu scan` on one recorded screen. */
-export function analyzeRecording(captureJson: unknown, png: Buffer, screen: TruthScreen): Issue[] {
+export function analyzeRecording(
+  captureJson: unknown,
+  png: Buffer,
+  screen: TruthScreen,
+  largeTextJson: unknown = null,
+): Issue[] {
   const capture = parseAndroidCapture(captureJson);
-  const normalized = normalizeAndroidCapture(capture, {
-    screenId: screen.id,
-    screenName: screen.name,
-    screenshotFile: null,
-  });
+  const options = { screenId: screen.id, screenName: screen.name, screenshotFile: null };
+  const normalized = normalizeAndroidCapture(capture, options);
+  if (largeTextJson !== null) {
+    const largeCapture = parseAndroidCapture(largeTextJson);
+    const large = normalizeAndroidCapture(largeCapture, options).screen;
+    normalized.screen.largeText = {
+      fontScale: largeCapture.device.fontScale,
+      windows: large.windows,
+      nodes: large.nodes,
+    };
+  }
   if (!normalized.screen.nodes.some((node) => node.resourceId === screen.marker)) {
     throw new Error(
       `The recording for "${screen.id}" does not show that screen (marker "${screen.marker}" is missing).`,
@@ -68,10 +86,14 @@ export async function loadOutcomes(root: string, truths: readonly GroundTruth[])
           `No recording for ${truth.fixture} › ${screen.id}. Record it on an emulator with "pnpm bench:record".`,
         );
       }
+      const largeText: unknown = existsSync(files.largeTextJson)
+        ? JSON.parse(await readFile(files.largeTextJson, 'utf8'))
+        : null;
       const issues = analyzeRecording(
         JSON.parse(await readFile(files.json, 'utf8')),
         await readFile(files.png),
         screen,
+        largeText,
       );
       outcomes.push({ fixture: truth.fixture, screen, issues });
     }

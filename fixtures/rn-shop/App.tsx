@@ -4,13 +4,14 @@ import { Linking } from 'react-native';
 import { CartScreen } from './src/screens/CartScreen';
 import { FormScreen } from './src/screens/FormScreen';
 import { ProductScreen } from './src/screens/ProductScreen';
+import { SummaryScreen } from './src/screens/SummaryScreen';
 
 // Pragu fixture "rn-shop". Each screen seeds accessibility barriers next to correct
 // twins. Pragu Bench opens a screen by deep link (rnshop://cart, rnshop://cart?dialog=remove,
-// rnshop://product, rnshop://form) and checks the scan against expected.json, keyed by testID.
+// rnshop://product, rnshop://form, rnshop://summary) and checks the scan against expected.json, keyed by testID.
 
 interface Route {
-  screen: 'cart' | 'product' | 'form';
+  screen: 'cart' | 'product' | 'form' | 'summary';
   dialog: boolean;
 }
 
@@ -18,7 +19,7 @@ function routeFromUrl(url: string | null | undefined): Route {
   const path = url?.replace(/^rnshop:\/\//, '') ?? '';
   const name = path.split(/[/?#]/)[0];
   return {
-    screen: name === 'product' || name === 'form' ? name : 'cart',
+    screen: name === 'product' || name === 'form' || name === 'summary' ? name : 'cart',
     dialog: /[?&]dialog=remove(&|$)/.test(path),
   };
 }
@@ -29,6 +30,8 @@ function Screen({ route }: { route: Route }) {
       return <ProductScreen />;
     case 'form':
       return <FormScreen />;
+    case 'summary':
+      return <SummaryScreen />;
     default:
       return <CartScreen confirmRemove={route.dialog} />;
   }

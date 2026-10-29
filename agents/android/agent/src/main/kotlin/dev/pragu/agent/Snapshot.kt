@@ -36,6 +36,8 @@ data class NodeSnapshot(
     val screenReaderFocusable: Boolean,
     val actions: List<Int>,
     val textSizePx: Float?,
+    /** Visible characters laid out with no width or no position, as an ellipsis leaves them; null when the app does not say. */
+    val textCollapsedChars: Int?,
     val children: List<NodeSnapshot>,
 ) {
     fun toJson(): JSONObject {
@@ -63,6 +65,7 @@ data class NodeSnapshot(
         json.put("screenReaderFocusable", screenReaderFocusable)
         json.put("actions", JSONArray(actions))
         json.putNullable("textSizePx", textSizePx?.takeIf { it.isFinite() }?.toDouble())
+        json.putNullable("textCollapsedChars", textCollapsedChars)
         val childArray = JSONArray()
         children.forEach { childArray.put(it.toJson()) }
         json.put("children", childArray)

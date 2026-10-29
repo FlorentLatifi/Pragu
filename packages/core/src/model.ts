@@ -5,9 +5,10 @@
 /**
  * Version of the JSON result contract written to pragu-result.json.
  * 0.2.0 added windows; 0.3.0 added `PamNode.boundsAreTouchArea`; 0.4.0 added
- * `PamNode.checked` and `stateDescription`; 0.5.0 added `PamNode.focusable`.
+ * `PamNode.checked` and `stateDescription`; 0.5.0 added `PamNode.focusable`; 0.6.0 added
+ * `PamNode.textEllipsized` and `PamScreen.largeText`.
  */
-export const RESULT_SCHEMA_VERSION = '0.5.0';
+export const RESULT_SCHEMA_VERSION = '0.6.0';
 
 export type Platform = 'android' | 'ios';
 export type Severity = 'error' | 'warning' | 'info';
@@ -80,6 +81,8 @@ export interface PamNode {
   stateDescription: string | null;
   /** Rendered text size, when the platform reports it. */
   textSizeDp: number | null;
+  /** An ellipsis hides some of the text; null when the platform does not say. */
+  textEllipsized: boolean | null;
 }
 
 export interface Screenshot {
@@ -108,6 +111,15 @@ export interface PamScreen {
   /** Bottom first. */
   windows: PamWindow[];
   /** Depth-first per app window, bottom window first. */
+  nodes: PamNode[];
+  /** The same screen captured again with text at 200% (WCAG 1.4.4), when the scan asked for it. */
+  largeText: LargeTextCapture | null;
+}
+
+/** A second capture of a screen at a larger font scale; rules compare it with the first. */
+export interface LargeTextCapture {
+  fontScale: number;
+  windows: PamWindow[];
   nodes: PamNode[];
 }
 
