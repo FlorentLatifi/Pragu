@@ -31,7 +31,7 @@ JSON:   reports/rn-shop/pragu-result.json
 
 ## Run it from source
 
-You need Node 22.13+, pnpm 12, JDK 17, the Android SDK (`ANDROID_HOME`) and an emulator or a phone with USB debugging.
+You need Node 22.18+, pnpm 12, JDK 17, the Android SDK (`ANDROID_HOME`) and an emulator or a phone with USB debugging.
 
 ```bash
 pnpm install

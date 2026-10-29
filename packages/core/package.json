@@ -8,15 +8,17 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    }
+    },
+    "./schema/pragu-result.schema.json": "./schema/pragu-result.schema.json"
   },
   "files": [
-    "dist"
+    "dist",
+    "schema"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json"
   },
   "engines": {
-    "node": ">=22.13"
+    "node": ">=22.18"
   }
 }

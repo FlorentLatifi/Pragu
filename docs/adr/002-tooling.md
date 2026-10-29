@@ -22,3 +22,7 @@
 - In cmdline-tools 23, Google's new Android CLI collects usage metrics by default. Pragu's scripts and docs always pass `--no-metrics`.
 - React Native builds need JDK 17 (its docs warn about newer JDKs). The agent builds with JDK 17 or newer.
 - CI pins every GitHub Action to a full commit SHA.
+
+## Amendment (2026-10-29)
+
+Node 22.18 or newer: it strips TypeScript types by default, so `pragu.config.ts` loads without a loader dependency. Test-only dev dependencies: `ajv` (validates real results against the JSON Schema) and `fast-check` (property tests for issue fingerprints). Approved by Florent.

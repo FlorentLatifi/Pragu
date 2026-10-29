@@ -5,7 +5,7 @@ Open-source tool that finds accessibility barriers in mobile apps on every pull 
 ## Commands
 
 ```bash
-pnpm install            # Node >= 22.13, pnpm 12 (pinned in package.json)
+pnpm install            # Node >= 22.18, pnpm 12 (pinned in package.json)
 pnpm lint               # ESLint (strict, type-aware) + Prettier check
 pnpm typecheck          # tsc over every package and test, from source
 pnpm test               # Vitest with coverage; packages/core must stay >= 90%

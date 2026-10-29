@@ -40,6 +40,7 @@ Defined in `packages/core/src/model.ts`. It is platform-neutral, so rules never 
 - **Window:** kind (`app`, `keyboard`, `system`, `other-app`, `overlay`), title, bounds, and whether it is the app's topmost (`foreground`) window.
 - **Screen:** app id, name, screenshot reference, `largeText` (the same screen at 200% text, with `--check-font-scale`, ADR-011), windows bottom first, nodes depth-first per app window.
 - **What rules judge** (ADR-008): visible elements of the app's topmost window, not fully covered by another window, and not web content. Contrast also skips partly covered (`obscured`) elements.
+- **Result file:** `pragu-result.json` follows `packages/core/schema/pragu-result.schema.json` (JSON Schema 2020-12, strict). A test validates real bench results against it; the versioning policy is in `packages/core/schema/README.md`.
 - **Issue:** rule metadata copied in (WCAG/EN mappings, who is affected, fix guidance), evidence, confidence, fingerprint (ADR-004).
 
 ## Android specifics, in `android.ts`

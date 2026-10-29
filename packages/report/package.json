@@ -20,6 +20,6 @@
     "@pragu/core": "workspace:*"
   },
   "engines": {
-    "node": ">=22.13"
+    "node": ">=22.18"
   }
 }

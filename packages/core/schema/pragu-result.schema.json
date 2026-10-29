@@ -1,0 +1,262 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:pragu:result:0.6.0",
+  "title": "Pragu scan result",
+  "description": "pragu-result.json: what one scan found. The stable machine contract; see packages/core/schema/README.md for the versioning policy.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "tool", "startedAt", "device", "app", "screens", "issues", "summary"],
+  "properties": {
+    "schemaVersion": { "const": "0.6.0" },
+    "tool": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "version"],
+      "properties": { "name": { "const": "pragu" }, "version": { "type": "string" } }
+    },
+    "startedAt": { "type": "string", "description": "ISO 8601 time the scan started." },
+    "device": { "$ref": "#/$defs/device" },
+    "app": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id"],
+      "properties": { "id": { "type": "string", "description": "Android applicationId." } }
+    },
+    "screens": { "type": "array", "items": { "$ref": "#/$defs/screen" } },
+    "issues": { "type": "array", "items": { "$ref": "#/$defs/issue" } },
+    "summary": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["errors", "warnings", "infos", "rulesRun"],
+      "properties": {
+        "errors": { "type": "integer", "minimum": 0 },
+        "warnings": { "type": "integer", "minimum": 0 },
+        "infos": { "type": "integer", "minimum": 0 },
+        "rulesRun": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  "$defs": {
+    "rect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["left", "top", "right", "bottom"],
+      "properties": {
+        "left": { "type": "number" },
+        "top": { "type": "number" },
+        "right": { "type": "number" },
+        "bottom": { "type": "number" }
+      }
+    },
+    "nullableString": { "type": ["string", "null"] },
+    "device": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "platform",
+        "osVersion",
+        "apiLevel",
+        "manufacturer",
+        "model",
+        "densityDpi",
+        "fontScale",
+        "locale",
+        "nightMode",
+        "screenWidthPx",
+        "screenHeightPx"
+      ],
+      "properties": {
+        "platform": { "enum": ["android", "ios"] },
+        "osVersion": { "type": "string" },
+        "apiLevel": { "type": "integer" },
+        "manufacturer": { "type": "string" },
+        "model": { "type": "string" },
+        "densityDpi": { "type": "number" },
+        "fontScale": { "type": "number" },
+        "locale": { "type": "string" },
+        "nightMode": { "type": "boolean" },
+        "screenWidthPx": { "type": "number" },
+        "screenHeightPx": { "type": "number" }
+      }
+    },
+    "window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "title", "boundsPx", "foreground"],
+      "properties": {
+        "kind": { "enum": ["app", "keyboard", "system", "other-app", "overlay"] },
+        "title": { "$ref": "#/$defs/nullableString" },
+        "boundsPx": { "$ref": "#/$defs/rect" },
+        "foreground": { "type": "boolean" }
+      }
+    },
+    "role": {
+      "enum": [
+        "button",
+        "link",
+        "image",
+        "text",
+        "heading",
+        "textfield",
+        "switch",
+        "checkbox",
+        "radio",
+        "tab",
+        "slider",
+        "progressbar",
+        "list",
+        "container"
+      ]
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "parentId",
+        "childIds",
+        "role",
+        "platformRole",
+        "name",
+        "text",
+        "hint",
+        "resourceId",
+        "boundsPx",
+        "boundsDp",
+        "boundsAreTouchArea",
+        "interactive",
+        "focusable",
+        "exposedToAssistiveTech",
+        "visible",
+        "obscured",
+        "inWebView",
+        "window",
+        "enabled",
+        "checked",
+        "stateDescription",
+        "textSizeDp",
+        "textEllipsized"
+      ],
+      "properties": {
+        "id": { "type": "string" },
+        "parentId": { "$ref": "#/$defs/nullableString" },
+        "childIds": { "type": "array", "items": { "type": "string" } },
+        "role": { "$ref": "#/$defs/role" },
+        "platformRole": { "type": "string" },
+        "name": { "$ref": "#/$defs/nullableString" },
+        "text": { "$ref": "#/$defs/nullableString" },
+        "hint": { "$ref": "#/$defs/nullableString" },
+        "resourceId": { "$ref": "#/$defs/nullableString" },
+        "boundsPx": { "$ref": "#/$defs/rect" },
+        "boundsDp": { "$ref": "#/$defs/rect" },
+        "boundsAreTouchArea": { "type": "boolean" },
+        "interactive": { "type": "boolean" },
+        "focusable": { "type": "boolean" },
+        "exposedToAssistiveTech": { "type": "boolean" },
+        "visible": { "type": "boolean" },
+        "obscured": { "type": "boolean" },
+        "inWebView": { "type": "boolean" },
+        "window": { "type": "integer", "minimum": 0 },
+        "enabled": { "type": "boolean" },
+        "checked": { "type": ["boolean", "null"] },
+        "stateDescription": { "$ref": "#/$defs/nullableString" },
+        "textSizeDp": { "type": ["number", "null"] },
+        "textEllipsized": { "type": ["boolean", "null"] }
+      }
+    },
+    "screen": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "appId", "screenshot", "windows", "nodes", "largeText"],
+      "properties": {
+        "id": { "type": "string" },
+        "name": { "type": "string" },
+        "appId": { "type": "string" },
+        "screenshot": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["file", "widthPx", "heightPx"],
+              "properties": {
+                "file": { "type": "string" },
+                "widthPx": { "type": "number" },
+                "heightPx": { "type": "number" }
+              }
+            }
+          ]
+        },
+        "windows": { "type": "array", "items": { "$ref": "#/$defs/window" } },
+        "nodes": { "type": "array", "items": { "$ref": "#/$defs/node" } },
+        "largeText": {
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["fontScale", "windows", "nodes"],
+              "properties": {
+                "fontScale": { "type": "number" },
+                "windows": { "type": "array", "items": { "$ref": "#/$defs/window" } },
+                "nodes": { "type": "array", "items": { "$ref": "#/$defs/node" } }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "issue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "ruleId",
+        "title",
+        "severity",
+        "confidence",
+        "screenId",
+        "nodeId",
+        "resourceId",
+        "fingerprint",
+        "message",
+        "whoIsAffected",
+        "whatTheyExperience",
+        "wcag",
+        "en301549",
+        "boundsPx",
+        "evidence",
+        "fix"
+      ],
+      "properties": {
+        "ruleId": { "type": "string", "description": "e.g. name/interactive-missing" },
+        "title": { "type": "string" },
+        "severity": { "enum": ["error", "warning", "info"] },
+        "confidence": { "enum": ["high", "medium", "low"] },
+        "screenId": { "type": "string" },
+        "nodeId": { "type": "string" },
+        "resourceId": { "$ref": "#/$defs/nullableString" },
+        "fingerprint": {
+          "type": "string",
+          "description": "Stable id a baseline uses to recognise the same issue later."
+        },
+        "message": { "type": "string" },
+        "whoIsAffected": { "type": "string" },
+        "whatTheyExperience": { "type": "string" },
+        "wcag": { "type": "array", "items": { "type": "string" } },
+        "en301549": { "type": "array", "items": { "type": "string" } },
+        "boundsPx": { "$ref": "#/$defs/rect" },
+        "evidence": { "type": "object", "additionalProperties": { "type": ["string", "number"] } },
+        "fix": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["reactNative", "compose", "androidViews"],
+          "properties": {
+            "reactNative": { "type": "string" },
+            "compose": { "type": "string" },
+            "androidViews": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}
