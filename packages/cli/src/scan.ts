@@ -57,6 +57,21 @@ const DEV_AGENT_APK = fileURLToPath(
   new URL('../../../agents/android/agent/build/outputs/apk/release/agent-release.apk', import.meta.url),
 );
 
+/**
+ * Installs the agent, replacing one signed with another key: every machine signs its own
+ * build with its own debug key, so an agent left on a device by another machine cannot be
+ * updated in place. The agent keeps no data, so reinstalling loses nothing.
+ */
+export async function installAgent(device: Pick<Adb, 'run'>, agentApk: string): Promise<void> {
+  try {
+    await device.run(['install', '-r', agentApk], 120_000);
+  } catch (error) {
+    if (!(error instanceof PraguError) || !error.message.includes('INSTALL_FAILED_UPDATE_INCOMPATIBLE')) throw error;
+    await device.run(['uninstall', AGENT_PACKAGE], 60_000);
+    await device.run(['install', agentApk], 120_000);
+  }
+}
+
 /** The agent APK a scan installs: --agent-apk, then PRAGU_AGENT_APK, then the one built in this repo. */
 export function agentApkPath(explicit: string | undefined): string {
   return explicit ?? process.env.PRAGU_AGENT_APK ?? DEV_AGENT_APK;
@@ -159,7 +174,7 @@ async function captureFromDevice(options: ScanOptions, log: (line: string) => vo
       'Build it with "pnpm agent:build".',
     );
   }
-  await device.run(['install', '-r', agentApk], 120_000);
+  await installAgent(device, agentApk);
 
   if (options.launch) {
     const launched = await device.shell(['monkey', '-p', appId, '-c', 'android.intent.category.LAUNCHER', '1']);

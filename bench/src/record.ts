@@ -45,6 +45,20 @@ export function isBlank(png: Buffer): boolean {
   return true;
 }
 
+/**
+ * Fixture apps are test apps: one signed by another machine's debug key cannot be updated
+ * in place, so it is replaced.
+ */
+async function installFixture(adb: (args: string[]) => Promise<unknown>, apk: string, appId: string): Promise<void> {
+  try {
+    await adb(['install', '-r', apk]);
+  } catch (error) {
+    if (!String(error).includes('INSTALL_FAILED_UPDATE_INCOMPATIBLE')) throw error;
+    await adb(['uninstall', appId]);
+    await adb(['install', apk]);
+  }
+}
+
 /** 200%, as WCAG 1.4.4 asks. */
 const LARGE_TEXT_SCALE = '2.0';
 
@@ -175,7 +189,7 @@ export async function recordAll(root: string, options: RecordOptions, log: (line
         throw new Error(`No APK for ${truth.fixture} at ${apk}. Build it with "pnpm fixture:build ${truth.fixture}".`);
       }
       log(`Installing ${truth.fixture}`);
-      await adb(['install', '-r', apk]);
+      await installFixture(adb, apk, truth.appId);
     }
     for (const screen of truth.screens) {
       const files = recordingFiles(root, truth.fixture, screen.id);

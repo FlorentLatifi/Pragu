@@ -10,6 +10,7 @@ import { parseDevices } from '../src/adb.js';
 import { initConfig, loadConfig } from '../src/config.js';
 import { formatError, PraguError } from '../src/errors.js';
 import { main } from '../src/main.js';
+import { installAgent } from '../src/scan.js';
 import { FrameDecoder, parseHeader } from '../src/protocol.js';
 import { exitCodeFor } from '../src/scan.js';
 
@@ -349,5 +350,33 @@ describe('pragu.config.ts', () => {
     const file = await initConfig(dir);
     expect(await readFile(file, 'utf8')).toContain("import { defineConfig } from 'pragu';");
     await expect(initConfig(dir)).rejects.toThrow('This project already has pragu.config.ts.');
+  });
+});
+
+describe('installing the agent', () => {
+  const device = (failFirst: string | null) => {
+    const calls: string[] = [];
+    return {
+      calls,
+      run(args: string[]) {
+        calls.push(args.join(' '));
+        if (failFirst !== null && calls.length === 1) {
+          return Promise.reject(new PraguError(3, `adb install failed: Failure [${failFirst}: ...]`));
+        }
+        return Promise.resolve('Success');
+      },
+    };
+  };
+
+  it('replaces an agent signed by another machine, which cannot be updated in place', async () => {
+    const fake = device('INSTALL_FAILED_UPDATE_INCOMPATIBLE');
+    await installAgent(fake, 'agent.apk');
+    expect(fake.calls).toEqual(['install -r agent.apk', 'uninstall dev.pragu.agent', 'install agent.apk']);
+  });
+
+  it('leaves every other install failure alone', async () => {
+    await expect(installAgent(device('INSTALL_FAILED_INSUFFICIENT_STORAGE'), 'agent.apk')).rejects.toThrow(
+      'INSUFFICIENT_STORAGE',
+    );
   });
 });
