@@ -30,6 +30,8 @@ export interface RecordOptions {
   /** Record one fixture only, leaving the others' recordings untouched. */
   only: string | undefined;
   serial: string | undefined;
+  /** Fail when any single scan takes longer than this (the CI budget). */
+  budgetSeconds: number | undefined;
 }
 
 type Adb = (args: string[]) => Promise<unknown>;
@@ -56,7 +58,7 @@ async function recordScreen(
   truth: GroundTruth,
   screen: TruthScreen,
   keep: (captureDir: string) => Promise<void>,
-): Promise<void> {
+): Promise<number> {
   for (let attempt = 1; attempt <= ATTEMPTS; attempt++) {
     await context.adb(['shell', 'am', 'force-stop', truth.appId]);
     // adb hands the command to the device's shell, which would treat ? and & in a deep link specially.
@@ -65,6 +67,7 @@ async function recordScreen(
     const out = await mkdtemp(join(tmpdir(), 'pragu-bench-'));
     try {
       const scanArgs = ['scan', '--app', truth.appId, '--no-launch', '--screen-name', screen.name];
+      const started = performance.now();
       await run(
         process.execPath,
         [context.cli, ...scanArgs, '--out', out, '--fail-on', 'never', ...context.serialArgs],
@@ -73,6 +76,7 @@ async function recordScreen(
           windowsHide: true,
         },
       );
+      const seconds = (performance.now() - started) / 1000;
       const captureDir = join(out, 'capture');
       const capture = parseAndroidCapture(JSON.parse(await readFile(join(captureDir, 'screen-1.json'), 'utf8')));
       const showsMarker = capture.windows.some(
@@ -86,7 +90,7 @@ async function recordScreen(
       }
       if (showsMarker) {
         await keep(captureDir);
-        return;
+        return seconds;
       }
       context.log(
         `${truth.fixture} › ${screen.id}: marker "${screen.marker}" not on screen yet (attempt ${String(attempt)})`,
@@ -118,6 +122,32 @@ async function atLargeText(
   }
 }
 
+export interface ScanTiming {
+  scan: string;
+  seconds: number;
+}
+
+/** Summarises scan times and checks them against the budget, when there is one. */
+export function checkBudget(
+  timings: readonly ScanTiming[],
+  budgetSeconds: number | undefined,
+): { ok: boolean; summary: string } {
+  const total = timings.reduce((sum, timing) => sum + timing.seconds, 0);
+  const slowest = timings.reduce<ScanTiming | null>(
+    (worst, timing) => (worst === null || timing.seconds > worst.seconds ? timing : worst),
+    null,
+  );
+  const base = `${String(timings.length)} scans in ${total.toFixed(1)} s; slowest ${slowest === null ? 'none' : `${slowest.scan} (${slowest.seconds.toFixed(1)} s)`}`;
+  if (budgetSeconds === undefined) return { ok: true, summary: `${base}.` };
+  const over = timings.filter((timing) => timing.seconds > budgetSeconds);
+  return over.length === 0
+    ? { ok: true, summary: `${base}; every scan within the ${String(budgetSeconds)} s budget.` }
+    : {
+        ok: false,
+        summary: `${base}. Over the ${String(budgetSeconds)} s budget: ${over.map((timing) => `${timing.scan} (${timing.seconds.toFixed(1)} s)`).join(', ')}.`,
+      };
+}
+
 /**
  * Records every labelled screen twice: at the device's own text size, and opened fresh at
  * 200% text for the large-text comparison (pragu scan --check-font-scale does the same live).
@@ -136,6 +166,7 @@ export async function recordAll(root: string, options: RecordOptions, log: (line
   );
   if (fixtures.length === 0) throw new Error(`No fixture named "${options.only ?? ''}" has an expected.json.`);
   const context = { adb, cli, serialArgs, log };
+  const timings: ScanTiming[] = [];
 
   for (const truth of fixtures) {
     if (options.install) {
@@ -149,21 +180,26 @@ export async function recordAll(root: string, options: RecordOptions, log: (line
     for (const screen of truth.screens) {
       const files = recordingFiles(root, truth.fixture, screen.id);
       await mkdir(dirname(files.json), { recursive: true });
-      await recordScreen(context, truth, screen, async (captureDir) => {
+      const seconds = await recordScreen(context, truth, screen, async (captureDir) => {
         await copyFile(join(captureDir, 'screen-1.json'), files.json);
         await copyFile(join(captureDir, 'screen-1.png'), files.png);
       });
-      log(`Recorded ${truth.fixture} › ${screen.id}`);
+      timings.push({ scan: `${truth.fixture} › ${screen.id}`, seconds });
+      log(`Recorded ${truth.fixture} › ${screen.id} (${seconds.toFixed(1)} s)`);
     }
     await atLargeText(adb, async () => {
       for (const screen of truth.screens) {
         const files = recordingFiles(root, truth.fixture, screen.id);
         // Only the tree is kept from the 200% capture; its screenshot is never analysed.
-        await recordScreen(context, truth, screen, (captureDir) =>
+        const seconds = await recordScreen(context, truth, screen, (captureDir) =>
           copyFile(join(captureDir, 'screen-1.json'), files.largeTextJson),
         );
-        log(`Recorded ${truth.fixture} › ${screen.id} at 200% text`);
+        timings.push({ scan: `${truth.fixture} › ${screen.id} at 200%`, seconds });
+        log(`Recorded ${truth.fixture} › ${screen.id} at 200% text (${seconds.toFixed(1)} s)`);
       }
     });
   }
+  const verdict = checkBudget(timings, options.budgetSeconds);
+  log(verdict.summary);
+  if (!verdict.ok) throw new Error(verdict.summary);
 }

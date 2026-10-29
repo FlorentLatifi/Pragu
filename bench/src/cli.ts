@@ -13,7 +13,7 @@ import { renderMarkdown } from './report.js';
 
 // Usage:
 //   node bench/dist/cli.js evaluate [--update]                 score the recordings (CI runs this)
-//   node bench/dist/cli.js record [--install] [--only <fixture>] [--serial <id>]   refresh recordings on a device
+//   node bench/dist/cli.js record [--install] [--only <fixture>] [--serial <id>] [--budget-seconds <n>]   refresh recordings on a device
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
 const resultsFile = join(root, 'bench', 'results.json');
@@ -54,6 +54,14 @@ async function evaluateCommand(update: boolean): Promise<number> {
   return gate.ok ? 0 : 1;
 }
 
+function budgetFrom(value: string | undefined): number | undefined {
+  if (value === undefined) return undefined;
+  const seconds = Number(value);
+  if (!Number.isFinite(seconds) || seconds <= 0)
+    throw new Error(`--budget-seconds must be a positive number, not "${value}".`);
+  return seconds;
+}
+
 function valueAfter(args: readonly string[], flag: string): string | undefined {
   const index = args.indexOf(flag);
   return index === -1 ? undefined : args[index + 1];
@@ -68,13 +76,14 @@ try {
       install: args.includes('--install'),
       only: valueAfter(args, '--only'),
       serial: valueAfter(args, '--serial'),
+      budgetSeconds: budgetFrom(valueAfter(args, '--budget-seconds')),
     };
     await recordAll(root, options, (line) => {
       console.log(line);
     });
   } else {
     console.error(
-      `Unknown command "${command}". Use "evaluate [--update]" or "record [--install] [--only <fixture>] [--serial <id>]".`,
+      `Unknown command "${command}". Use "evaluate [--update]" or "record [--install] [--only <fixture>] [--serial <id>] [--budget-seconds <n>]".`,
     );
     process.exitCode = 2;
   }

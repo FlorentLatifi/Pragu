@@ -6,7 +6,7 @@ import { evaluate } from '../src/evaluate.js';
 import type { BenchResult } from '../src/evaluate.js';
 import { compareWithBaseline, errorRulesBelowBar } from '../src/gate.js';
 import { f1, formatMetric, mcc, precision, recall, truncate } from '../src/metrics.js';
-import { containsResourceId, isBlank } from '../src/record.js';
+import { checkBudget, containsResourceId, isBlank } from '../src/record.js';
 import { analyzeRecording } from '../src/recordings.js';
 import { renderMarkdown } from '../src/report.js';
 import { parseGroundTruth } from '../src/truth.js';
@@ -285,5 +285,28 @@ describe('isBlank', () => {
   it('spots a screenshot the device drew nothing into', () => {
     expect(isBlank(png(false))).toBe(true);
     expect(isBlank(png(true))).toBe(false);
+  });
+});
+
+describe('checkBudget', () => {
+  const timings = [
+    { scan: 'rn-shop › cart', seconds: 6.2 },
+    { scan: 'rn-shop › cart at 200%', seconds: 11.4 },
+  ];
+
+  it('summarises scan times, with or without a budget', () => {
+    expect(checkBudget(timings, undefined)).toEqual({
+      ok: true,
+      summary: '2 scans in 17.6 s; slowest rn-shop › cart at 200% (11.4 s).',
+    });
+    expect(checkBudget(timings, 30).summary).toContain('every scan within the 30 s budget');
+  });
+
+  it('fails and names every scan over the budget', () => {
+    expect(checkBudget(timings, 10)).toEqual({
+      ok: false,
+      summary:
+        '2 scans in 17.6 s; slowest rn-shop › cart at 200% (11.4 s). Over the 10 s budget: rn-shop › cart at 200% (11.4 s).',
+    });
   });
 });
