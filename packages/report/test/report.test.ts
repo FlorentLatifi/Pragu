@@ -197,6 +197,54 @@ describe('escapeHtml', () => {
   });
 });
 
+describe('screen-reader transcript', () => {
+  it('reads the screen as TalkBack would, labelled as an approximation, with finding numbers', () => {
+    const base = result([issue({ nodeId: '0.1' })]);
+    const screen = base.screens[0];
+    if (screen === undefined) throw new Error('fixture has a screen');
+    const node = (overrides: Record<string, unknown>) =>
+      ({
+        parentId: null,
+        childIds: [],
+        platformRole: 'android.widget.Button',
+        text: null,
+        hint: null,
+        resourceId: null,
+        boundsPx: { left: 0, top: 0, right: 10, bottom: 10 },
+        boundsDp: { left: 0, top: 0, right: 10, bottom: 10 },
+        boundsAreTouchArea: false,
+        interactive: true,
+        focusable: true,
+        exposedToAssistiveTech: true,
+        visible: true,
+        obscured: false,
+        inWebView: false,
+        window: 0,
+        enabled: true,
+        checked: null,
+        stateDescription: null,
+        textSizeDp: null,
+        textEllipsized: null,
+        ...overrides,
+      }) as unknown as ScanResult['screens'][number]['nodes'][number];
+    const nodes = [
+      node({ id: '0.0', role: 'heading', name: 'Your cart', interactive: false, focusable: false }),
+      node({ id: '0.1', role: 'button', name: null }),
+    ];
+    const html = renderReport({ result: { ...base, screens: [{ ...screen, nodes }] }, screenshots });
+    expect(html).toContain('<h3 id="screen-1-transcript">What a screen reader says</h3>');
+    expect(html).toContain("Pragu's approximation of TalkBack");
+    expect(html).toContain('<li><span>Your cart, Heading</span></li>');
+    expect(html).toContain('<li><span class="plate" aria-label="Issue 1">1</span><span>Unlabelled, Button</span></li>');
+  });
+
+  it('says so when nothing reaches a screen reader', () => {
+    expect(renderReport({ result: result([issue()]), screenshots })).toContain(
+      'Nothing on this screen reaches a screen reader.',
+    );
+  });
+});
+
 describe('baseline', () => {
   it('says what is new, known and fixed, and tags issues the baseline accepts', () => {
     const base = result([issue({ inBaseline: true })]);

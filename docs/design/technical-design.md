@@ -42,6 +42,7 @@ Defined in `packages/core/src/model.ts`. It is platform-neutral, so rules never 
 - **Window:** kind (`app`, `keyboard`, `system`, `other-app`, `overlay`), title, bounds, and whether it is the app's topmost (`foreground`) window.
 - **Screen:** app id, name, screenshot reference, `largeText` (the same screen at 200% text, with `--check-font-scale`, ADR-011), windows bottom first, nodes depth-first per app window.
 - **What rules judge** (ADR-008): visible elements of the app's topmost window, not fully covered by another window, and not web content. Contrast also skips partly covered (`obscured`) elements.
+- **Transcript:** `transcript(screen)` approximates what TalkBack says when someone swipes through the screen: focus stops in tree order (own focus stop, or something to say with no focusable ancestor reading it), each as name, role, state ("Gift wrap, Checkbox, not checked"; "Unlabelled" for a silent control). The report shows it per screen, labelled as an approximation, with finding numbers on the lines they affect. Not yet compared with real TalkBack.
 - **Result file:** `pragu-result.json` follows `packages/core/schema/pragu-result.schema.json` (JSON Schema 2020-12, strict). A test validates real bench results against it; the versioning policy is in `packages/core/schema/README.md`.
 - **Issue:** rule metadata copied in (WCAG/EN mappings, who is affected, fix guidance), evidence, confidence, fingerprint (ADR-004).
 
@@ -78,4 +79,4 @@ Every user-facing error is a `PraguError` with what happened and the exact fix. 
 
 ## Not done yet
 
-Scrolling and off-screen content, flows and crawling, fuzzy baseline matching, SARIF (owner task), scoring, transcript, iOS. See `docs/plans/m1.md` and `ROADMAP.md`. Windows, dialogs, the keyboard and WebViews arrived in M1 (ADR-008).
+Scrolling and off-screen content, flows and crawling, fuzzy baseline matching, SARIF (owner task), scoring, iOS. See `docs/plans/m1.md` and `ROADMAP.md`. Windows, dialogs, the keyboard and WebViews arrived in M1 (ADR-008).

@@ -1,3 +1,4 @@
+import { transcript } from '@pragu/core';
 import type { Issue, PamScreen, ScanResult, Severity } from '@pragu/core';
 import { FONT_FACES } from './fonts.js';
 import { themeCss } from './theme.js';
@@ -227,9 +228,38 @@ function renderScreen(
   ${notesList}
   <div class="screen-grid">
     ${figure}
+    <div>
     ${list}
+    ${renderTranscript(screen, numbered)}
+    </div>
   </div>
 </section>`;
+}
+
+/**
+ * The screen as a TalkBack user hears it, swiping from start to end. Lines whose element has
+ * a finding carry its number, so a barrier can be heard, not only seen.
+ */
+function renderTranscript(screen: PamScreen, numbered: readonly { issue: Issue; number: number }[]): string {
+  const headingId = `${screen.id}-transcript`;
+  const lines = transcript(screen);
+  const numbersFor = (nodeId: string) =>
+    numbered
+      .filter(({ issue }) => issue.nodeId === nodeId)
+      .map(
+        ({ number }) =>
+          `<span class="plate" aria-label="${escapeHtml(`Issue ${String(number)}`)}">${String(number)}</span>`,
+      )
+      .join('');
+  const body =
+    lines.length === 0
+      ? '<p class="empty">Nothing on this screen reaches a screen reader. That is a barrier in itself: check that the screen is not hidden from accessibility.</p>'
+      : `<ol class="transcript-lines">${lines.map((line) => `<li>${numbersFor(line.nodeId)}<span>${escapeHtml(line.text)}</span></li>`).join('')}</ol>`;
+  return `<section class="transcript" aria-labelledby="${headingId}">
+      <h3 id="${headingId}">What a screen reader says</h3>
+      <p class="transcript-note">Pragu's approximation of TalkBack swiping through this screen, in order. A real device can word or order it differently, so check with TalkBack on.</p>
+      ${body}
+    </section>`;
 }
 
 const FIX_TOOLKITS: readonly (readonly [keyof Issue['fix'], string])[] = [
@@ -382,6 +412,12 @@ figcaption { margin-top: 12px; }
 @media (min-width: 720px) { .details { grid-template-columns: 180px minmax(0, 1fr); } .details dt { margin-top: 0; } }
 .details dd { margin: 0; overflow-wrap: anywhere; }
 .details code { display: inline-block; margin: 0 8px 4px 0; }
+.transcript { margin-top: 32px; }
+.transcript-note { margin: 4px 0 12px; color: var(--muted); font-size: 14px; }
+.transcript-lines { margin: 0; padding: 0 0 0 32px; font: 14px/1.6 var(--font-mono); }
+.transcript-lines li { padding: 4px 0; border-bottom: 1px solid var(--line); }
+.transcript-lines li::marker { color: var(--muted); }
+.transcript-lines .plate { margin-right: 8px; }
 .limits { padding: 32px 0; }
 .limits p { max-width: 70ch; margin: 0; }
 .footer { padding-top: 24px; padding-bottom: 48px; border-top: 1px solid var(--line); }

@@ -17,6 +17,8 @@ export type {
   NormalizedCapture,
 } from './android.js';
 export { analyze, summarize } from './engine.js';
+export { announce, transcript } from './transcript.js';
+export type { TranscriptLine } from './transcript.js';
 export { BASELINE_VERSION, compareWithBaseline, createBaseline, parseBaseline } from './baseline.js';
 export type { Baseline, BaselineComparison, BaselineEntry } from './baseline.js';
 export { applyConfig, defineConfig, enabledRules, parseConfig } from './config.js';
