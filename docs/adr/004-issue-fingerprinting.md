@@ -1,6 +1,6 @@
 # ADR-004: Issue fingerprints for baselines
 
-- Status: Proposed. M0 ships a placeholder. M1 implements this, with property tests.
+- Status: Accepted. Layer 1 implemented in M1 (v1, below); layer 2 (fuzzy matching) is next.
 - Date: 2026-10-27
 
 ## Context
@@ -28,3 +28,10 @@ Two layers.
 ## M0 placeholder
 
 `issueFingerprint()` hashes rule, app, screen name, and either the resource id or role, name and text. It is stable for the fixture, but not under copy edits to unnamed elements.
+
+## Implemented (v1, M1)
+
+- `elementKey()` follows the order above: developer id, then role and accessible name, then a structural path of roles and same-role sibling positions that skips layout-only wrappers (containers with no name, id or action). `issueFingerprint()` hashes rule, app, screen name and that key.
+- Property tests (fast-check, `packages/core/test/fingerprint.test.ts`) prove: deterministic; unchanged when everything moves on screen, when another element's text changes, and when an element is appended to any list; unchanged when an element with an id or a name is wrapped in a layout container; changed by another rule, screen, app or element id.
+- **Not guaranteed yet:** an element with neither id nor name can change its fingerprint when a same-role sibling is inserted before it or when it is wrapped. Fuzzy matching (layer 2) is meant to absorb that.
+- Baselines (`packages/core/src/baseline.ts`, version 1) match by fingerprint and store each issue's rule, screen, resource id and message, so layer 2 can be added without regenerating them.

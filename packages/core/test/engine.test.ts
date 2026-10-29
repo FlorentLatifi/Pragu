@@ -138,6 +138,7 @@ describe('summarize', () => {
       warnings: 1,
       infos: 0,
       ignored: 0,
+      baseline: null,
       rulesRun: [
         'name/interactive-missing',
         'name/image-missing',

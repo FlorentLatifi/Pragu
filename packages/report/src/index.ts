@@ -83,6 +83,7 @@ export function renderReport({ result, screenshots }: ReportInput): string {
     <div><dt>Screens</dt><dd>${String(result.screens.length)}</dd></div>
   </dl>
   <p class="rules">Rules run: ${summary.rulesRun.map((id) => `<code>${escapeHtml(id)}</code>`).join(', ')}</p>
+  ${summary.baseline === null ? '' : `<p class="baseline">${escapeHtml(`Compared with ${summary.baseline.file}: ${String(summary.baseline.newIssues)} new · ${String(summary.baseline.known)} already in the baseline · ${String(summary.baseline.fixed)} fixed since`)}</p>`}
   ${summary.ignored === 0 ? '' : `<p class="rules">${escapeHtml(plural(summary.ignored, 'issue', 'issues'))} ignored by the project's config (pragu.config.ts), not counted above.</p>`}
 </section>
 ${screens}
@@ -284,7 +285,7 @@ function renderIssue(issue: Issue, number: number): string {
   const element = issue.resourceId === null ? '' : `Element <code>${escapeHtml(issue.resourceId)}</code> · `;
   return `<li class="issue" id="issue-${String(number)}" tabindex="-1">
   <h3><span class="plate" aria-hidden="true">${String(number)}</span>${escapeHtml(issue.title)}</h3>
-  <p class="tags"><span class="severity severity-${issue.severity}">${SEVERITY_LABEL[issue.severity]}</span>${standards.map((s) => `<span>${escapeHtml(s)}</span>`).join('')}<span>Confidence: ${issue.confidence}</span></p>
+  <p class="tags"><span class="severity severity-${issue.severity}">${SEVERITY_LABEL[issue.severity]}</span>${standards.map((s) => `<span>${escapeHtml(s)}</span>`).join('')}<span>Confidence: ${issue.confidence}</span>${issue.inBaseline ? '<span class="in-baseline">In baseline</span>' : ''}</p>
   <p class="message">${escapeHtml(issue.message)}</p>
   <dl class="details">
     <dt>Who it affects</dt><dd>${escapeHtml(issue.whoIsAffected)}</dd>
@@ -372,6 +373,8 @@ figcaption { margin-top: 12px; }
 .tags { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: center; margin: 12px 0; font: 12px/1.6 var(--font-mono); color: var(--muted); }
 .tags .severity { padding: 0 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; border: 2px solid var(--ink); color: var(--ink); }
 .tags .severity-error { background: var(--ink); color: var(--bg); }
+.tags .in-baseline { padding: 0 8px; border: 1px dashed var(--muted); }
+.baseline { margin: 12px 0 0; padding: 8px 12px; background: var(--surface); font: 700 14px/1.5 var(--font-mono); }
 .tags .severity-info { border-color: var(--muted); border-width: 1px; color: var(--muted); }
 .message { margin: 0 0 12px; font-size: 16px; }
 .details { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px 24px; margin: 0 0 12px; font-size: 14px; }

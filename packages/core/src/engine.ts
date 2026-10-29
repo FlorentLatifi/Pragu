@@ -24,6 +24,7 @@ export function analyze(input: AnalyzeInput): Issue[] {
   const issues: Issue[] = [];
   for (const screen of input.screens) {
     const screenIssues: Issue[] = [];
+    const byId = new Map(screen.nodes.map((node) => [node.id, node]));
     for (const rule of rules) {
       const findings = rule.check({ screen, device: input.device, raster: input.rasters.get(screen.id) ?? null });
       for (const finding of findings) {
@@ -35,7 +36,7 @@ export function analyze(input: AnalyzeInput): Issue[] {
           screenId: screen.id,
           nodeId: finding.node.id,
           resourceId: finding.node.resourceId,
-          fingerprint: issueFingerprint(rule.meta.id, screen.appId, screen.name, finding.node),
+          fingerprint: issueFingerprint(rule.meta.id, screen.appId, screen.name, finding.node, byId),
           message: finding.message,
           whoIsAffected: rule.meta.whoIsAffected,
           whatTheyExperience: rule.meta.whatTheyExperience,
@@ -44,6 +45,7 @@ export function analyze(input: AnalyzeInput): Issue[] {
           boundsPx: finding.node.boundsPx,
           evidence: finding.evidence,
           fix: rule.meta.fix,
+          inBaseline: false,
         });
       }
     }
@@ -65,6 +67,7 @@ export function summarize(issues: readonly Issue[], rules: readonly Rule[] = def
     warnings: issues.filter((issue) => issue.severity === 'warning').length,
     infos: issues.filter((issue) => issue.severity === 'info').length,
     ignored,
+    baseline: null,
     rulesRun: rules.map((rule) => rule.meta.id),
   };
 }

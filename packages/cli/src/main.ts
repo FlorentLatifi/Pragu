@@ -3,6 +3,7 @@ import type { Issue } from '@pragu/core';
 import { existsSync } from 'node:fs';
 import { relative } from 'node:path';
 import { Adb, findAdb } from './adb.js';
+import { runBaseline } from './baseline.js';
 import { initConfig, loadConfig } from './config.js';
 import { formatChecks, runDoctor } from './doctor.js';
 import { EXIT, PraguError, formatError } from './errors.js';
@@ -26,11 +27,14 @@ Usage
   pragu scan --app <applicationId> [options]
   pragu init               Write a starter pragu.config.ts
   pragu doctor             Check Node, adb, the device and the agent, with exact fixes
+  pragu baseline create|update --from <pragu-result.json> [--out <file>]
+                           Accept a scan's issues, so later scans fail only on new ones
   pragu --version
 
 Scan options
   --app <id>             Application id to launch and scan, e.g. com.example.shop
   --config <file>        Use this config instead of pragu.config.ts in this folder
+  --baseline <file>      Fail only on issues that are not in this baseline
   --out <dir>            Where to write the report and JSON (default: pragu-report)
   --serial <id>          Device to use when several are connected (see "adb devices")
   --install <apk>        Install this APK before scanning
@@ -50,7 +54,7 @@ Exit codes
 Automated checks find some barriers, not all. Pragu never certifies compliance.
 `;
 
-const PLANNED = new Set(['report', 'baseline', 'rules']);
+const PLANNED = new Set(['report', 'rules']);
 const FAIL_ON: readonly FailOn[] = ['error', 'warning', 'info', 'never'];
 
 function parseScanArgs(args: string[]) {
@@ -63,6 +67,7 @@ function parseScanArgs(args: string[]) {
         app: { type: 'string' },
         out: { type: 'string' },
         config: { type: 'string' },
+        baseline: { type: 'string' },
         serial: { type: 'string' },
         install: { type: 'string' },
         'screen-name': { type: 'string' },
@@ -122,6 +127,7 @@ async function runScan(args: string[], io: Io): Promise<number> {
       launch: !values['no-launch'],
       checkFontScale: values['check-font-scale'] || config.checkFontScale === true,
       config,
+      baselineFile: values.baseline ?? config.baseline,
     },
     (line) => {
       io.err(`${line}\n`);
@@ -135,6 +141,10 @@ async function runScan(args: string[], io: Io): Promise<number> {
   io.out(
     `${count(result.issues.length, 'barrier', 'barriers')}: ${count(errors, 'error', 'errors')}, ${count(warnings, 'warning', 'warnings')}, ${String(infos)} info\n`,
   );
+  if (result.summary.baseline !== null) {
+    const { newIssues, known, fixed } = result.summary.baseline;
+    io.out(`Baseline: ${String(newIssues)} new, ${String(known)} already accepted, ${String(fixed)} fixed since\n`);
+  }
   result.issues.forEach((issue, index) => {
     io.out(describeIssue(issue, index));
   });
@@ -154,6 +164,7 @@ export async function main(argv: string[], io: Io = defaultIo): Promise<number> 
       return EXIT.ok;
     }
     if (command === 'scan') return await runScan(rest, io);
+    if (command === 'baseline') return await runBaseline(rest, io);
     if (command === 'doctor') {
       const adbPath = findAdb();
       const adb = new Adb(adbPath);

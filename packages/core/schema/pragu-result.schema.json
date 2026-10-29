@@ -1,13 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:pragu:result:0.7.0",
+  "$id": "urn:pragu:result:0.8.0",
   "title": "Pragu scan result",
   "description": "pragu-result.json: what one scan found. The stable machine contract; see packages/core/schema/README.md for the versioning policy.",
   "type": "object",
   "additionalProperties": false,
   "required": ["schemaVersion", "tool", "startedAt", "device", "app", "screens", "issues", "summary"],
   "properties": {
-    "schemaVersion": { "const": "0.7.0" },
+    "schemaVersion": { "const": "0.8.0" },
     "tool": {
       "type": "object",
       "additionalProperties": false,
@@ -27,7 +27,7 @@
     "summary": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["errors", "warnings", "infos", "ignored", "rulesRun"],
+      "required": ["errors", "warnings", "infos", "ignored", "baseline", "rulesRun"],
       "properties": {
         "errors": { "type": "integer", "minimum": 0 },
         "warnings": { "type": "integer", "minimum": 0 },
@@ -36,6 +36,23 @@
           "type": "integer",
           "minimum": 0,
           "description": "Issues the config ignores, left out of the counts and the issue list."
+        },
+        "baseline": {
+          "description": "The comparison with a baseline, when the scan used one.",
+          "oneOf": [
+            { "type": "null" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["file", "newIssues", "known", "fixed"],
+              "properties": {
+                "file": { "type": "string" },
+                "newIssues": { "type": "integer", "minimum": 0 },
+                "known": { "type": "integer", "minimum": 0 },
+                "fixed": { "type": "integer", "minimum": 0 }
+              }
+            }
+          ]
         },
         "rulesRun": { "type": "array", "items": { "type": "string" } }
       }
@@ -230,7 +247,8 @@
         "en301549",
         "boundsPx",
         "evidence",
-        "fix"
+        "fix",
+        "inBaseline"
       ],
       "properties": {
         "ruleId": { "type": "string", "description": "e.g. name/interactive-missing" },
@@ -251,6 +269,10 @@
         "en301549": { "type": "array", "items": { "type": "string" } },
         "boundsPx": { "$ref": "#/$defs/rect" },
         "evidence": { "type": "object", "additionalProperties": { "type": ["string", "number"] } },
+        "inBaseline": {
+          "type": "boolean",
+          "description": "Accepted by the baseline the scan compared against; false without a baseline."
+        },
         "fix": {
           "type": "object",
           "additionalProperties": false,

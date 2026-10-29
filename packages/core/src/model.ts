@@ -6,9 +6,10 @@
  * Version of the JSON result contract written to pragu-result.json.
  * 0.2.0 added windows; 0.3.0 added `PamNode.boundsAreTouchArea`; 0.4.0 added
  * `PamNode.checked` and `stateDescription`; 0.5.0 added `PamNode.focusable`; 0.6.0 added
- * `PamNode.textEllipsized` and `PamScreen.largeText`; 0.7.0 added `ScanSummary.ignored`.
+ * `PamNode.textEllipsized` and `PamScreen.largeText`; 0.7.0 added `ScanSummary.ignored`; 0.8.0 added
+ * `Issue.inBaseline` and `ScanSummary.baseline`.
  */
-export const RESULT_SCHEMA_VERSION = '0.7.0';
+export const RESULT_SCHEMA_VERSION = '0.8.0';
 
 export type Platform = 'android' | 'ios';
 export type Severity = 'error' | 'warning' | 'info';
@@ -161,6 +162,8 @@ export interface Issue {
   boundsPx: Rect;
   evidence: Record<string, string | number>;
   fix: FixGuidance;
+  /** Accepted by the baseline the scan compared against; false without a baseline. */
+  inBaseline: boolean;
 }
 
 export interface ScanSummary {
@@ -169,6 +172,8 @@ export interface ScanSummary {
   infos: number;
   /** Issues the config ignores; they are left out of the counts and the issue list. */
   ignored: number;
+  /** The comparison with a baseline, when the scan used one. */
+  baseline: { file: string; newIssues: number; known: number; fixed: number } | null;
   rulesRun: string[];
 }
 

@@ -19,6 +19,7 @@ const issue = (overrides: Partial<Issue>): Issue => ({
   boundsPx: { left: 0, top: 0, right: 10, bottom: 10 },
   evidence: {},
   fix: { reactNative: '', compose: '', androidViews: '' },
+  inBaseline: false,
   ...overrides,
 });
 

@@ -135,7 +135,7 @@ describe('scan --from-capture (whole pipeline, no device)', () => {
 
     expect(code).toBe(1);
     const result = JSON.parse(await readFile(join(out, 'pragu-result.json'), 'utf8')) as ScanResult;
-    expect(result.schemaVersion).toBe('0.7.0');
+    expect(result.schemaVersion).toBe('0.8.0');
     expect(result.issues.map((issue) => [issue.ruleId, issue.resourceId])).toEqual([
       ['target/size', 'seed-tiny-dismiss'],
       ['name/interactive-missing', 'seed-unlabeled-remove'],
@@ -185,6 +185,44 @@ describe('scan --from-capture (whole pipeline, no device)', () => {
     expect(result.summary.rulesRun).not.toContain('target/size');
     expect(result.issues.map((found) => found.ruleId)).toEqual(['name/interactive-missing']);
     expect(result.summary.ignored).toBe(1);
+  });
+
+  it('adopts gradually: accept a scan as the baseline, then fail only on new issues', async () => {
+    const captureFile = await writeFixtureCapture();
+    const { io, sink } = capturingIo();
+    const first = join(dir, 'first');
+    expect(await main(['scan', '--from-capture', captureFile, '--out', first], sink)).toBe(1);
+
+    const baselineFile = join(dir, 'pragu-baseline.json');
+    const fromResult = ['--from', join(first, 'pragu-result.json'), '--out', baselineFile];
+    expect(await main(['baseline', 'create', ...fromResult], sink)).toBe(0);
+    expect(io.stdout).toContain('accepted issues');
+    expect(await main(['baseline', 'create', ...fromResult], sink)).toBe(2);
+    expect(io.stderr).toContain('Use "pragu baseline update" to replace it on purpose.');
+    expect(await main(['baseline', 'update', ...fromResult], sink)).toBe(0);
+
+    const second = join(dir, 'second');
+    expect(await main(['scan', '--from-capture', captureFile, '--baseline', baselineFile, '--out', second], sink)).toBe(
+      0,
+    );
+    const result = JSON.parse(await readFile(join(second, 'pragu-result.json'), 'utf8')) as ScanResult;
+    expect(result.issues.every((found) => found.inBaseline)).toBe(true);
+    expect(result.summary.baseline).toMatchObject({ newIssues: 0, fixed: 0 });
+    expect(io.stdout).toContain('Baseline: 0 new');
+  });
+
+  it('explains a missing baseline and a missing scan result', async () => {
+    const captureFile = await writeFixtureCapture();
+    const { io, sink } = capturingIo();
+    expect(
+      await main(
+        ['scan', '--from-capture', captureFile, '--baseline', join(dir, 'nope.json'), '--out', join(dir, 'x')],
+        sink,
+      ),
+    ).toBe(2);
+    expect(io.stderr).toContain('pragu baseline create --from');
+    expect(await main(['baseline', 'create', '--from', join(dir, 'none.json')], sink)).toBe(2);
+    expect(await main(['baseline', 'delete'], sink)).toBe(2);
   });
 
   it('compares with the 200% capture saved next to the first, and keeps it in the result', async () => {

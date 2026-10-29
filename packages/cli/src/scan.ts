@@ -6,6 +6,7 @@ import {
   RESULT_SCHEMA_VERSION,
   analyze,
   applyConfig,
+  compareWithBaseline,
   enabledRules,
   normalizeAndroidCapture,
   parseAndroidCapture,
@@ -17,6 +18,7 @@ import { PNG } from 'pngjs';
 import { Adb, findAdb, selectDevice } from './adb.js';
 import { AGENT_PACKAGE, startAgentSession } from './agent.js';
 import type { AgentSession } from './agent.js';
+import { readBaseline } from './baseline.js';
 import { EXIT, PraguError } from './errors.js';
 import { LARGE_TEXT_SCALE, withFontScale } from './font-scale.js';
 import { toolVersion } from './version.js';
@@ -37,6 +39,8 @@ export interface ScanOptions {
   checkFontScale: boolean;
   /** Rule settings and ignores from pragu.config.ts. */
   config: PraguConfig;
+  /** Accepted issues; only issues not in it fail the scan. */
+  baselineFile: string | undefined;
 }
 
 export interface ScanOutcome {
@@ -263,7 +267,14 @@ export async function scan(options: ScanOptions, log: (line: string) => void): P
     rasters: new Map([[SCREEN_ID, { width: decoded.width, height: decoded.height, data: decoded.data }]]),
     rules,
   });
-  const { issues, ignored } = applyConfig(found, options.config, new Map([[screen.id, screen.name]]));
+  const configured = applyConfig(found, options.config, new Map([[screen.id, screen.name]]));
+  const baseline = options.baselineFile === undefined ? null : await readBaseline(options.baselineFile);
+  const compared = baseline === null ? null : compareWithBaseline(configured.issues, [screen], baseline);
+  const issues = compared?.issues ?? configured.issues;
+  const summary = summarize(issues, rules, configured.ignored.length);
+  if (compared !== null && options.baselineFile !== undefined) {
+    summary.baseline = { file: options.baselineFile, ...compared.comparison };
+  }
   const result: ScanResult = {
     schemaVersion: RESULT_SCHEMA_VERSION,
     tool: { name: 'pragu', version: toolVersion() },
@@ -272,7 +283,7 @@ export async function scan(options: ScanOptions, log: (line: string) => void): P
     app: { id: raw.capture.packageName },
     screens: [screen],
     issues,
-    summary: summarize(issues, rules, ignored.length),
+    summary,
   };
 
   const resultFile = join(options.outDir, 'pragu-result.json');
@@ -286,5 +297,7 @@ export async function scan(options: ScanOptions, log: (line: string) => void): P
       screenshots: new Map([[SCREEN_ID, { mimeType: 'image/png', base64: raw.png.toString('base64') }]]),
     }),
   );
-  return { result, exitCode: exitCodeFor(issues, options.failOn), resultFile, reportFile };
+  // With a baseline, only new issues can fail the build.
+  const failing = issues.filter((issue) => !issue.inBaseline);
+  return { result, exitCode: exitCodeFor(failing, options.failOn), resultFile, reportFile };
 }

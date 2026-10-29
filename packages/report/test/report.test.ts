@@ -25,6 +25,7 @@ function issue(overrides: Partial<Issue> = {}): Issue {
       compose: 'Give the icon a contentDescription.',
       androidViews: 'Set android:contentDescription.',
     },
+    inBaseline: false,
     ...overrides,
   };
 }
@@ -67,6 +68,7 @@ function result(issues: Issue[]): ScanResult {
       warnings: issues.filter((i) => i.severity === 'warning').length,
       infos: issues.filter((i) => i.severity === 'info').length,
       ignored: 0,
+      baseline: null,
       rulesRun: ['name/interactive-missing', 'contrast/text', 'target/size'],
     },
   };
@@ -191,6 +193,17 @@ describe('escapeHtml', () => {
     expect(escapeHtml(`<a href="x" title='y'>&</a>`)).toBe(
       '&lt;a href=&quot;x&quot; title=&#39;y&#39;&gt;&amp;&lt;/a&gt;',
     );
+  });
+});
+
+describe('baseline', () => {
+  it('says what is new, known and fixed, and tags issues the baseline accepts', () => {
+    const base = result([issue({ inBaseline: true })]);
+    const baseline = { file: 'pragu-baseline.json', newIssues: 0, known: 1, fixed: 2 };
+    const html = renderReport({ result: { ...base, summary: { ...base.summary, baseline } }, screenshots });
+    expect(html).toContain('Compared with pragu-baseline.json: 0 new · 1 already in the baseline · 2 fixed since');
+    expect(html).toContain('<span class="in-baseline">In baseline</span>');
+    expect(renderReport({ result: result([issue()]), screenshots })).not.toContain('In baseline');
   });
 });
 
