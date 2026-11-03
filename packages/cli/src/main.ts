@@ -55,6 +55,7 @@ Flags win over pragu.config.ts, which wins over the defaults. With "screens" in 
                          device's font size for a few seconds and always restores it
   --from-capture <json>  Re-analyse a capture saved by an earlier scan, without a device
   --agent-apk <path>     Use this agent APK instead of the bundled one
+  --verbose              Print each adb command and agent request with its duration
 
 Exit codes
   0 no issues at the threshold · 1 issues found · 2 usage error · 3 environment error
@@ -84,6 +85,7 @@ function parseScanArgs(args: string[]) {
         'check-font-scale': { type: 'boolean', default: false },
         'from-capture': { type: 'string' },
         'agent-apk': { type: 'string' },
+        verbose: { type: 'boolean', default: false },
         help: { type: 'boolean', short: 'h', default: false },
       },
     }).values;
@@ -181,6 +183,7 @@ async function runScan(args: string[], io: Io): Promise<number> {
       checkFontScale: values['check-font-scale'] || config.checkFontScale === true,
       config,
       baselineFile: values.baseline ?? config.baseline,
+      verbose: values.verbose,
     },
     (line) => {
       io.err(`${line}\n`);

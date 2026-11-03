@@ -40,10 +40,12 @@ export class Adb {
   constructor(
     readonly executable: string,
     readonly serial: string | null = null,
+    /** With --verbose: each adb command and how long it took, for support and slow-device reports. */
+    private readonly trace: ((line: string) => void) | null = null,
   ) {}
 
   withSerial(serial: string): Adb {
-    return new Adb(this.executable, serial);
+    return new Adb(this.executable, serial, this.trace);
   }
 
   private args(args: string[]): string[] {
@@ -51,6 +53,7 @@ export class Adb {
   }
 
   async run(args: string[], timeoutMs = 60_000): Promise<string> {
+    const started = performance.now();
     try {
       const { stdout } = await execFileAsync(this.executable, this.args(args), {
         timeout: timeoutMs,
@@ -68,6 +71,8 @@ export class Adb {
       }
       const stderr = (error as { stderr?: string }).stderr ?? '';
       throw new PraguError(EXIT.environment, `adb ${args.join(' ')} failed: ${stderr.trim() || String(error)}`);
+    } finally {
+      this.trace?.(`adb ${args.join(' ')} (${String(Math.round(performance.now() - started))} ms)`);
     }
   }
 
@@ -76,6 +81,7 @@ export class Adb {
   }
 
   spawnShell(args: string[]): ChildProcessWithoutNullStreams {
+    this.trace?.(`adb shell ${args.join(' ')} (keeps running)`);
     return spawn(this.executable, this.args(['shell', ...args]), { windowsHide: true });
   }
 }

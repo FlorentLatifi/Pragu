@@ -6,7 +6,7 @@ import type { Issue, ScanResult } from '@pragu/core';
 import { PNG } from 'pngjs';
 import { afterEach, describe, expect, it } from 'vitest';
 import { captureOf, createRaster, fillRect, paintText, rawNode, rect } from '../../core/test/helpers.js';
-import { parseDevices } from '../src/adb.js';
+import { Adb, parseDevices } from '../src/adb.js';
 import { initConfig, loadConfig } from '../src/config.js';
 import { formatError, PraguError } from '../src/errors.js';
 import { main } from '../src/main.js';
@@ -373,6 +373,21 @@ describe('exitCodeFor', () => {
     expect(exitCodeFor([issue('error')], 'info')).toBe(1);
     expect(exitCodeFor([issue('error')], 'never')).toBe(0);
     expect(exitCodeFor([], 'info')).toBe(0);
+  });
+});
+
+describe('--verbose', () => {
+  it('traces each command with its duration, also when it fails, and keeps tracing on a chosen device', async () => {
+    const lines: string[] = [];
+    // Node stands in for adb: "-e" runs the code that follows.
+    const adb = new Adb(process.execPath, null, (line) => lines.push(line)).withSerial('emulator-5554');
+    await adb.run(['-e', 'process.exit(0)']).catch(() => undefined);
+    await expect(
+      new Adb(process.execPath, null, (line) => lines.push(line)).run(['-e', 'process.exit(3)']),
+    ).rejects.toThrow('failed');
+    expect(lines).toHaveLength(2);
+    expect(lines[0]).toMatch(/^adb -e process\.exit\(0\) \(\d+ ms\)$/);
+    expect(lines[1]).toMatch(/^adb -e process\.exit\(3\) \(\d+ ms\)$/);
   });
 });
 

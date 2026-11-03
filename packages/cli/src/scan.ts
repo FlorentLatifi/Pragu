@@ -54,6 +54,8 @@ export interface ScanOptions {
   config: PraguConfig;
   /** Accepted issues; only issues not in it fail the scan. */
   baselineFile: string | undefined;
+  /** Log every adb command and agent request with its duration. */
+  verbose: boolean;
 }
 
 export interface ScanOutcome {
@@ -133,6 +135,21 @@ async function captureOnce(session: AgentSession, appId: string): Promise<RawCap
 }
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/** With --verbose: each agent request and how long the device took to answer. */
+function traced(session: AgentSession, log: (line: string) => void): AgentSession {
+  return {
+    async request(command, timeoutMs) {
+      const started = performance.now();
+      try {
+        return await session.request(command, timeoutMs);
+      } finally {
+        log(`agent ${String(command.cmd)} (${String(Math.round(performance.now() - started))} ms)`);
+      }
+    },
+    close: () => session.close(),
+  };
+}
 
 /** Resource ids match as given (React Native testID, Compose testTag) or after "package:id/" (Views). */
 function hasResourceId(node: AndroidRawNode, id: string): boolean {
@@ -281,7 +298,7 @@ async function captureFromDevice(options: ScanOptions, log: (line: string) => vo
     );
   }
   const appId = options.appId;
-  const adb = new Adb(findAdb());
+  const adb = new Adb(findAdb(), null, options.verbose ? log : null);
   const device = adb.withSerial(await selectDevice(adb, options.serial));
 
   if (options.installApk !== undefined) {
@@ -309,7 +326,8 @@ async function captureFromDevice(options: ScanOptions, log: (line: string) => vo
   if (options.screens === undefined && options.launch) await launchApp(device, appId);
 
   log(`Capturing ${appId} on ${device.serial ?? 'device'}`);
-  const session = await startAgentSession(device);
+  const agent = await startAgentSession(device);
+  const session = options.verbose ? traced(agent, log) : agent;
   try {
     if (options.screens !== undefined) {
       return await captureScreens(device, session, appId, options.screens, options.checkFontScale, log);
