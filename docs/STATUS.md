@@ -1,8 +1,11 @@
 # Pragu status
 
-Last updated: 2026-10-29, M1 session 4. **M0 approved. M1 in progress:** Pragu Bench covers two fixtures (React Native and Jetpack Compose); agent hardening mostly done; all five planned M1 error rules have landed (`input/missing-label`, `state/not-exposed`, `name/image-missing`, `focus/unreachable`, `text/scaling-truncation`).
+Last updated: 2026-11-03, M1 session 5. **M0 approved. M1 in progress:** Pragu Bench covers two fixtures (React Native and Jetpack Compose); agent hardening mostly done; all five planned M1 error rules have landed (`input/missing-label`, `state/not-exposed`, `name/image-missing`, `focus/unreachable`, `text/scaling-truncation`).
 
 ## Decisions made
+
+The full register is [docs/decisions.md](decisions.md) (2026-11-03, 45 decisions across product, rules, evaluation, architecture, platforms, releases, GitHub, security, docs and later milestones), with ADR-012 to ADR-016. The list below is the history before it.
+
 
 - Repo `FlorentLatifi/Pragu`; free options only; Apache-2.0 with DCO; pnpm 12, TypeScript 6.0.3, Node >= 22.18 for TypeScript config loading (ADR-002, ADR-005).
 - Capture via Instrumentation + UiAutomation; the agent talks only through adb (ADR-001, ADR-006).
@@ -19,7 +22,11 @@ Last updated: 2026-10-29, M1 session 4. **M0 approved. M1 in progress:** Pragu B
 
 ## Decisions needed (Florent)
 
-None open.
+Section L of [docs/decisions.md](decisions.md) has each one with a recommendation. The most urgent:
+
+- Approve moving M1's "20 screens" to the real bench (D-16) and the [M2 plan](plans/m2.md).
+- Reserve the `@pragu` npm organisation (F-1); turn on private vulnerability reporting (F-6).
+- Merge the three green Dependabot PRs once each release is a week old (F-10).
 
 ## Done
 
@@ -79,9 +86,10 @@ All error rules meet the 0.90 bar. Known misses stay published: home-made checkb
 
 ## Next
 
-1. **Florent:** read the M1 walkthrough (`docs/plans/m1-walkthrough.md`) and answer its three interview questions. It also lists where M1 stands against its plan; the one open exit-criterion question is 16 scans rather than 20 distinct screens.
-2. Compare the transcript with real TalkBack by hand on a phone (swipe through rn-shop cart and Compose checkout, note each spoken line); on the emulator the next thing to try is injecting the swipe through UiAutomation in the agent.
-3. Owner tasks for Florent, briefs ready: SARIF writer (`docs/plans/owner-task-sarif.md`); `target/size` platform tier, `name/generic`, `contrast/non-text` (`docs/plans/owner-tasks-rules.md`).
+1. **Florent:** the decisions in section L of `docs/decisions.md`; the M1 walkthrough and its three questions (`docs/plans/m1-walkthrough.md`).
+2. **Florent:** check the transcript on a phone with TalkBack's "Display speech output" (D-14): rn-shop cart and Compose checkout, every spoken line written down.
+3. **Florent's owner tasks**, briefs ready: SARIF writer (`docs/plans/owner-task-sarif.md`); `target/size` platform tier, `name/generic`, `contrast/non-text` (`docs/plans/owner-tasks-rules.md`).
+4. **Claude, once the M2 plan is approved,** in its order, without touching the owner tasks' files: several screens per scan (work package 1), then the honest edges (work package 2), then distribution (work package 6).
 
 ## Notes and risks
 

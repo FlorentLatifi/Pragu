@@ -1,6 +1,6 @@
 # Pragu
 
-Open-source tool that finds accessibility barriers in mobile apps on every pull request. Source of truth for scope: `docs/00-founding-brief.md` (never edit it). Current state: `docs/STATUS.md`. Update STATUS.md at the end of every session.
+Open-source tool that finds accessibility barriers in mobile apps on every pull request. Source of truth for scope: `docs/00-founding-brief.md` (never edit it). Current state: `docs/STATUS.md`. Update STATUS.md at the end of every session. Decisions: `docs/decisions.md` (read it before deciding anything; do not re-decide an entry, supersede it with an ADR) and `docs/adr/`.
 
 ## Commands
 
