@@ -230,6 +230,10 @@ export function screenNotes(screen: PamScreen): string[] {
       'This screen contains web content (a WebView). Pragu checks native UI only; test web content with a web tool such as axe-core.',
     );
   }
+  const foreground = screen.windows.findIndex((window) => window.foreground);
+  if (screen.nodes.some((node) => node.scrollable && node.window === foreground)) {
+    notes.push('This screen scrolls. Only the part on screen was checked; scroll and scan again for the rest.');
+  }
   if (screen.largeText !== null) {
     notes.push(
       `Also captured at ${String(Math.round(screen.largeText.fontScale * 100))}% text size, to find text that gets cut off.`,

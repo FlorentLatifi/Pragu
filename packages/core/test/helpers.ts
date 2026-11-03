@@ -123,6 +123,7 @@ export function pamNode(overrides: Partial<PamNode> & { id: string }): PamNode {
     stateDescription: null,
     textSizeDp: null,
     textEllipsized: null,
+    scrollable: false,
     ...overrides,
   };
 }

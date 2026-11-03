@@ -99,6 +99,8 @@ export interface AndroidCapture {
 
 const ACTION_CLICK = 16;
 const ACTION_LONG_CLICK = 32;
+// Scroll forward and backward, then the direction actions (android.R.id.accessibilityActionScrollUp … Right).
+const SCROLL_ACTIONS: readonly number[] = [4096, 8192, 16908344, 16908345, 16908346, 16908347];
 
 // Most specific first: "ImageButton" must win over "Button".
 const CLASS_ROLES: readonly (readonly [string, Role])[] = [
@@ -348,6 +350,7 @@ export function normalizeAndroidCapture(
       stateDescription: nonBlank(raw.stateDescription),
       textSizeDp: raw.textSizePx === null ? null : round1(raw.textSizePx / density),
       textEllipsized: isEllipsized(raw),
+      scrollable: raw.actions.some((action) => SCROLL_ACTIONS.includes(action)),
     };
     nodes.push(node);
     raw.children.forEach((child, index) => {

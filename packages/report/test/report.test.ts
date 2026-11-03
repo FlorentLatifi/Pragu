@@ -185,6 +185,22 @@ describe('renderReport', () => {
     expect(screenNotes(screen)).toEqual([]);
   });
 
+  it('says when a screen scrolls, since only the part on screen was checked', () => {
+    const base = result([]);
+    const screen = base.screens[0];
+    if (screen === undefined) throw new Error('fixture has a screen');
+    const list = {
+      id: '0.1',
+      window: 0,
+      inWebView: false,
+      scrollable: true,
+    } as unknown as ScanResult['screens'][number]['nodes'][number];
+    expect(screenNotes({ ...screen, nodes: [list] })).toContain(
+      'This screen scrolls. Only the part on screen was checked; scroll and scan again for the rest.',
+    );
+    expect(screenNotes({ ...screen, nodes: [{ ...list, scrollable: false }] })).toEqual([]);
+  });
+
   it('says when the screen was also checked at 200% text size', () => {
     const screen = result([issue()]).screens[0];
     if (screen === undefined) throw new Error('fixture has a screen');
@@ -230,6 +246,7 @@ describe('screen-reader transcript', () => {
         stateDescription: null,
         textSizeDp: null,
         textEllipsized: null,
+        scrollable: false,
         ...overrides,
       }) as unknown as ScanResult['screens'][number]['nodes'][number];
     const nodes = [

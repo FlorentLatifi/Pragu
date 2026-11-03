@@ -7,9 +7,10 @@
  * 0.2.0 added windows; 0.3.0 added `PamNode.boundsAreTouchArea`; 0.4.0 added
  * `PamNode.checked` and `stateDescription`; 0.5.0 added `PamNode.focusable`; 0.6.0 added
  * `PamNode.textEllipsized` and `PamScreen.largeText`; 0.7.0 added `ScanSummary.ignored`; 0.8.0 added
- * `Issue.inBaseline` and `ScanSummary.baseline`; 0.9.0 added `ScanSummary.baseline.fixedIssues`.
+ * `Issue.inBaseline` and `ScanSummary.baseline`; 0.9.0 added `ScanSummary.baseline.fixedIssues`; 0.10.0 added
+ * `PamNode.scrollable`.
  */
-export const RESULT_SCHEMA_VERSION = '0.9.0';
+export const RESULT_SCHEMA_VERSION = '0.10.0';
 
 export type Platform = 'android' | 'ios';
 export type Severity = 'error' | 'warning' | 'info';
@@ -84,6 +85,8 @@ export interface PamNode {
   textSizeDp: number | null;
   /** An ellipsis hides some of the text; null when the platform does not say. */
   textEllipsized: boolean | null;
+  /** It offers to scroll, so part of its content is off screen and was not checked. */
+  scrollable: boolean;
 }
 
 export interface Screenshot {

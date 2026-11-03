@@ -1,13 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:pragu:result:0.9.0",
+  "$id": "urn:pragu:result:0.10.0",
   "title": "Pragu scan result",
   "description": "pragu-result.json: what one scan found. The stable machine contract; see packages/core/schema/README.md for the versioning policy.",
   "type": "object",
   "additionalProperties": false,
   "required": ["schemaVersion", "tool", "startedAt", "device", "app", "screens", "issues", "summary"],
   "properties": {
-    "schemaVersion": { "const": "0.9.0" },
+    "schemaVersion": { "const": "0.10.0" },
     "tool": {
       "type": "object",
       "additionalProperties": false,
@@ -173,7 +173,8 @@
         "checked",
         "stateDescription",
         "textSizeDp",
-        "textEllipsized"
+        "textEllipsized",
+        "scrollable"
       ],
       "properties": {
         "id": { "type": "string" },
@@ -199,7 +200,8 @@
         "checked": { "type": ["boolean", "null"] },
         "stateDescription": { "$ref": "#/$defs/nullableString" },
         "textSizeDp": { "type": ["number", "null"] },
-        "textEllipsized": { "type": ["boolean", "null"] }
+        "textEllipsized": { "type": ["boolean", "null"] },
+        "scrollable": { "type": "boolean" }
       }
     },
     "screen": {
