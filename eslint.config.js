@@ -3,7 +3,15 @@ import { defineConfig, globalIgnores } from 'eslint/config';
 import tseslint from 'typescript-eslint';
 
 export default defineConfig(
-  globalIgnores(['**/dist/', '**/coverage/', '**/node_modules/', 'fixtures/', 'agents/', 'reports/']),
+  globalIgnores([
+    '**/dist/',
+    '**/coverage/',
+    '**/node_modules/',
+    'fixtures/',
+    'agents/',
+    'reports/',
+    'apps/docs/.astro/',
+  ]),
   js.configs.recommended,
   tseslint.configs.strictTypeChecked,
   tseslint.configs.stylisticTypeChecked,

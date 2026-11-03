@@ -6,6 +6,12 @@
       "runtimeExecutable": "node",
       "runtimeArgs": ["scripts/serve-reports.mjs"],
       "port": 4173
+    },
+    {
+      "name": "docs",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--dir", "apps/docs", "exec", "astro", "preview", "--port", "4321"],
+      "port": 4321
     }
   ]
 }

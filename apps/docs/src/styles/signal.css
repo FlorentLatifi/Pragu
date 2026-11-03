@@ -1,0 +1,54 @@
+/* Direction "Signal" (DESIGN.md), the report's tokens (packages/report/src/theme.ts) mapped
+   onto Starlight's variables. Yellow is only ever a fill behind black text. */
+@font-face { font-family: 'Atkinson Hyperlegible Next'; font-weight: 400; font-display: swap; src: url('../../../../packages/report/fonts/atkinson-hyperlegible-next-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Atkinson Hyperlegible Next'; font-weight: 700; font-display: swap; src: url('../../../../packages/report/fonts/atkinson-hyperlegible-next-latin-700-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Atkinson Hyperlegible Mono'; font-weight: 400; font-display: swap; src: url('../../../../packages/report/fonts/atkinson-hyperlegible-mono-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Atkinson Hyperlegible Mono'; font-weight: 700; font-display: swap; src: url('../../../../packages/report/fonts/atkinson-hyperlegible-mono-latin-700-normal.woff2') format('woff2'); }
+
+:root {
+  --sl-font: 'Atkinson Hyperlegible Next', system-ui, sans-serif;
+  --sl-font-mono: 'Atkinson Hyperlegible Mono', ui-monospace, monospace;
+  /* Dark (Starlight's default theme). */
+  --sl-color-white: #f6f6f2;
+  --sl-color-gray-1: #e8e8e3;
+  --sl-color-gray-2: #b8b8b1;
+  --sl-color-gray-3: #8f8f88;
+  --sl-color-gray-4: #555550;
+  --sl-color-gray-5: #333333;
+  --sl-color-gray-6: #191919;
+  --sl-color-black: #0d0d0d;
+  --sl-color-accent-low: #3d3300;
+  --sl-color-accent: #ffd400;
+  --sl-color-accent-high: #fff1a8;
+}
+
+:root[data-theme='light'] {
+  --sl-color-white: #101010;
+  --sl-color-gray-1: #191919;
+  --sl-color-gray-2: #333333;
+  --sl-color-gray-3: #474747;
+  --sl-color-gray-4: #8f8f88;
+  --sl-color-gray-5: #d4d4ce;
+  --sl-color-gray-6: #f4f4f1;
+  --sl-color-gray-7: #fafaf8;
+  --sl-color-black: #ffffff;
+  /* On white, yellow text fails contrast: links and accents are black on yellow fills. */
+  --sl-color-accent-low: #fff1a8;
+  --sl-color-accent: #101010;
+  --sl-color-accent-high: #101010;
+}
+
+/* The signature: the site title sits on a yellow plate with a black rule, like the report. */
+.site-title {
+  padding: 0.15rem 0.6rem;
+  background: #ffd400;
+  color: #101010 !important;
+  border-bottom: 3px solid #101010;
+  font-weight: 700;
+}
+
+:focus-visible { outline: 3px solid var(--sl-color-accent); outline-offset: 2px; }
+
+/* Code wraps (expressiveCode wrap) and long paths break anywhere, so no block scrolls sideways. */
+.expressive-code pre { overflow-x: visible !important; }
+.expressive-code .ec-line .code { overflow-wrap: anywhere; }

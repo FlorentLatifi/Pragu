@@ -25,3 +25,8 @@ Thumbs.db
 
 # Personal, machine-specific notes for Claude Code
 CLAUDE.local.md
+
+# Docs site: build output, Astro's cache, and rule pages generated from rule metadata
+apps/docs/dist/
+apps/docs/.astro/
+apps/docs/src/content/docs/rules/

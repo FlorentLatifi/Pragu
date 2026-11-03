@@ -22,7 +22,8 @@
     "bench:update": "node bench/dist/cli.js evaluate --update",
     "bench:record": "node bench/dist/cli.js record --install",
     "changeset": "changeset",
-    "report:a11y": "node scripts/check-report-a11y.mjs"
+    "report:a11y": "node scripts/check-report-a11y.mjs",
+    "docs:a11y": "node scripts/check-docs-a11y.mjs"
   },
   "devDependencies": {
     "@changesets/cli": "3.0.3",
