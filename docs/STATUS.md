@@ -82,7 +82,12 @@ Walking skeleton on the emulator, CI, docs (PRD, technical design, ADR-001 to 00
   - The report says when a screen scrolls and only its visible part was checked (D-04; `PamNode.scrollable`, result schema 0.10.0). Checked on the emulator's Settings app.
   - `FLAG_SECURE` screens (D-03): Android 16 paints a secure window black instead of refusing the screenshot. When every visible text sits on pure black, Pragu checks the screen by its tree alone, skips contrast and says why; the agent (0.0.5) also sends the tree alone if a device does refuse. Checked on the emulator with the Compose fixture's new `composeshop://secure`: 4 issues, no contrast check, the note in the report.
   - `--redact` (D-33, the wider scope Florent approved): covered screenshots in `screenshots/`, `[redacted]` for the app's text in the result and report, no `capture/`, `redacted: true` in the result (schema 0.11.0). On the emulator, five rn-shop screens: none of the app texts checked ("Hand-thrown", "Free shipping", "Ceramic", "Prishtina") is left in the JSON or the HTML, and the report is 337 KB.
-- Checks: 296 TypeScript tests (plus 18 owner-task todos), 26 JVM tests, lint, typecheck, bench, report axe check (24 runs).
+- Checks: 296 TypeScript tests (plus 18 owner-task todos), 26 JVM tests, lint, typecheck, bench, report axe check (24 runs). After work packages 6, 7 and 4: 303 TypeScript tests (plus 28 owner-task todos).
+- **Work package 4 (real-app bench), the tooling; the labelling is Florent's:**
+  - `bench/real/PROTOCOL.md`: choosing apps, recording, blind labelling for every rule, a second labeller on 20% with Cohen's kappa, and when the test half may be scored.
+  - `bench/real/<app>/expected.json` with labels keyed by node id (real apps rarely have ids), licence, source and `dev`/`test` split; `evaluate --real dev|test` scores one half.
+  - `record-real --app --package --screen [--large-text]` captures the screen on show and writes a labelling page that shows the tree and the screenshot but none of Pragu's findings; clicking marks an element as barrier or correct for the chosen rule and builds the JSON. Checked on the emulator's Settings app (recording then deleted).
+  - No app is labelled yet: choosing the apps and each APK download need Florent.
 - **Work package 7 (GitHub integration):**
   - `pragu comment <result> [--base <main result>] [--report-url <url>]`: the pull-request comment in Markdown, golden-tested. It lists only new barriers (not in the main branch's latest scan, or, without one, not in the baseline), each with the screen, element, what the screen reader says, and folded fixes; at most 10, then a count.
   - `action.yml` at the repository root, a composite action with no bundled JavaScript: finds the default branch's latest `pragu-report` artifact with `gh`, writes the comment to the job summary, keeps one comment per pull request up to date (same-repository pull requests only; forks get the summary), uploads the report (7 days), and uploads SARIF when present.
@@ -115,8 +120,8 @@ All error rules meet the 0.90 bar. Known misses stay published: home-made checkb
 
 1. **Florent:** the decisions in section L of `docs/decisions.md`; the M1 walkthrough and its three questions (`docs/plans/m1-walkthrough.md`).
 2. **Florent:** check the transcript on a phone with TalkBack's "Display speech output" (D-14): rn-shop cart and Compose checkout, every spoken line written down.
-3. **Florent's owner tasks**, briefs ready: SARIF writer (`docs/plans/owner-task-sarif.md`); `target/size` platform tier, `name/generic`, `contrast/non-text` (`docs/plans/owner-tasks-rules.md`).
-4. **Claude** (the M2 plan was approved on 2026-11-03), in its order, without touching the owner tasks' files: the real bench's protocol and tooling (work package 4), the remaining rules (work package 5) and the docs site (work package 8).
+3. **Florent's owner tasks**, briefs ready: Wilson intervals and the Pragu score (`docs/plans/owner-tasks-m2.md`; also review `pragu comment`, which Claude built although it was an owner-task candidate); SARIF writer (`docs/plans/owner-task-sarif.md`); `target/size` platform tier, `name/generic`, `contrast/non-text` (`docs/plans/owner-tasks-rules.md`).
+4. **Claude** (the M2 plan was approved on 2026-11-03), in its order, without touching the owner tasks' files: the remaining rules (work package 5) and the docs site (work package 8).
 
 ## Notes and risks
 

@@ -11,6 +11,10 @@ Measures whether Pragu's rules are right, rule by rule, on screens where we know
    - Precision, recall, F1 and MCC follow. Ratios are truncated, never rounded up.
 4. **The gate:** `bench/results.json` holds the published numbers. CI fails when a fresh evaluation differs: a drop in precision or recall is a regression; any other change means the published table must be updated on purpose with `pnpm bench:update`.
 
+## Real apps
+
+The numbers Pragu quotes in public come from open-source apps labelled blind, split into a dev and a held-out test half (ADR-015). How to record and label them: [real/PROTOCOL.md](real/PROTOCOL.md).
+
 ## Commands
 
 ```bash

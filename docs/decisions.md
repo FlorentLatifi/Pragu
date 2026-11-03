@@ -31,7 +31,7 @@
 
 ## C. Evaluation and research
 
-- **D-13 Real-app bench:** blind labelling, a held-out test set, Wilson intervals, and ATF as a comparator (ADR-015).
+- **D-13 Real-app bench:** blind labelling, a held-out test set, Wilson intervals, and ATF as a comparator (ADR-015). Tooling implemented 2026-11-03 (`bench/real/PROTOCOL.md`, `record-real`, the blind labelling page, `evaluate --real`); no app labelled yet.
 - **D-14 Checking the transcript against TalkBack:** Florent, on a physical phone, with TalkBack's developer setting "Display speech output". He swipes through the rn-shop cart and the Compose checkout and writes down each line. Shell-injected gestures could not move TalkBack's focus on the emulator (2026-10-29). A later automation idea: Pragu moves accessibility focus itself and reads TalkBack's spoken-text toasts from accessibility events. That checks wording, not order.
 - **D-15 `focus/order` waits for D-14.**
 - **D-16 The M1 exit criterion "20 screens"** is met by the real bench in M2 (at least 20 distinct screens across at least 5 apps), not by fixtures. Approved by Florent on 2026-11-03.
