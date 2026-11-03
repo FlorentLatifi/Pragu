@@ -43,6 +43,9 @@ jobs:
       - name: Report accessibility (axe-core in Chrome, light and dark, phone and desktop)
         if: matrix.node == 24
         run: pnpm report:a11y
+      - name: Install from the packed npm tarballs into an empty folder, as a user would
+        if: matrix.node == 24
+        run: pnpm package:check
       # Dogfood: the same two steps a team's workflow runs, on a recorded fixture screen.
       - name: Scan a recorded screen, as a team's workflow would
         if: matrix.node == 24
@@ -76,6 +79,7 @@ jobs:
       - run: pnpm test
       - run: pnpm build
       - run: pnpm bench
+      - run: pnpm package:check
 
   android-agent:
     name: Android agent
