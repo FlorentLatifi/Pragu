@@ -26,6 +26,7 @@ Section L of [docs/decisions.md](decisions.md) has each one with a recommendatio
 
 - Reserve the `@pragu` npm organisation (F-1); turn on private vulnerability reporting (F-6).
 - Merge the three green Dependabot PRs once each release is a week old (F-10).
+- **`--redact` (D-33) needs a wider scope.** Filling text in the screenshots alone would leave the same text in the screen-reader transcript, the issue messages (contrast quotes the text), the result JSON (every node's name and text) and `capture/` (raw trees and full screenshots). Proposal: `--redact` writes a report meant for sharing: text areas filled in the screenshots, transcript lines reduced to role and state ("Button", "Text"), quoted text removed from messages, node text and names replaced in the JSON, and no `capture/` folder; the result says it is redacted. The GitHub Action uploads only that. Needs Florent's yes, since it changes the result schema and the action's artifact.
 
 ## Done
 
@@ -75,6 +76,12 @@ Walking skeleton on the emulator, CI, docs (PRD, technical design, ADR-001 to 00
   - The five-screen report is 777 KB, about 155 KB per screen: screenshot downscaling (D-20, work package 2) is next.
 - **The rest of work package 1:** `pragu rules [--explain <id>]` (from rule metadata); `pragu report <pragu-result.json>` (re-renders from a result and its kept screenshots; refuses another schema version and says how to re-analyse); `--verbose` (each adb command and agent request with its duration, checked on the emulator); the report lists the screens with their counts when a scan has several, and counts issues per WCAG principle. The axe check now includes a three-screen report (24 runs, passing).
 - Checks: 283 TypeScript tests (plus 18 owner-task todos), lint, typecheck, bench, report axe check.
+- **Work package 2 (honest edges), all but `--redact`:**
+  - Screenshots are embedded at 720 px without alpha (D-20): the five-screen report went from 777 KB to 618 KB, so 20 screens come to about 2.3 MB. pngjs compresses worse than Android, which is why the gain is smaller than the pixel count suggests.
+  - A scan warns when the report folder is inside OneDrive, Dropbox, iCloud Drive or Google Drive (D-34).
+  - The report says when a screen scrolls and only its visible part was checked (D-04; `PamNode.scrollable`, result schema 0.10.0). Checked on the emulator's Settings app.
+  - `FLAG_SECURE` screens (D-03): Android 16 paints a secure window black instead of refusing the screenshot. When every visible text sits on pure black, Pragu checks the screen by its tree alone, skips contrast and says why; the agent (0.0.5) also sends the tree alone if a device does refuse. Checked on the emulator with the Compose fixture's new `composeshop://secure`: 4 issues, no contrast check, the note in the report.
+- Checks: 292 TypeScript tests (plus 18 owner-task todos), 27 JVM tests, lint, typecheck, bench.
 
 ## Bench results (8 screens: rn-shop, android-compose)
 
@@ -97,7 +104,7 @@ All error rules meet the 0.90 bar. Known misses stay published: home-made checkb
 1. **Florent:** the decisions in section L of `docs/decisions.md`; the M1 walkthrough and its three questions (`docs/plans/m1-walkthrough.md`).
 2. **Florent:** check the transcript on a phone with TalkBack's "Display speech output" (D-14): rn-shop cart and Compose checkout, every spoken line written down.
 3. **Florent's owner tasks**, briefs ready: SARIF writer (`docs/plans/owner-task-sarif.md`); `target/size` platform tier, `name/generic`, `contrast/non-text` (`docs/plans/owner-tasks-rules.md`).
-4. **Claude** (the M2 plan was approved on 2026-11-03), in its order, without touching the owner tasks' files: the honest edges (work package 2), then distribution (work package 6).
+4. **Claude** (the M2 plan was approved on 2026-11-03), in its order, without touching the owner tasks' files: `--redact` once its scope is agreed, then distribution (work package 6).
 
 ## Notes and risks
 

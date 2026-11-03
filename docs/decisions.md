@@ -12,7 +12,7 @@
   - In: Android; `scan`, `init` (with `--github`), `doctor`, `report`, `baseline`, `rules`, `comment`; several screens per scan (D-02); HTML, JSON and SARIF; the GitHub Action (ADR-014); the Pragu score (ADR-012); `--redact` (D-33); the 14 brief rules where precision allows (D-08, D-09).
   - Out: flows beyond the `--no-launch` recipe, the crawler, a theme or font matrix beyond `--check-font-scale`, iOS, AI, source mapping beyond D-43's static hint, auto-fix.
 - **D-02 Several screens per scan.** `screens: [{ name, deepLink? }]` in config, with a fresh app start per screen: the path the bench recorder already uses (ADR-016 step 1). *Why:* one screen per scan cannot serve a CI check; deep links work in React Native, Expo and Compose with no code change. *Revisit:* if design partners' apps lack deep links, bring `--flow` forward.
-- **D-03 Screens that refuse screenshots** (`FLAG_SECURE`, common in banking apps): scan the tree anyway, skip pixel rules, and say so in the report, instead of failing the scan.
+- **D-03 Screens that refuse screenshots** (`FLAG_SECURE`, common in banking apps): scan the tree anyway, skip pixel rules, and say so in the report, instead of failing the scan. *Found 2026-11-03:* Android 16 does not refuse the screenshot of a secure window, it paints the window black; Pragu treats a screen whose every visible text sits on pure black as having no screenshot. Implemented.
 - **D-04 Scrolling:** v0.1 checks what is on screen. When a screen can scroll, the report says that only the visible part was checked. Scroll capture is for the M3 RFC.
 - **D-05 Nothing phones home:** no telemetry, accounts, servers, dashboards or paid tiers in v0.x. Adoption is measured from public signals: npm downloads, GitHub dependents, design partners. Telemetry would need an ADR and would be opt-in.
 - **D-06 English only** in the CLI, report and docs until 1.0. *Revisit:* a design partner needs a translated report for a client.
@@ -78,8 +78,8 @@ The composite action, `pragu comment`, "new" meaning not in the latest `main` re
 
 ## I. Security and privacy
 
-- **D-33 `--redact` (M2):** after analysis, text rectangles in the embedded screenshots are filled. On by default in the GitHub Action for public repositories; off locally.
-- **D-34 Cloud folders:** warn, without blocking, when `--out` is inside OneDrive, Dropbox, iCloud Drive or Google Drive.
+- **D-33 `--redact` (M2):** after analysis, text rectangles in the embedded screenshots are filled. On by default in the GitHub Action for public repositories; off locally. *Under review (2026-11-03):* filling the screenshots alone leaves the same text in the transcript, the issue messages, the result JSON and `capture/`. A revised proposal is in STATUS, waiting for Florent; not implemented until then.
+- **D-34 Cloud folders:** warn, without blocking, when `--out` is inside OneDrive, Dropbox, iCloud Drive or Google Drive. Implemented.
 - **D-35 AI providers (M4):** an OpenAI-compatible endpoint. The default must be a loopback address (a model the user runs locally). Any other address needs `--allow-remote-ai` plus config, and every run says what leaves the machine. Suggestions start deterministic (resource and icon names, nearby text); a model is added only if it beats that baseline on a labelled set.
 - **D-36 Dependabot cooldown of 7 days** for npm, Gradle and Actions. *Why:* Dependabot rewrites the lockfile itself, so pnpm's release-age guard never sees its updates. Security updates are not delayed. Implemented 2026-11-03.
 - **D-37 CodeQL and OpenSSF Scorecard** workflows in M2 (free on public repositories).
