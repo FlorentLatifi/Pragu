@@ -1,6 +1,6 @@
 # ADR-014: GitHub integration
 
-- Status: Accepted (2026-11-03, decided on Florent's instruction; see `docs/decisions.md`). Implement in M2.
+- Status: Accepted (2026-11-03, decided on Florent's instruction; see `docs/decisions.md`). Implemented on 2026-11-03: `action.yml`, `pragu comment`, `pragu init --github`. The pull-request path (the main branch's artifact, the comment itself) runs for the first time on a real pull request.
 - Date: 2026-11-03
 
 ## Context

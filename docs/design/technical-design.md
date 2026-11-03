@@ -36,6 +36,8 @@ Around the scan: `pragu.config.ts` (`defineConfig()`, loaded with Node's own typ
 
 `--from-capture` re-runs steps 8–9 from a saved capture, or from a `screens.json` for the whole scan. Tests use it to cover the whole pipeline without a device. `pragu report <pragu-result.json>` only re-renders the HTML, without running rules; `pragu rules [--explain <id>]` prints the rule metadata; `--verbose` traces every adb command and agent request with its duration.
 
+GitHub: `pragu comment` renders the pull-request comment (only barriers not in the default branch's latest scan); `action.yml` posts it, keeps the report as an artifact and uploads SARIF (ADR-014).
+
 Honest edges: screenshots are embedded at 720 px (analysis uses the full capture); a scan warns when `--out` is in a synced folder; the report says when a screen scrolls (`PamNode.scrollable`); a screen whose visible text all sits on pure black (a `FLAG_SECURE` window, which Android paints black) is checked without a screenshot (`screenshotBlocked`).
 
 ## Pragu Accessibility Model (PAM)

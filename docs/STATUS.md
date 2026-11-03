@@ -83,6 +83,11 @@ Walking skeleton on the emulator, CI, docs (PRD, technical design, ADR-001 to 00
   - `FLAG_SECURE` screens (D-03): Android 16 paints a secure window black instead of refusing the screenshot. When every visible text sits on pure black, Pragu checks the screen by its tree alone, skips contrast and says why; the agent (0.0.5) also sends the tree alone if a device does refuse. Checked on the emulator with the Compose fixture's new `composeshop://secure`: 4 issues, no contrast check, the note in the report.
   - `--redact` (D-33, the wider scope Florent approved): covered screenshots in `screenshots/`, `[redacted]` for the app's text in the result and report, no `capture/`, `redacted: true` in the result (schema 0.11.0). On the emulator, five rn-shop screens: none of the app texts checked ("Hand-thrown", "Free shipping", "Ceramic", "Prishtina") is left in the JSON or the HTML, and the report is 337 KB.
 - Checks: 296 TypeScript tests (plus 18 owner-task todos), 26 JVM tests, lint, typecheck, bench, report axe check (24 runs).
+- **Work package 7 (GitHub integration):**
+  - `pragu comment <result> [--base <main result>] [--report-url <url>]`: the pull-request comment in Markdown, golden-tested. It lists only new barriers (not in the main branch's latest scan, or, without one, not in the baseline), each with the screen, element, what the screen reader says, and folded fixes; at most 10, then a count.
+  - `action.yml` at the repository root, a composite action with no bundled JavaScript: finds the default branch's latest `pragu-report` artifact with `gh`, writes the comment to the job summary, keeps one comment per pull request up to date (same-repository pull requests only; forks get the summary), uploads the report (7 days), and uploads SARIF when present.
+  - `pragu init --github` writes a starter workflow: emulator, scan with `--redact` on public repositories, then the action.
+  - CI runs the action on a recorded screen on every push: on 2026-11-03 it wrote the summary and uploaded a 79 KB redacted report. **Not yet run:** the pull-request path (downloading the main branch's report, posting the comment), which needs a real pull request. `@v0` does not exist until the first release tag.
 - **Work package 6 (distribution), everything that needs no account of Florent's:**
   - The agent ships inside the `pragu` package with its SHA-256 (`scripts/bundle-agent.mjs`); the CLI refuses a bundled APK that does not match, and installs the agent only when the device's copy differs (compared by SHA-256 on the device). On the emulator: a repeat scan runs two checks of about 150 ms instead of a 1.1 s install; a changed APK is refused. A packed `pragu` tarball is 700 KB with the agent.
   - Agent compile and target SDK 37; lint's SDK warning is gone.
@@ -111,7 +116,7 @@ All error rules meet the 0.90 bar. Known misses stay published: home-made checkb
 1. **Florent:** the decisions in section L of `docs/decisions.md`; the M1 walkthrough and its three questions (`docs/plans/m1-walkthrough.md`).
 2. **Florent:** check the transcript on a phone with TalkBack's "Display speech output" (D-14): rn-shop cart and Compose checkout, every spoken line written down.
 3. **Florent's owner tasks**, briefs ready: SARIF writer (`docs/plans/owner-task-sarif.md`); `target/size` platform tier, `name/generic`, `contrast/non-text` (`docs/plans/owner-tasks-rules.md`).
-4. **Claude** (the M2 plan was approved on 2026-11-03), in its order, without touching the owner tasks' files: the GitHub integration (work package 7), then the real bench's protocol and tooling (work package 4) and the docs site (work package 8).
+4. **Claude** (the M2 plan was approved on 2026-11-03), in its order, without touching the owner tasks' files: the real bench's protocol and tooling (work package 4), the remaining rules (work package 5) and the docs site (work package 8).
 
 ## Notes and risks
 

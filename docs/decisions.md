@@ -74,7 +74,7 @@ Three npm packages in lockstep; the signed agent bundled in `pragu` and checked 
 
 ## H. GitHub integration (ADR-014)
 
-The composite action, `pragu comment`, "new" meaning not in the latest `main` result, fork pull requests, and minimal permissions.
+The composite action, `pragu comment`, "new" meaning not in the latest `main` result, fork pull requests, and minimal permissions. Implemented 2026-11-03 (`action.yml`, `pragu comment`, `pragu init --github`); CI dogfoods it on pushes.
 
 ## I. Security and privacy
 
