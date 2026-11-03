@@ -20,7 +20,7 @@ v0.1 must install with one command (`npx pragu`), work offline, and be trustwort
   3. `pnpm pack` each package, which rewrites `workspace:` ranges;
   4. `npm publish` each tarball with npm trusted publishing (OIDC, npm CLI 11.5.1 or newer), which adds provenance automatically from a public repository;
   5. a GitHub Release with the APK, SHA-256 sums and a CycloneDX SBOM (`pnpm sbom --sbom-format cyclonedx --prod`, built into pnpm since 11.0).
-- **First publish:** npm configures trusted publishers in a package's settings. If a brand-new name cannot be configured before it exists, Florent publishes the first version by hand with 2FA, then CI takes over. Check this when the time comes.
+- **First publish:** npm configures trusted publishers in a package's settings. If a brand-new name cannot be configured before it exists, Florent publishes the first version by hand with 2FA, then CI takes over. Checked 2026-11-04: npm needs the package to exist, so Florent published a `0.0.0` placeholder of each package by hand, then added the trusted publisher.
 
 ## Why
 

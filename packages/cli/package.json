@@ -1,6 +1,6 @@
 {
   "name": "pragu",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Find the accessibility barriers in your mobile app before your users hit them.",
   "license": "Apache-2.0",
   "repository": {
