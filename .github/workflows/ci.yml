@@ -23,6 +23,7 @@ jobs:
     permissions:
       contents: read
       actions: read # Pragu's own action reads the main branch's latest report
+      pull-requests: write # test only: let the action comment
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -46,13 +47,13 @@ jobs:
       # Dogfood: the same two steps a team's workflow runs, on a recorded fixture screen.
       - name: Scan a recorded screen, as a team's workflow would
         if: matrix.node == 24
-        run: node packages/cli/dist/bin.js scan --from-capture bench/recordings/rn-shop/cart.json --out pragu-report --fail-on never --redact
+        run: node packages/cli/dist/bin.js scan --from-capture bench/recordings/rn-shop/product.json --out pragu-report --fail-on never --redact
       - name: Pragu's own action (job summary and artifact; it does not comment on Pragu's pull requests)
         if: matrix.node == 24
         uses: ./
         with:
           pragu: node packages/cli/dist/bin.js
-          comment: 'false'
+          comment: 'true'
 
   # The CLI runs on developers' Windows and Mac machines too (D-27); the emulator job stays on Linux.
   other-systems:
