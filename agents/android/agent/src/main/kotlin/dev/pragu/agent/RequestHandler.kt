@@ -45,9 +45,9 @@ class RequestHandler(private val capturer: ScreenCapturer, private val agentVers
                     .put("packageName", capture.packageName)
                     .put("windows", capture.windows.size)
                     .put("nodes", capture.nodeCount()),
-                payloads = listOf(
+                payloads = listOfNotNull(
                     Payload("tree", "application/json", tree),
-                    Payload("screenshot", "image/png", capture.png),
+                    capture.png?.let { Payload("screenshot", "image/png", it) },
                 ),
             )
         } catch (e: CaptureException) {

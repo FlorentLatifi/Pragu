@@ -152,7 +152,8 @@ class Capture(
     val screenHeightPx: Int,
     /** Every window on screen, bottom first. */
     val windows: List<WindowSnapshot>,
-    val png: ByteArray,
+    /** Null when the app blocks screenshots (FLAG_SECURE). */
+    val png: ByteArray?,
 ) {
     fun nodeCount(): Int = windows.sumOf { it.root?.nodeCount() ?: 0 }
 

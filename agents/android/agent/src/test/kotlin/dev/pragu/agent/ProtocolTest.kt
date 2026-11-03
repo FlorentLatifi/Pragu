@@ -10,7 +10,7 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 
-private class FakeCapturer(private val failure: String? = null) : ScreenCapturer {
+private class FakeCapturer(private val failure: String? = null, private val secure: Boolean = false) : ScreenCapturer {
     var lastPackage: String? = null
     var lastTimeout: Long = 0
 
@@ -21,7 +21,8 @@ private class FakeCapturer(private val failure: String? = null) : ScreenCapturer
         lastTimeout = timeoutMs
         if (failure != null) throw CaptureException(failure)
         val app = WindowSnapshot("application", 0, "Shop", 0, 0, 1080, 2400, active = true, focused = true, root = snapshot(text = "Hi"))
-        return Capture("com.example.shop", "Shop", "2026-10-27T12:00:00Z", 1080, 2400, listOf(app), byteArrayOf(9, 8, 7))
+        val png = if (secure) null else byteArrayOf(9, 8, 7)
+        return Capture("com.example.shop", "Shop", "2026-10-27T12:00:00Z", 1080, 2400, listOf(app), png)
     }
 }
 
@@ -108,6 +109,13 @@ class RequestHandlerTest {
         val response = RequestHandler(FakeCapturer("App did not start"), "0.0.1").handle("""{"cmd":"capture"}""")
         assertFalse(response.ok)
         assertEquals("App did not start", response.error)
+    }
+
+    @Test
+    fun aScreenThatBlocksScreenshotsStillSendsItsTree() {
+        val response = RequestHandler(FakeCapturer(secure = true), "0.0.1").handle("""{"cmd":"capture"}""")
+        assertTrue(response.ok)
+        assertEquals(listOf("tree"), response.payloads.map { it.name })
     }
 
     @Test

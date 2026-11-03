@@ -85,15 +85,20 @@ class UiAutomationCapturer(private val ui: UiAutomation, private val context: Co
             },
         )
         val foreground = windows.last { it.root != null }
+        // A secure window (FLAG_SECURE, common in banking apps) makes Android refuse the screenshot.
+        // The tree is still worth checking, so the capture goes on without pixels.
         val bitmap = ui.takeScreenshot()
-            ?: throw CaptureException("Android refused the screenshot. A secure window (FLAG_SECURE) may be showing.")
-        val width = bitmap.width
-        val height = bitmap.height
-        val png = ByteArrayOutputStream().use { out ->
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
-            out.toByteArray()
+        if (bitmap == null) Log.w(TAG, "Android refused the screenshot (FLAG_SECURE?); sending the tree only")
+        val png = bitmap?.let {
+            ByteArrayOutputStream().use { out ->
+                it.compress(Bitmap.CompressFormat.PNG, 100, out)
+                out.toByteArray()
+            }
         }
-        bitmap.recycle()
+        // Without a screenshot, the windows (status and navigation bars included) span the screen.
+        val width = bitmap?.width ?: windows.maxOf { it.right }
+        val height = bitmap?.height ?: windows.maxOf { it.bottom }
+        bitmap?.recycle()
         return Capture(
             packageName = foreground.root?.packageName ?: "unknown",
             windowTitle = foreground.title,
