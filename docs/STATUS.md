@@ -24,7 +24,7 @@ The full register is [docs/decisions.md](decisions.md) (2026-11-03, 45 decisions
 
 Section L of [docs/decisions.md](decisions.md) has each one with a recommendation. The most urgent:
 
-- Reserve the `@pragu` npm organisation (F-1). Private vulnerability reporting is on (F-6, 2026-11-04).
+- The `@pragu` npm organisation is reserved (F-1) and private vulnerability reporting is on (F-6), both 2026-11-04.
 - For the first release (F-5): create the release keystore and add `PRAGU_KEYSTORE_BASE64`, `PRAGU_KEYSTORE_PASSWORD`, `PRAGU_KEY_ALIAS`, `PRAGU_KEY_PASSWORD` as repository secrets; add `release.yml` as the trusted publisher of `pragu`, `@pragu/core` and `@pragu/report` on npm (the first publish of a new name may have to be by hand).
 - Merge the three green Dependabot PRs once each release is a week old (F-10).
 

@@ -27,7 +27,8 @@ The brief asks for a Google-style launch checklist before every public release. 
 
 ## Release
 
-- [ ] **F** `@pragu` npm organisation; trusted publishing for `pragu`, `@pragu/core`, `@pragu/report` (ADR-013).
+- [x] **F** `@pragu` npm organisation (2026-11-04).
+- [ ] **F** Trusted publishing for `pragu`, `@pragu/core`, `@pragu/report` (ADR-013).
 - [ ] **F** Release keystore and its four secrets.
 - [ ] `pnpm changeset version`, review `CHANGELOG.md`, tag `v0.1.0`; the release workflow is green; `v0` tag moved to it for the action.
 - [ ] npm shows provenance on all three packages; the GitHub Release has the APK, `SHA256SUMS` and the SBOM.

@@ -108,7 +108,7 @@ The composite action, `pragu comment`, "new" meaning not in the latest `main` re
 
 ## L. Florent decides (recommendation in brackets)
 
-- **F-1** Reserve the `@pragu` npm organisation. [Now: it is free, and the name could be taken.]
+- **F-1** Reserve the `@pragu` npm organisation. Done 2026-11-04: Florent owns `@pragu` (a second organisation he made, `pragu-report`, is unused).
 - **F-2** ~~Buy `pragu.dev`~~: no paid domain (zero budget, Florent, 2026-11-03). The docs stay at `florentlatifi.github.io/Pragu`.
 - **F-3** Where the repository lives. [Stay on `FlorentLatifi/Pragu` until there is a second maintainer: no overhead, clear authorship.]
 - **F-4** ~~Approve D-16 and the M2 plan~~: approved on 2026-11-03.
