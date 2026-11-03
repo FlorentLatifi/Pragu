@@ -4,7 +4,7 @@
     "android-compose",
     "rn-shop"
   ],
-  "screens": 8,
+  "screens": 9,
   "rules": [
     {
       "rule": "name/interactive-missing",
@@ -109,6 +109,30 @@
       "fp": 0,
       "fn": 0,
       "tn": 2,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "mcc": 1
+    },
+    {
+      "rule": "name/role-in-label",
+      "severity": "info",
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1,
+      "precision": 1,
+      "recall": 1,
+      "f1": 1,
+      "mcc": 1
+    },
+    {
+      "rule": "structure/no-headings",
+      "severity": "info",
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "tn": 3,
       "precision": 1,
       "recall": 1,
       "f1": 1,

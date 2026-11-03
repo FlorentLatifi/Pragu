@@ -33,7 +33,8 @@
         { "rule": "target/size", "testID": "twin-expanded-clear", "note": "20 dp icon 2 dp from another; Compose enlarges its touch area well past 24 dp (checked on the emulator)" },
         { "rule": "target/size", "testID": "twin-expanded-info", "note": "as twin-expanded-clear" },
         { "rule": "target/size", "testID": "twin-star-1", "note": "end star: it gains the free side's enlargement" },
-        { "rule": "target/size", "testID": "twin-star-5", "note": "end star: it gains the free side's enlargement" }
+        { "rule": "target/size", "testID": "twin-star-5", "note": "end star: it gains the free side's enlargement" },
+        { "rule": "structure/no-headings", "node": "0", "note": "the screen has a heading" }
       ]
     },
     {
@@ -58,7 +59,8 @@
         { "rule": "input/missing-label", "testID": "twin-labelled-field", "note": "OutlinedTextField with a label" },
         { "rule": "input/placeholder-label", "testID": "twin-labelled-field" },
         { "rule": "contrast/text", "testID": "twin-disabled-text", "note": "inactive components have no contrast requirement (WCAG 1.4.3)" },
-        { "rule": "target/size", "testID": "twin-pay-button" }
+        { "rule": "target/size", "testID": "twin-pay-button" },
+        { "rule": "structure/no-headings", "node": "0", "note": "the screen has a heading" }
       ]
     },
     {
@@ -73,7 +75,21 @@
       "correctTwins": [
         { "rule": "text/scaling-truncation", "testID": "twin-wrapping-name", "note": "the same name, allowed to wrap" },
         { "rule": "text/scaling-truncation", "testID": "twin-short-line", "note": "one line, but short enough to fit at 200%" },
-        { "rule": "text/scaling-truncation", "testID": "twin-growing-box-text", "note": "box with a minimum height that grows" }
+        { "rule": "text/scaling-truncation", "testID": "twin-growing-box-text", "note": "box with a minimum height that grows" },
+        { "rule": "structure/no-headings", "node": "0", "note": "the screen has a heading" }
+      ]
+    },
+    {
+      "id": "help",
+      "name": "Help",
+      "url": "composeshop://help",
+      "marker": "screen-help",
+      "barriers": [
+        { "rule": "structure/no-headings", "node": "0", "note": "eleven texts; the titles are bold, but none is marked as a heading" },
+        { "rule": "name/role-in-label", "testID": "seed-role-in-label-close", "note": "\"Close button\": TalkBack says the role twice" }
+      ],
+      "correctTwins": [
+        { "rule": "name/role-in-label", "testID": "twin-labeled-back-help", "note": "named just \"Back\"" }
       ]
     }
   ]

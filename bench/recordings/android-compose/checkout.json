@@ -1,7 +1,7 @@
 {
   "protocol": 4,
-  "agentVersion": "0.0.4",
-  "capturedAt": "2026-10-29T14:47:38.806545Z",
+  "agentVersion": "0.0.5",
+  "capturedAt": "2026-11-03T20:25:12.405589Z",
   "packageName": "dev.pragu.fixtures.compose",
   "windowTitle": "Compose shop",
   "screenWidthPx": 1080,
@@ -304,7 +304,7 @@
                                 "heading": false,
                                 "screenReaderFocusable": true,
                                 "actions": [
-                                  1,
+                                  2,
                                   64,
                                   16,
                                   32,
@@ -360,9 +360,9 @@
                                     "roleDescription": null,
                                     "bounds": [
                                       84,
-                                      315,
-                                      277,
-                                      378
+                                      252,
+                                      228,
+                                      294
                                     ],
                                     "clickable": false,
                                     "longClickable": false,
@@ -397,9 +397,9 @@
                                     "roleDescription": null,
                                     "bounds": [
                                       84,
-                                      284,
+                                      315,
                                       996,
-                                      410
+                                      378
                                     ],
                                     "clickable": false,
                                     "longClickable": false,

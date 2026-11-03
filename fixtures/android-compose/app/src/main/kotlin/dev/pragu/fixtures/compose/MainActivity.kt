@@ -16,7 +16,7 @@ import androidx.compose.ui.semantics.testTagsAsResourceId
 
 // Pragu fixture "android-compose": Jetpack Compose screens that seed accessibility
 // barriers next to correct twins. Pragu Bench opens them by deep link
-// (composeshop://settings, composeshop://checkout, composeshop://summary) and checks the scan against
+// (composeshop://settings, composeshop://checkout, composeshop://summary, composeshop://help) and checks the scan against
 // expected.json, keyed by testTag. composeshop://secure shows the settings screen with FLAG_SECURE,
 // as banking apps do, to check that Pragu scans a screen that refuses screenshots (D-03); it is not
 // in the bench, since no rule depends on it.
@@ -33,6 +33,7 @@ class MainActivity : ComponentActivity() {
                     when (screen) {
                         "checkout" -> CheckoutScreen()
                         "summary" -> SummaryScreen()
+                        "help" -> HelpScreen()
                         else -> SettingsScreen()
                     }
                 }
