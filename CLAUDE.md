@@ -31,7 +31,8 @@ Android SDK tools: always pass `--no-metrics` to the `android` CLI (cmdline-tool
 | `agents/android` | Kotlin agent APK: Instrumentation + UiAutomation, abstract-socket server (protocol 4: every window, trees for the app's own, `labeledBy`, ellipsized characters). |
 | `fixtures/rn-shop` | Expo app with seeded barriers and correct twins on deep-linked screens (`rnshop://cart|product|form|summary`). Standalone npm project, not in the workspace. |
 | `fixtures/android-compose` | Jetpack Compose app, same idea (`composeshop://settings|checkout|summary`). Standalone Gradle project. How Pragu reads Compose: ADR-009. |
-| `bench` | Pragu Bench: ground-truth evaluation (precision, recall, F1, MCC per rule) on recorded fixture screens. |
+| `bench` | Pragu Bench: ground-truth evaluation (precision, recall, F1, MCC per rule) on recorded fixture screens; `bench/real` for open-source apps labelled blind (ADR-015). |
+| `apps/docs` | Docs site (Astro Starlight, D-39). Rule pages are generated from rule metadata at build time. `pnpm --dir apps/docs build`, then `pnpm docs:a11y`. |
 | `docs/` | Brief, PRD, technical design, ADRs, threat model, test strategy, plans, research notes. |
 
 The agent's JSON field names (`agents/android/.../Snapshot.kt`) must match `AndroidRawNode` in `packages/core/src/android.ts`. `SnapshotTest` locks the field list. Change both together and bump `PROTOCOL_VERSION`.

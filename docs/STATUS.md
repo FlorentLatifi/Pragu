@@ -25,6 +25,7 @@ The full register is [docs/decisions.md](decisions.md) (2026-11-03, 45 decisions
 Section L of [docs/decisions.md](decisions.md) has each one with a recommendation. The most urgent:
 
 - Reserve the `@pragu` npm organisation (F-1); turn on private vulnerability reporting (F-6).
+- For the docs site: turn on GitHub Pages with "GitHub Actions" as the source, then set the repository variable `DOCS_DEPLOY` to `true`.
 - For the first release (F-5): create the release keystore and add `PRAGU_KEYSTORE_BASE64`, `PRAGU_KEYSTORE_PASSWORD`, `PRAGU_KEY_ALIAS`, `PRAGU_KEY_PASSWORD` as repository secrets; add `release.yml` as the trusted publisher of `pragu`, `@pragu/core` and `@pragu/report` on npm (the first publish of a new name may have to be by hand).
 - Merge the three green Dependabot PRs once each release is a week old (F-10).
 
@@ -83,6 +84,7 @@ Walking skeleton on the emulator, CI, docs (PRD, technical design, ADR-001 to 00
   - `FLAG_SECURE` screens (D-03): Android 16 paints a secure window black instead of refusing the screenshot. When every visible text sits on pure black, Pragu checks the screen by its tree alone, skips contrast and says why; the agent (0.0.5) also sends the tree alone if a device does refuse. Checked on the emulator with the Compose fixture's new `composeshop://secure`: 4 issues, no contrast check, the note in the report.
   - `--redact` (D-33, the wider scope Florent approved): covered screenshots in `screenshots/`, `[redacted]` for the app's text in the result and report, no `capture/`, `redacted: true` in the result (schema 0.11.0). On the emulator, five rn-shop screens: none of the app texts checked ("Hand-thrown", "Free shipping", "Ceramic", "Prishtina") is left in the JSON or the HTML, and the report is 337 KB.
 - Checks: 296 TypeScript tests (plus 18 owner-task todos), 26 JVM tests, lint, typecheck, bench, report axe check (24 runs). After work packages 6, 7 and 4: 303 TypeScript tests (plus 28 owner-task todos).
+- **Work package 8 (docs site), first version:** `apps/docs` with Astro Starlight (D-39) in the Signal tokens and the report's Atkinson Hyperlegible fonts: home, getting started, React Native and Expo, pull requests on GitHub, what checks miss, baselines, how Pragu is measured, Accessibility 101, CLI and config reference, FAQ, and one page per rule generated from rule metadata at build time (never committed, so it cannot drift). `pnpm docs:a11y` runs axe on 6 pages in light and dark at phone and desktop width: its first run found code blocks that scrolled sideways without keyboard access, so code now wraps; 24 runs pass. `docs.yml` builds and checks it on every change and deploys to GitHub Pages once Florent turns Pages on (source: GitHub Actions) and sets the repository variable `DOCS_DEPLOY` to `true`. Not yet: the honest comparison page (needs competitors re-checked with sources, work package 9) and the README GIF.
 - **Work package 5 (rules), part one:** `name/role-in-label` (info, best practice) and `structure/no-headings` (info, low confidence), each with unit tests and a barrier and twin on the Compose fixture's new `composeshop://help` screen; both 1 TP and no false positive on the 9 bench screens, and nothing else on the bench changed. `focus/order` still waits for the transcript check on a phone (D-14).
 - **Work package 4 (real-app bench), the tooling; the labelling is Florent's:**
   - `bench/real/PROTOCOL.md`: choosing apps, recording, blind labelling for every rule, a second labeller on 20% with Cohen's kappa, and when the test half may be scored.
@@ -124,7 +126,7 @@ All error rules meet the 0.90 bar. Known misses stay published: home-made checkb
 1. **Florent:** the decisions in section L of `docs/decisions.md`; the M1 walkthrough and its three questions (`docs/plans/m1-walkthrough.md`).
 2. **Florent:** check the transcript on a phone with TalkBack's "Display speech output" (D-14): rn-shop cart and Compose checkout, every spoken line written down.
 3. **Florent's owner tasks**, briefs ready: Wilson intervals and the Pragu score (`docs/plans/owner-tasks-m2.md`; also review `pragu comment`, which Claude built although it was an owner-task candidate); SARIF writer (`docs/plans/owner-task-sarif.md`); `target/size` platform tier, `name/generic`, `contrast/non-text` (`docs/plans/owner-tasks-rules.md`).
-4. **Claude** (the M2 plan was approved on 2026-11-03), in its order, without touching the owner tasks' files: the docs site (work package 8); `focus/order` once D-14 is done.
+4. **Claude** (the M2 plan was approved on 2026-11-03), in its order, without touching the owner tasks' files: the launch work that needs no account (work package 9: launch checklist, community files, the comparison page with sources); `focus/order` once D-14 is done.
 
 ## Notes and risks
 
