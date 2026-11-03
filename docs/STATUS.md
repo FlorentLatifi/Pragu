@@ -81,7 +81,7 @@ Walking skeleton on the emulator, CI, docs (PRD, technical design, ADR-001 to 00
   - A scan warns when the report folder is inside OneDrive, Dropbox, iCloud Drive or Google Drive (D-34).
   - The report says when a screen scrolls and only its visible part was checked (D-04; `PamNode.scrollable`, result schema 0.10.0). Checked on the emulator's Settings app.
   - `FLAG_SECURE` screens (D-03): Android 16 paints a secure window black instead of refusing the screenshot. When every visible text sits on pure black, Pragu checks the screen by its tree alone, skips contrast and says why; the agent (0.0.5) also sends the tree alone if a device does refuse. Checked on the emulator with the Compose fixture's new `composeshop://secure`: 4 issues, no contrast check, the note in the report.
-- Checks: 292 TypeScript tests (plus 18 owner-task todos), 27 JVM tests, lint, typecheck, bench.
+- Checks: 292 TypeScript tests (plus 18 owner-task todos), 26 JVM tests (counted from the test reports), lint, typecheck, bench.
 
 ## Bench results (8 screens: rn-shop, android-compose)
 
