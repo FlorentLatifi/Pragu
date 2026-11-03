@@ -18,7 +18,7 @@ Machine ↔ device (adb) · agent ↔ other apps on the device · CLI ↔ the fi
 | Threat | Example | Mitigation | Status |
 |---|---|---|---|
 | **Spoofing** | Another app on the device connects to the agent's socket and requests screenshots | Peer uid allowlist (0 root, 2000 shell); random socket name per session (ADR-006) | Done |
-| Spoofing | A tampered agent APK is installed in place of the real one | The CLI installs only the APK it ships. Signed release APK, checksum and npm provenance (M2) | M2 |
+| Spoofing | A tampered agent APK is installed in place of the real one | The CLI installs only the APK it ships, and refuses a bundled APK whose SHA-256 differs from the one written at release. Release signing from CI secrets and npm provenance are in the release workflow, waiting for the first release (ADR-013) | Partly |
 | Tampering | `--check-font-scale` leaves the device at 200% text after a failure | Opt-in only. The original value is read first and restored in a `finally` and on Ctrl+C; an unset value is deleted again. A killed process or crashed emulator can still skip it, so the scan says it changes the setting (ADR-011) | Done |
 | **Tampering** | A crafted capture file (`--from-capture`) exploits the report | `parseAndroidCapture` validates every field. All app text is HTML-escaped (tested with an `<img onerror>` payload) | Done |
 | Tampering | The app under test manipulates its own tree to hide issues | Out of scope: Pragu audits apps for their own developers | Accepted |

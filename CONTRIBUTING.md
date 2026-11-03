@@ -8,6 +8,7 @@ Thank you for helping make apps easier to use for everyone.
 2. Use [Conventional Commits](https://www.conventionalcommits.org/): `feat(core): …`, `fix(cli): …`, `docs: …`.
 3. Run the checks: `pnpm lint && pnpm typecheck && pnpm test`. Agent changes also need `pnpm agent:build`.
 4. Explain any new dependency in one line, with the alternative you considered.
+5. If users will notice the change, add a changeset: `pnpm changeset`, with one line for the changelog.
 
 ## Adding or changing a rule
 

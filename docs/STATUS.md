@@ -25,6 +25,7 @@ The full register is [docs/decisions.md](decisions.md) (2026-11-03, 45 decisions
 Section L of [docs/decisions.md](decisions.md) has each one with a recommendation. The most urgent:
 
 - Reserve the `@pragu` npm organisation (F-1); turn on private vulnerability reporting (F-6).
+- For the first release (F-5): create the release keystore and add `PRAGU_KEYSTORE_BASE64`, `PRAGU_KEYSTORE_PASSWORD`, `PRAGU_KEY_ALIAS`, `PRAGU_KEY_PASSWORD` as repository secrets; add `release.yml` as the trusted publisher of `pragu`, `@pragu/core` and `@pragu/report` on npm (the first publish of a new name may have to be by hand).
 - Merge the three green Dependabot PRs once each release is a week old (F-10).
 
 ## Done
@@ -82,6 +83,12 @@ Walking skeleton on the emulator, CI, docs (PRD, technical design, ADR-001 to 00
   - `FLAG_SECURE` screens (D-03): Android 16 paints a secure window black instead of refusing the screenshot. When every visible text sits on pure black, Pragu checks the screen by its tree alone, skips contrast and says why; the agent (0.0.5) also sends the tree alone if a device does refuse. Checked on the emulator with the Compose fixture's new `composeshop://secure`: 4 issues, no contrast check, the note in the report.
   - `--redact` (D-33, the wider scope Florent approved): covered screenshots in `screenshots/`, `[redacted]` for the app's text in the result and report, no `capture/`, `redacted: true` in the result (schema 0.11.0). On the emulator, five rn-shop screens: none of the app texts checked ("Hand-thrown", "Free shipping", "Ceramic", "Prishtina") is left in the JSON or the HTML, and the report is 337 KB.
 - Checks: 296 TypeScript tests (plus 18 owner-task todos), 26 JVM tests, lint, typecheck, bench, report axe check (24 runs).
+- **Work package 6 (distribution), everything that needs no account of Florent's:**
+  - The agent ships inside the `pragu` package with its SHA-256 (`scripts/bundle-agent.mjs`); the CLI refuses a bundled APK that does not match, and installs the agent only when the device's copy differs (compared by SHA-256 on the device). On the emulator: a repeat scan runs two checks of about 150 ms instead of a 1.1 s install; a changed APK is refused. A packed `pragu` tarball is 700 KB with the agent.
+  - Agent compile and target SDK 37; lint's SDK warning is gone.
+  - CI: unit tests, build and bench on Windows and macOS; CodeQL and OpenSSF Scorecard (`security.yml`); a weekly emulator run on API 30 that must keep the 0.90 bar (`bench evaluate --bar-only`). The first API 30 run was started by hand on 2026-11-03.
+  - Release pipeline (`release.yml`, on a version tag): every check, the agent signed with the release key from secrets, bundled, packed, published with npm trusted publishing and provenance, and a GitHub Release with the APK, `SHA256SUMS` and a CycloneDX SBOM. Changesets keeps the three packages on one version. **Not run yet:** it needs the keystore secrets and the npm setup (F-1, F-5). Signing with a release key could not be tried locally: a hook blocks any command touching a keystore file, so the first release run is its first test.
+
 
 ## Bench results (8 screens: rn-shop, android-compose)
 
@@ -104,7 +111,7 @@ All error rules meet the 0.90 bar. Known misses stay published: home-made checkb
 1. **Florent:** the decisions in section L of `docs/decisions.md`; the M1 walkthrough and its three questions (`docs/plans/m1-walkthrough.md`).
 2. **Florent:** check the transcript on a phone with TalkBack's "Display speech output" (D-14): rn-shop cart and Compose checkout, every spoken line written down.
 3. **Florent's owner tasks**, briefs ready: SARIF writer (`docs/plans/owner-task-sarif.md`); `target/size` platform tier, `name/generic`, `contrast/non-text` (`docs/plans/owner-tasks-rules.md`).
-4. **Claude** (the M2 plan was approved on 2026-11-03), in its order, without touching the owner tasks' files: distribution (work package 6).
+4. **Claude** (the M2 plan was approved on 2026-11-03), in its order, without touching the owner tasks' files: the GitHub integration (work package 7), then the real bench's protocol and tooling (work package 4) and the docs site (work package 8).
 
 ## Notes and risks
 

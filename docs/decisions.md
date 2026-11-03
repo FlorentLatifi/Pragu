@@ -46,16 +46,16 @@
 - **D-18 Where logic lives.** The PAM stays platform-neutral. Rules run in TypeScript on the developer's machine; the agent only captures. ATF is never part of the product's rules, only the bench comparator.
 - **D-19 Report:** typed templates (ADR-003 amendments). Preact only when the report needs real client state: navigating 50+ screens, sorting, search.
 - **D-20 Screenshots in reports:** downscaled to 720 px wide (twice the display width) by a box filter in plain TypeScript, kept as PNG. Analysis uses full resolution first; the full-size PNG stays in `capture/`. No WebP dependency. Budget: a 20-screen report ≤ 3 MB, set after measuring. *Revisit:* above 3 MB after downscaling.
-- **D-21 Agent install** only when the device lacks the bundled version (ADR-013).
+- **D-21 Agent install** only when the device lacks the bundled version (ADR-013). Implemented: the device's installed APK is compared by SHA-256.
 - **D-22 Config** is validated strictly, with friendly errors, and follows the result schema's pre-1.0 versioning policy.
 - **D-23 ktlint or detekt** (promised for M1 in ADR-002) are deferred: Android Lint is enough for about 700 lines of Kotlin. *Revisit:* above 2,000 lines, or when a second person writes Kotlin.
 - **D-24 Expo config plugin** (brief, M3): its purpose is set in the M3 RFC. Working assumption: register a deep-link scheme, and later install the dev-only source-mapping plugin (D-43). Nothing is built before then.
 
 ## E. Platforms
 
-- **D-25 Android versions:** API 30+ (Android 11) is supported. API 26–29 runs with a `doctor` warning that some checks are less reliable. CI: the emulator e2e on API 36 for every push (exact bench), plus API 30 weekly (precision ≥ 0.90, not exact equality, because rendering differs). `minSdk` stays 26.
-- **D-26 Compile and target SDK 37** in M2, verified on the emulator. This clears the lint warning.
-- **D-27 The CLI runs on Windows, macOS and Linux.** CI adds `windows-latest` and `macos-latest` to the unit-test matrix (free on public repositories). The emulator job stays on Linux.
+- **D-25 Android versions:** API 30+ (Android 11) is supported. API 26–29 runs with a `doctor` warning that some checks are less reliable. CI: the emulator e2e on API 36 for every push (exact bench), plus API 30 weekly (precision ≥ 0.90, not exact equality, because rendering differs). `minSdk` stays 26. Implemented: weekly API 30 run with `bench evaluate --bar-only`.
+- **D-26 Compile and target SDK 37** in M2, verified on the emulator. This clears the lint warning. Implemented.
+- **D-27 The CLI runs on Windows, macOS and Linux.** CI adds `windows-latest` and `macos-latest` to the unit-test matrix (free on public repositories). The emulator job stays on Linux. Implemented.
 - **D-28 Flutter on Android** already exposes its semantics through Android accessibility. A Flutter fixture and Flutter fixes come in M3. A separate Views fixture is not needed (React Native exercises the View system) unless a design partner needs one.
 - **D-29 iOS:** a spike in M3 on GitHub's macOS runners (free on public repositories), so no Mac is needed for the spike. *Revisit:* if CI-only development proves too slow, Florent decides on a Mac (money).
 
@@ -82,7 +82,7 @@ The composite action, `pragu comment`, "new" meaning not in the latest `main` re
 - **D-34 Cloud folders:** warn, without blocking, when `--out` is inside OneDrive, Dropbox, iCloud Drive or Google Drive. Implemented.
 - **D-35 AI providers (M4):** an OpenAI-compatible endpoint. The default must be a loopback address (a model the user runs locally). Any other address needs `--allow-remote-ai` plus config, and every run says what leaves the machine. Suggestions start deterministic (resource and icon names, nearby text); a model is added only if it beats that baseline on a labelled set.
 - **D-36 Dependabot cooldown of 7 days** for npm, Gradle and Actions. *Why:* Dependabot rewrites the lockfile itself, so pnpm's release-age guard never sees its updates. Security updates are not delayed. Implemented 2026-11-03.
-- **D-37 CodeQL and OpenSSF Scorecard** workflows in M2 (free on public repositories).
+- **D-37 CodeQL and OpenSSF Scorecard** workflows in M2 (free on public repositories). Implemented (`.github/workflows/security.yml`).
 - **D-38 Threat-model reviews** for the GitHub Action (M2: artifacts, fork pull requests), watch mode and the crawler (M3), AI (M4), and auto-fix (M5).
 
 ## J. Docs, brand and community
