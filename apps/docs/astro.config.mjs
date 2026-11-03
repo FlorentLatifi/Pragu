@@ -19,7 +19,7 @@ export default defineConfig({
       social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/FlorentLatifi/Pragu' }],
       sidebar: [
         { label: 'Start', items: ['getting-started', 'guides/react-native', 'guides/ci'] },
-        { label: 'Understand', items: ['concepts/what-checks-miss', 'concepts/baselines', 'concepts/evidence', 'accessibility-101'] },
+        { label: 'Understand', items: ['concepts/what-checks-miss', 'concepts/baselines', 'concepts/evidence', 'concepts/comparison', 'accessibility-101'] },
         { label: 'Reference', items: ['reference/cli', 'reference/config', { label: 'Rules', items: [{ autogenerate: { directory: 'rules' } }] }] },
         { label: 'More', items: ['faq'] },
       ],

@@ -1,0 +1,47 @@
+# v0.1 launch checklist
+
+The brief asks for a Google-style launch checklist before every public release. Each line is checked off with evidence (a link, a command output, a screenshot); nothing is ticked on trust. **F** marks what only Florent can do.
+
+## Product
+
+- [ ] The 60-second quickstart works on a clean machine: Windows, macOS and Linux, `npx pragu` from npm, timed (M2 exit criterion).
+- [ ] `pragu doctor` gives the right fix for each missing piece on that clean machine: no adb, no device, wrong Node.
+- [ ] Every error rule meets precision 0.90 on the seeded bench and, where it has 5+ labelled barriers, on the real bench's test half (D-08); results published with counts and intervals.
+- [ ] The real bench has at least 20 distinct screens across 5 apps (D-16).
+- [ ] The transcript checked on a phone with TalkBack (D-14), and the report's wording matches.
+- [ ] Report, docs and CLI pass the axe checks (CI); a keyboard walk-through and a screen-reader pass of the report and the docs, recorded in the release notes.
+
+## Facts and claims
+
+- [x] Competitors re-checked with sources (`apps/docs/.../concepts/comparison.md`, 2026-11-03). Re-check again in the week of launch.
+- [ ] Every number and legal date in README, docs and posts has a source, re-checked in the week of launch (WHO, ICSE 2020, EAA, DOJ Title II).
+- [ ] No "compliant", "certified" or "100%" anywhere: `grep -riE "complian|certif|100%" README.md apps/docs/src` reviewed by hand.
+- [ ] **F** Trademark search for "Pragu" (EUIPO TMview), and the result noted.
+
+## Security and privacy
+
+- [ ] **F** Private vulnerability reporting turned on (SECURITY.md depends on it).
+- [ ] Threat model reviewed for the GitHub Action (D-38): artifacts, fork pull requests, tokens.
+- [ ] `--redact` checked on a real report: no app text in the HTML or JSON.
+- [ ] The release APK has no INTERNET permission (`verifyReleaseNoInternetPermission` in the release workflow).
+
+## Release
+
+- [ ] **F** `@pragu` npm organisation; trusted publishing for `pragu`, `@pragu/core`, `@pragu/report` (ADR-013).
+- [ ] **F** Release keystore and its four secrets.
+- [ ] `pnpm changeset version`, review `CHANGELOG.md`, tag `v0.1.0`; the release workflow is green; `v0` tag moved to it for the action.
+- [ ] npm shows provenance on all three packages; the GitHub Release has the APK, `SHA256SUMS` and the SBOM.
+- [ ] Each package has a README (npm shows it).
+
+## Docs and community
+
+- [ ] **F** GitHub Pages on, `DOCS_DEPLOY` set; the site is live and its links work.
+- [ ] **F** The code of conduct's contact is set.
+- [ ] README: a GIF of a scan and the report, the quickstart from npm, the comparison, what checks miss.
+- [ ] "good first issue" labels on a few owner-task-sized issues.
+
+## Launch
+
+- [ ] **F** Three design partners have run Pragu on a test build (F-7 protocol).
+- [ ] **F** Posts reviewed and approved (`docs/launch/posts.md`): nothing is posted without Florent.
+- [ ] **F** Launch day chosen when Florent can answer comments for two days.
