@@ -75,6 +75,8 @@ const STARTER = `import { defineConfig } from 'pragu';
 export default defineConfig({
   app: 'com.example.shop',
   failOn: 'error',
+  // Screens to check, each opened on a fresh start; waitFor is a testID shown once the screen has loaded:
+  // screens: [{ name: 'Cart', deepLink: 'shop://cart', waitFor: 'cart-title' }],
   // Turn a rule off, or change its severity:
   // rules: { 'target/size': 'error' },
   // Issues you decided to live with; every entry needs a reason, and reports count them:

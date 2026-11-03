@@ -252,6 +252,76 @@ describe('scan --from-capture (whole pipeline, no device)', () => {
     );
   });
 
+  it('scans every screen a screens.json lists, under its name, and writes one for the next run', async () => {
+    const captureFile = await writeFixtureCapture();
+    await writeFile(join(dir, 'screen-2.json'), await readFile(captureFile));
+    await writeFile(join(dir, 'screen-2.png'), await readFile(join(dir, 'screen-1.png')));
+    const list = join(dir, 'screens.json');
+    await writeFile(
+      list,
+      JSON.stringify({
+        screens: [
+          { name: 'Cart', capture: 'screen-1.json' },
+          { name: 'Checkout', capture: 'screen-2.json' },
+        ],
+      }),
+    );
+    const { sink } = capturingIo();
+    const out = join(dir, 'two');
+
+    expect(await main(['scan', '--from-capture', list, '--out', out, '--fail-on', 'never'], sink)).toBe(0);
+
+    const result = JSON.parse(await readFile(join(out, 'pragu-result.json'), 'utf8')) as ScanResult;
+    expect(result.screens.map((screen) => [screen.id, screen.name])).toEqual([
+      ['screen-1', 'Cart'],
+      ['screen-2', 'Checkout'],
+    ]);
+    expect(result.issues.filter((issue) => issue.screenId === 'screen-1')).toHaveLength(3);
+    expect(result.issues).toHaveLength(6);
+    // The same element on two screens gives two issues that a baseline can tell apart.
+    expect(new Set(result.issues.map((issue) => issue.fingerprint)).size).toBe(6);
+    const report = await readFile(join(out, 'pragu-report.html'), 'utf8');
+    expect(report).toContain('<h2 id="screen-2-heading">Checkout <span');
+    expect(report).toContain('id="issue-6"');
+
+    const again = join(dir, 'again');
+    const rerunList = join(out, 'capture', 'screens.json');
+    expect(await main(['scan', '--from-capture', rerunList, '--out', again, '--fail-on', 'never'], sink)).toBe(0);
+    const rerun = JSON.parse(await readFile(join(again, 'pragu-result.json'), 'utf8')) as ScanResult;
+    expect(rerun.issues.map((issue) => issue.fingerprint)).toEqual(result.issues.map((issue) => issue.fingerprint));
+  });
+
+  it('opens configured screens only when launching, and explains flags that conflict with them', async () => {
+    dir = await mkdtemp(join(tmpdir(), 'pragu-cli-'));
+    const configFile = join(dir, 'pragu.config.mjs');
+    await writeFile(
+      configFile,
+      "export default { app: 'com.example.shop', screens: [{ name: 'Cart', deepLink: 'shop://cart' }] };\n",
+    );
+    const run = async (...args: string[]) => {
+      const { io, sink } = capturingIo();
+      const code = await main(['scan', '--config', configFile, ...args], sink);
+      return { code, stderr: io.stderr };
+    };
+
+    const unknown = await run('--screen', 'Checkout');
+    expect(unknown.code).toBe(2);
+    expect(unknown.stderr).toContain('--screen "Checkout" is not one of the screens in pragu.config.ts.');
+    expect(unknown.stderr).toContain('Known screens: Cart.');
+
+    const named = await run('--screen-name', 'Cart');
+    expect(named.code).toBe(2);
+    expect(named.stderr).toContain('Use --screen <name> to scan one of them');
+
+    const onShow = await run('--screen', 'Cart', '--no-launch');
+    expect(onShow.code).toBe(2);
+    expect(onShow.stderr).toContain('cannot be combined with --no-launch or --from-capture');
+
+    const none = capturingIo();
+    expect(await main(['scan', '--app', 'com.example.shop', '--screen', 'Cart'], none.sink)).toBe(2);
+    expect(none.io.stderr).toContain('pragu.config.ts lists no screens');
+  });
+
   it('explains a missing capture file', async () => {
     const { io, sink } = capturingIo();
     expect(await main(['scan', '--from-capture', 'nope.json'], sink)).toBe(2);

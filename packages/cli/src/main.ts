@@ -1,5 +1,5 @@
 import { parseArgs } from 'node:util';
-import type { Issue } from '@pragu/core';
+import type { Issue, ScreenConfig } from '@pragu/core';
 import { existsSync } from 'node:fs';
 import { relative } from 'node:path';
 import { Adb, findAdb } from './adb.js';
@@ -33,15 +33,17 @@ Usage
 
 Scan options
   --app <id>             Application id to launch and scan, e.g. com.example.shop
+  --screen <name>        Scan only this screen from the "screens" in pragu.config.ts
   --config <file>        Use this config instead of pragu.config.ts in this folder
   --baseline <file>      Fail only on issues that are not in this baseline
   --out <dir>            Where to write the report and JSON (default: pragu-report)
   --serial <id>          Device to use when several are connected (see "adb devices")
   --install <apk>        Install this APK before scanning
-  --screen-name <name>   Name for the screen in the report
+  --screen-name <name>   Name for the screen in the report, when no screens are configured
   --fail-on <level>      Exit 1 on issues at this severity or worse: error, warning, info, never (default: error)
 
-Flags win over pragu.config.ts, which wins over the defaults.
+Flags win over pragu.config.ts, which wins over the defaults. With "screens" in the config
+(name and deep link each), Pragu opens every screen on a fresh start and checks it.
   --no-launch            Scan whatever is on screen instead of launching the app
   --check-font-scale     Also capture at 200% text to find text that is cut off; changes the
                          device's font size for a few seconds and always restores it
@@ -70,6 +72,7 @@ function parseScanArgs(args: string[]) {
         baseline: { type: 'string' },
         serial: { type: 'string' },
         install: { type: 'string' },
+        screen: { type: 'string' },
         'screen-name': { type: 'string' },
         'fail-on': { type: 'string' },
         'no-launch': { type: 'boolean', default: false },
@@ -86,6 +89,46 @@ function parseScanArgs(args: string[]) {
       'Run "pragu scan --help".',
     );
   }
+}
+
+type ScanValues = ReturnType<typeof parseScanArgs>;
+
+/** The configured screens a scan opens: all of them, the one --screen names, or none when scanning what is on show. */
+function chooseScreens(
+  configured: readonly ScreenConfig[] | undefined,
+  values: ScanValues,
+): ScreenConfig[] | undefined {
+  const onShow = values['no-launch'] || values['from-capture'] !== undefined;
+  const wanted = values.screen;
+  if (wanted !== undefined) {
+    if (onShow) {
+      throw new PraguError(
+        EXIT.usage,
+        '--screen opens a screen from pragu.config.ts, so it cannot be combined with --no-launch or --from-capture.',
+        'Leave out one of them.',
+      );
+    }
+    const match = configured?.find((screen) => screen.name === wanted);
+    if (match !== undefined) return [match];
+    throw new PraguError(
+      EXIT.usage,
+      configured === undefined
+        ? `--screen "${wanted}": pragu.config.ts lists no screens.`
+        : `--screen "${wanted}" is not one of the screens in pragu.config.ts.`,
+      configured === undefined
+        ? 'Add screens: [{ name, deepLink }] to pragu.config.ts, or leave out --screen.'
+        : `Known screens: ${configured.map((screen) => screen.name).join(', ')}.`,
+    );
+  }
+  if (onShow || configured === undefined) return undefined;
+  if (values['screen-name'] !== undefined) {
+    throw new PraguError(
+      EXIT.usage,
+      '--screen-name names a single screen, but pragu.config.ts lists screens with their own names.',
+      'Use --screen <name> to scan one of them, or --no-launch to scan what is on show.',
+    );
+  }
+  return [...configured];
 }
 
 function describeIssue(issue: Issue, index: number): string {
@@ -105,6 +148,10 @@ async function runScan(args: string[], io: Io): Promise<number> {
   if (!FAIL_ON.includes(failOn)) {
     throw new PraguError(EXIT.usage, `--fail-on must be one of ${FAIL_ON.join(', ')}.`);
   }
+  const screens = chooseScreens(config.screens, values);
+  if (values['no-launch'] && config.screens !== undefined) {
+    io.err('Scanning what is on show (--no-launch); the screens in pragu.config.ts are not opened.\n');
+  }
   const appId = values.app ?? config.app;
   if (appId === undefined && values['from-capture'] === undefined) {
     throw new PraguError(
@@ -122,6 +169,7 @@ async function runScan(args: string[], io: Io): Promise<number> {
       installApk: values.install,
       agentApk: values['agent-apk'],
       screenName: values['screen-name'],
+      screens,
       failOn,
       fromCapture: values['from-capture'],
       launch: !values['no-launch'],
