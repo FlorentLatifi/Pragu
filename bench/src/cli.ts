@@ -13,6 +13,7 @@ import { renderMarkdown } from './report.js';
 
 // Usage:
 //   node bench/dist/cli.js evaluate [--update]                 score the recordings (CI runs this)
+//   node bench/dist/cli.js evaluate --bar-only                  only check the 0.90 bar for error rules (other Android versions)
 //   node bench/dist/cli.js record [--install] [--only <fixture>] [--serial <id>] [--budget-seconds <n>]   refresh recordings on a device
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
@@ -28,7 +29,7 @@ function printTable(result: BenchResult): void {
   }
 }
 
-async function evaluateCommand(update: boolean): Promise<number> {
+async function evaluateCommand(update: boolean, barOnly: boolean): Promise<number> {
   const outcomes = await loadOutcomes(root, await loadFixtures(root));
   const result = evaluate(
     outcomes,
@@ -39,6 +40,13 @@ async function evaluateCommand(update: boolean): Promise<number> {
     console.log(
       `Below the bar: ${rule.rule} has precision ${formatMetric(rule.precision)}; error rules need 0.90 by the end of M1.`,
     );
+  }
+  // Another Android version renders differently, so exact equality with the published table
+  // would fail for no reason; what must hold everywhere is the precision bar (D-25).
+  if (barOnly) {
+    const below = errorRulesBelowBar(result);
+    console.log(below.length === 0 ? 'Every error rule meets the 0.90 bar.' : 'An error rule is below the 0.90 bar.');
+    return below.length === 0 ? 0 : 1;
   }
   if (update) {
     await writeFile(resultsFile, `${JSON.stringify(result, null, 2)}\n`);
@@ -70,7 +78,7 @@ function valueAfter(args: readonly string[], flag: string): string | undefined {
 const [command = 'evaluate', ...args] = process.argv.slice(2);
 try {
   if (command === 'evaluate') {
-    process.exitCode = await evaluateCommand(args.includes('--update'));
+    process.exitCode = await evaluateCommand(args.includes('--update'), args.includes('--bar-only'));
   } else if (command === 'record') {
     const options = {
       install: args.includes('--install'),
@@ -83,7 +91,7 @@ try {
     });
   } else {
     console.error(
-      `Unknown command "${command}". Use "evaluate [--update]" or "record [--install] [--only <fixture>] [--serial <id>] [--budget-seconds <n>]".`,
+      `Unknown command "${command}". Use "evaluate [--update | --bar-only]" or "record [--install] [--only <fixture>] [--serial <id>] [--budget-seconds <n>]".`,
     );
     process.exitCode = 2;
   }

@@ -8,7 +8,14 @@ on:
   push:
     branches: [main]
   pull_request:
+  # Weekly on Android 11 (API 30), the oldest supported version (D-25).
+  schedule:
+    - cron: '17 3 * * 0'
   workflow_dispatch:
+    inputs:
+      api-level:
+        description: Android API level to record on
+        default: '36'
 
 permissions:
   contents: read
@@ -18,7 +25,8 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  API_LEVEL: 36
+  # 36 on every push; 30 on the weekly run, or what a manual run asks for.
+  API_LEVEL: ${{ github.event_name == 'schedule' && '30' || inputs.api-level || '36' }}
   # Seconds one scan may take on a CI emulator: the slowest measured scan was 7.6 s, so 20 s
   # absorbs runner noise and still catches a real slowdown (docs/testing/strategy.md).
   SCAN_BUDGET_SECONDS: 20
@@ -102,7 +110,11 @@ jobs:
           # On failure, keep the device log with the recordings, since the emulator is gone afterwards.
           script: node bench/dist/cli.js record --install --budget-seconds ${{ env.SCAN_BUDGET_SECONDS }} || { adb logcat -d > bench/recordings/logcat.txt; exit 1; }
       - name: The live recordings reproduce the published bench results
+        if: env.API_LEVEL == '36'
         run: pnpm bench
+      - name: Every error rule keeps the 0.90 bar on this Android version
+        if: env.API_LEVEL != '36'
+        run: node bench/dist/cli.js evaluate --bar-only
 
       - name: Keep the recordings for review
         if: failure()
