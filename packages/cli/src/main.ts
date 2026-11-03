@@ -148,7 +148,7 @@ function chooseScreens(
 function describeIssue(issue: Issue, index: number): string {
   const label = issue.severity.charAt(0).toUpperCase() + issue.severity.slice(1);
   const where = issue.resourceId === null ? '' : ` · ${issue.resourceId}`;
-  return `  ${String(index + 1)}. ${label}: ${issue.title}${where} (WCAG ${issue.wcag.join(', ')})\n`;
+  return `  ${String(index + 1)}. ${label}: ${issue.title}${where} (${issue.wcag.length === 0 ? 'best practice' : `WCAG ${issue.wcag.join(', ')}`})\n`;
 }
 
 async function runScan(args: string[], io: Io): Promise<number> {

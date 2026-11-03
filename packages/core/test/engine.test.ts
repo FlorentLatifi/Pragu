@@ -149,6 +149,8 @@ describe('summarize', () => {
         'text/scaling-truncation',
         'target/size',
         'name/duplicate',
+        'name/role-in-label',
+        'structure/no-headings',
       ],
     });
   });

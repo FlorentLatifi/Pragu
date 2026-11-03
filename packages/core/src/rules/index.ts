@@ -3,6 +3,8 @@ import { focusUnreachable } from './focus-unreachable.js';
 import { imageMissingName } from './image-missing-name.js';
 import { inputMissingLabel } from './input-missing-label.js';
 import { interactiveMissingName } from './interactive-missing-name.js';
+import { noHeadings } from './no-headings.js';
+import { roleInLabel } from './role-in-label.js';
 import { stateNotExposed } from './state-not-exposed.js';
 import { targetSize } from './target-size.js';
 import { textContrast } from './text-contrast.js';
@@ -15,6 +17,8 @@ export {
   imageMissingName,
   inputMissingLabel,
   interactiveMissingName,
+  noHeadings,
+  roleInLabel,
   stateNotExposed,
   targetSize,
   textContrast,
@@ -35,4 +39,6 @@ export const defaultRules: readonly Rule[] = [
   textScalingTruncation,
   targetSize,
   duplicateName,
+  roleInLabel,
+  noHeadings,
 ];

@@ -15,7 +15,7 @@ function listRules(rules: readonly Rule[]): string {
   const titleWidth = Math.max(...rules.map((rule) => rule.meta.title.length));
   const lines = rules.map(
     ({ meta }) =>
-      `  ${meta.id.padEnd(idWidth)}  ${meta.severity.padEnd(7)}  ${meta.title.padEnd(titleWidth)}  WCAG ${meta.wcag.join(', ')}`,
+      `  ${meta.id.padEnd(idWidth)}  ${meta.severity.padEnd(7)}  ${meta.title.padEnd(titleWidth)}  ${meta.wcag.length === 0 ? 'best practice' : `WCAG ${meta.wcag.join(', ')}`}`,
   );
   return [
     `${String(rules.length)} rules. Errors fail a scan by default (--fail-on error); warnings and info do not.`,
@@ -29,7 +29,9 @@ function listRules(rules: readonly Rule[]): string {
 
 function explainRule(rule: Rule): string {
   const { meta } = rule;
-  const standards = [`WCAG 2.2: ${meta.wcag.join(', ')}`];
+  const standards = [
+    meta.wcag.length === 0 ? 'Best practice (no WCAG criterion)' : `WCAG 2.2: ${meta.wcag.join(', ')}`,
+  ];
   if (meta.en301549.length > 0) standards.push(`EN 301 549: ${meta.en301549.join(', ')}`);
   const fixes = FIX_LABELS.filter(([toolkit]) => meta.fix[toolkit].trim() !== '').map(
     ([toolkit, label]) => `Fix in ${label}: ${meta.fix[toolkit]}`,

@@ -55,7 +55,7 @@ describe('pragu command line', () => {
   it('lists the rules, explains one with its fixes, and names the known ones for a typo', async () => {
     const list = capturingIo();
     expect(await main(['rules'], list.sink)).toBe(0);
-    expect(list.io.stdout).toMatch(/^9 rules\./);
+    expect(list.io.stdout).toMatch(/^11 rules\./);
     expect(list.io.stdout).toMatch(/ {2}contrast\/text +error +Text contrast is too low +WCAG 1\.4\.3/);
 
     const one = capturingIo();

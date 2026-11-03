@@ -47,7 +47,7 @@ function renderIssue(result: ScanResult, issue: Issue): string {
   const element = issue.resourceId === null ? '' : ` › \`${issue.resourceId.replaceAll('`', '')}\``;
   const said = spoken(result, issue);
   const lines = [
-    `- **${SEVERITY_LABEL[issue.severity]}** · ${inline(screen)}${element}: ${inline(issue.title)} (WCAG ${issue.wcag.join(', ')})`,
+    `- **${SEVERITY_LABEL[issue.severity]}** · ${inline(screen)}${element}: ${inline(issue.title)} (${issue.wcag.length === 0 ? 'best practice' : `WCAG ${issue.wcag.join(', ')}`})`,
     `  ${inline(issue.message)}`,
   ];
   if (said !== null) lines.push(`  Screen reader says: "${inline(said)}"`);
