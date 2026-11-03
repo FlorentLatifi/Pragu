@@ -76,6 +76,8 @@ figcaption { margin-top: 12px; }
 .screen-sign.is-dimmed, .plate.is-dimmed { background: var(--surface); color: var(--muted); border-style: dashed; border-color: var(--muted); z-index: 0; }
 .screen-sign.is-dimmed .sign-measure { border-left-color: var(--muted); }
 .screen-sign.is-dimmed { pointer-events: none; }
+.score { margin: 0 0 12px; font-size: 16px; }
+.score strong { font: 700 20px var(--font-mono); }
 .screens { padding: 32px 0; border-bottom: 1px solid var(--line); }
 .screen-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); }
 .screen-list li { display: flex; flex-direction: column; gap: 4px; padding: 12px 16px; background: var(--surface); border-left: 4px solid var(--signal); }
@@ -148,6 +150,7 @@ figcaption { margin-top: 12px; }
     <div><dt>Info</dt><dd>0</dd></div>
     <div><dt>Screens</dt><dd>1</dd></div>
   </dl>
+  
   <p class="rules">By WCAG principle: Perceivable 0 · Operable 1 · Understandable 0 · Robust 1. An issue under two criteria counts under both.</p>
   <p class="rules">Rules run: <code>name/interactive-missing</code>, <code>contrast/text</code>, <code>target/size</code></p>
   
@@ -237,7 +240,7 @@ figcaption { margin-top: 12px; }
 </section>
 </main>
 <footer class="footer">
-  <p>Pragu 0.0.0 · result schema 0.11.0 · Generated on this machine; nothing was uploaded.</p>
+  <p>Pragu 0.0.0 · result schema 0.12.0 · Generated on this machine; nothing was uploaded.</p>
 </footer>
 <script>(function () {
   var root = document.documentElement;

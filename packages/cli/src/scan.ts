@@ -11,6 +11,7 @@ import {
   coverText,
   parseAndroidCapture,
   redactResult,
+  scoreResult,
   screenshotBlocked,
   summarize,
 } from '@pragu/core';
@@ -532,6 +533,7 @@ export async function scan(options: ScanOptions, log: (line: string) => void): P
     screens,
     issues,
     summary,
+    score: scoreResult({ screens, issues, summary }),
   };
 
   const shared = options.redact

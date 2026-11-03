@@ -2,6 +2,8 @@ import { existsSync } from 'node:fs';
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { defaultRules, scoreResult, scoreScreen } from '@pragu/core';
 import type { Issue, ScanResult } from '@pragu/core';
 import { PNG } from 'pngjs';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -150,7 +152,7 @@ describe('scan --from-capture (whole pipeline, no device)', () => {
 
     expect(code).toBe(1);
     const result = JSON.parse(await readFile(join(out, 'pragu-result.json'), 'utf8')) as ScanResult;
-    expect(result.schemaVersion).toBe('0.11.0');
+    expect(result.schemaVersion).toBe('0.12.0');
     expect(result.issues.map((issue) => [issue.ruleId, issue.resourceId])).toEqual([
       ['target/size', 'seed-tiny-dismiss'],
       ['name/interactive-missing', 'seed-unlabeled-remove'],
@@ -416,14 +418,10 @@ describe('scan --from-capture (whole pipeline, no device)', () => {
     const result = JSON.parse(await readFile(head, 'utf8')) as ScanResult;
 
     // Main already had the target and contrast issues; this change adds the unlabelled button.
+    const mainIssues = result.issues.filter((issue) => issue.ruleId !== 'name/interactive-missing');
+    const mainScan = { ...result, issues: mainIssues, score: scoreResult({ ...result, issues: mainIssues }) };
     const base = join(dir, 'main.json');
-    await writeFile(
-      base,
-      JSON.stringify({
-        ...result,
-        issues: result.issues.filter((issue) => issue.ruleId !== 'name/interactive-missing'),
-      }),
-    );
+    await writeFile(base, JSON.stringify(mainScan));
     const comment = capturingIo();
     expect(
       await main(
@@ -442,6 +440,34 @@ describe('scan --from-capture (whole pipeline, no device)', () => {
     await main(['comment', head, '--base', head], none.sink);
     expect(none.io.stdout).toContain('### Pragu · no new barriers in this pull request');
   });
+
+  // Three full scans of real recordings, slow under coverage instrumentation.
+  it(
+    'reproduces the Pragu score worked example in ADR-012 from the bench recordings',
+    { timeout: 60_000 },
+    async () => {
+      dir = await mkdtemp(join(tmpdir(), 'pragu-score-'));
+      const recordings = new URL('../../../bench/recordings/', import.meta.url);
+      const cases = [
+        ['rn-shop/cart.json', 57.45],
+        ['rn-shop/summary.json', 89.89],
+        ['android-compose/settings.json', 75.62],
+      ] as const;
+      for (const [file, expected] of cases) {
+        const out = join(dir, file.replace('/', '-'));
+        await main(
+          ['scan', '--from-capture', fileURLToPath(new URL(file, recordings)), '--out', out, '--fail-on', 'never'],
+          capturingIo().sink,
+        );
+        const result = JSON.parse(await readFile(join(out, 'pragu-result.json'), 'utf8')) as ScanResult;
+        const screen = result.screens[0];
+        if (screen === undefined) throw new Error('a scan has a screen');
+        const rules = defaultRules.filter((rule) => result.summary.rulesRun.includes(rule.meta.id));
+        expect(scoreScreen(screen, result.issues, rules)).toBeCloseTo(expected, 2);
+        expect(result.score.value).toBe(Math.floor(expected));
+      }
+    },
+  );
 
   it('explains a missing capture file', async () => {
     const { io, sink } = capturingIo();

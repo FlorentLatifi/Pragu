@@ -41,6 +41,7 @@ function resultFromRecording(dir: string, screenId: string): ScanResult {
     screens: [screen],
     issues,
     summary: summarize(issues, defaultRules),
+    score: { version: 1, value: null, screens: {} },
   };
 }
 

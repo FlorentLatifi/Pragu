@@ -1,7 +1,7 @@
 import { existsSync } from 'node:fs';
 import { writeFile } from 'node:fs/promises';
 import { parseArgs } from 'node:util';
-import { transcript } from '@pragu/core';
+import { comparableScores, transcript } from '@pragu/core';
 import type { Issue, ScanResult } from '@pragu/core';
 import { readResult } from './baseline.js';
 import { EXIT, PraguError } from './errors.js';
@@ -78,7 +78,14 @@ export function renderComment(head: ScanResult, options: CommentOptions): string
   const listed = added.slice(0, MAX_LISTED).map((issue) => renderIssue(head, issue));
   const more = added.length > MAX_LISTED ? [`…and ${String(added.length - MAX_LISTED)} more in the report.`] : [];
   const compared = options.base === null ? 'the baseline' : 'the latest scan of the main branch';
+  const score =
+    head.score.value === null
+      ? null
+      : options.base !== null && comparableScores(head, options.base)
+        ? `Pragu score ${String(options.base.score.value)} → ${String(head.score.value)}`
+        : `Pragu score ${String(head.score.value)}/100`;
   const footer = [
+    score,
     `${plural(head.screens.length, 'screen', 'screens')} checked · ${plural(known, 'known issue', 'known issues')} not listed (compared with ${compared})`,
     options.reportUrl === null ? null : `Full report: [pragu-report](${options.reportUrl})`,
     'Automated checks find some barriers, not all; test with TalkBack too.',

@@ -90,6 +90,7 @@ export function renderReport({ result, screenshots }: ReportInput): string {
     <div><dt>Info</dt><dd>${String(summary.infos)}</dd></div>
     <div><dt>Screens</dt><dd>${String(result.screens.length)}</dd></div>
   </dl>
+  ${result.score.value === null ? '' : `<p class="score">Pragu score <strong>${String(result.score.value)}</strong>/100 · from automated checks; 100 does not mean accessible</p>`}
   ${renderPrinciples(issues)}
   <p class="rules">Rules run: ${summary.rulesRun.map((id) => `<code>${escapeHtml(id)}</code>`).join(', ')}</p>
   ${summary.baseline === null ? '' : `<p class="baseline">${escapeHtml(`Compared with ${summary.baseline.file}: ${String(summary.baseline.newIssues)} new · ${String(summary.baseline.known)} already in the baseline · ${String(summary.baseline.fixed)} fixed since`)}</p>`}
@@ -97,7 +98,7 @@ export function renderReport({ result, screenshots }: ReportInput): string {
   ${summary.ignored === 0 ? '' : `<p class="rules">${escapeHtml(plural(summary.ignored, 'issue', 'issues'))} ignored by the project's config (pragu.config.ts), not counted above.</p>`}
   ${renderFilters(issues, summary.baseline !== null)}
 </section>
-${renderScreenGrid(result.screens, issues)}
+${renderScreenGrid(result.screens, issues, result.score.screens)}
 ${renderRuleIndex(numbered, summary.rulesRun)}
 ${screens}
 ${summary.baseline === null ? '' : renderFixed(summary.baseline)}
@@ -141,12 +142,18 @@ function severityCounts(issues: readonly Issue[]): string {
 }
 
 /** With several screens, one line each, so a reader sees at once where the barriers are. */
-function renderScreenGrid(screens: readonly PamScreen[], issues: readonly Issue[]): string {
+function renderScreenGrid(
+  screens: readonly PamScreen[],
+  issues: readonly Issue[],
+  scores: Readonly<Record<string, number | null>>,
+): string {
   if (screens.length < 2) return '';
   const items = screens
     .map((screen) => {
       const own = issues.filter((issue) => issue.screenId === screen.id);
-      return `<li><a href="#${screen.id}">${escapeHtml(screen.name)}</a><span class="screen-count${own.length === 0 ? ' screen-clear' : ''}">${escapeHtml(severityCounts(own))}</span></li>`;
+      const score = scores[screen.id];
+      const scoreText = score === undefined || score === null ? '' : ` · score ${String(score)}`;
+      return `<li><a href="#${screen.id}">${escapeHtml(screen.name)}</a><span class="screen-count${own.length === 0 ? ' screen-clear' : ''}">${escapeHtml(severityCounts(own) + scoreText)}</span></li>`;
     })
     .join('');
   return `<section class="screens" aria-labelledby="screens-heading">
@@ -638,6 +645,8 @@ figcaption { margin-top: 12px; }
 .screen-sign.is-dimmed, .plate.is-dimmed { background: var(--surface); color: var(--muted); border-style: dashed; border-color: var(--muted); z-index: 0; }
 .screen-sign.is-dimmed .sign-measure { border-left-color: var(--muted); }
 .screen-sign.is-dimmed { pointer-events: none; }
+.score { margin: 0 0 12px; font-size: 16px; }
+.score strong { font: 700 20px var(--font-mono); }
 .screens { padding: 32px 0; border-bottom: 1px solid var(--line); }
 .screen-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); }
 .screen-list li { display: flex; flex-direction: column; gap: 4px; padding: 12px 16px; background: var(--surface); border-left: 4px solid var(--signal); }

@@ -54,6 +54,7 @@ export const textContrast: Rule = {
   meta: {
     id: 'contrast/text',
     title: 'Text contrast is too low',
+    requires: ['screenshot'],
     severity: 'error',
     confidence: 'high',
     wcag: ['1.4.3'],

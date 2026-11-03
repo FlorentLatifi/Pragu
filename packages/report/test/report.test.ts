@@ -73,6 +73,7 @@ function result(issues: Issue[]): ScanResult {
       baseline: null,
       rulesRun: ['name/interactive-missing', 'contrast/text', 'target/size'],
     },
+    score: { version: 1, value: null, screens: {} },
   };
 }
 

@@ -17,6 +17,7 @@ export const textScalingTruncation: Rule = {
   meta: {
     id: 'text/scaling-truncation',
     title: 'Text is cut off at a larger font size',
+    requires: ['largeText'],
     severity: 'error',
     confidence: 'high',
     wcag: ['1.4.4'],

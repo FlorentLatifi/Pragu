@@ -209,6 +209,9 @@ async function runScan(args: string[], io: Io): Promise<number> {
   io.out(
     `${count(result.issues.length, 'barrier', 'barriers')}: ${count(errors, 'error', 'errors')}, ${count(warnings, 'warning', 'warnings')}, ${String(infos)} info\n`,
   );
+  if (result.score.value !== null) {
+    io.out(`Pragu score: ${String(result.score.value)}/100 (automated checks; 100 does not mean accessible)\n`);
+  }
   if (result.summary.baseline !== null) {
     const { newIssues, known, fixed } = result.summary.baseline;
     io.out(`Baseline: ${String(newIssues)} new, ${String(known)} already accepted, ${String(fixed)} fixed since\n`);

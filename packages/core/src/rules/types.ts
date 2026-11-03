@@ -12,6 +12,8 @@ export interface RuleMeta {
   whoIsAffected: string;
   whatTheyExperience: string;
   fix: FixGuidance;
+  /** What the rule reads beyond the tree; without it on a screen, the rule is left out of the score (ADR-012). */
+  requires?: ('screenshot' | 'largeText')[];
 }
 
 export interface RuleContext {

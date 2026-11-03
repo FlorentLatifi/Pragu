@@ -3,6 +3,8 @@ export { contrastRatio, estimateTextColors, formatRatio, relativeLuminance, toHe
 export type { Raster, TextColors } from './color.js';
 export { screenshotBlocked } from './blocked-screenshot.js';
 export { REDACTED, coverText, redactMessage, redactResult } from './redact.js';
+export { SCORE_VERSION, comparableScores, penaltyShare, ruleWeight, scoreResult, scoreScreen } from './score.js';
+export type { Score } from './score.js';
 export {
   ANDROID_AGENT_PROTOCOL,
   accessibleName,

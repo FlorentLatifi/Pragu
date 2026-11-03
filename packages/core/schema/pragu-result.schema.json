@@ -1,13 +1,24 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:pragu:result:0.11.0",
+  "$id": "urn:pragu:result:0.12.0",
   "title": "Pragu scan result",
   "description": "pragu-result.json: what one scan found. The stable machine contract; see packages/core/schema/README.md for the versioning policy.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "tool", "startedAt", "device", "app", "redacted", "screens", "issues", "summary"],
+  "required": [
+    "schemaVersion",
+    "tool",
+    "startedAt",
+    "device",
+    "app",
+    "redacted",
+    "screens",
+    "issues",
+    "summary",
+    "score"
+  ],
   "properties": {
-    "schemaVersion": { "const": "0.11.0" },
+    "schemaVersion": { "const": "0.12.0" },
     "tool": {
       "type": "object",
       "additionalProperties": false,
@@ -15,6 +26,20 @@
       "properties": { "name": { "const": "pragu" }, "version": { "type": "string" } }
     },
     "startedAt": { "type": "string", "description": "ISO 8601 time the scan started." },
+    "score": {
+      "description": "The Pragu score (ADR-012): 0-100 from automated checks, floored. Never a claim of compliance.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "value", "screens"],
+      "properties": {
+        "version": { "type": "integer", "minimum": 1 },
+        "value": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 },
+        "screens": {
+          "type": "object",
+          "additionalProperties": { "type": ["integer", "null"], "minimum": 0, "maximum": 100 }
+        }
+      }
+    },
     "redacted": {
       "type": "boolean",
       "description": "The app's text was replaced for sharing (--redact): names, texts, hints, window titles, quotes in messages, evidence."
