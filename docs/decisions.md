@@ -89,7 +89,7 @@ The composite action, `pragu comment`, "new" meaning not in the latest `main` re
 
 - **D-39 Docs site:** Astro Starlight in `apps/docs`, on GitHub Pages, in the Signal tokens. The rules reference is generated from rule metadata. Local search, no analytics. *Alternatives:* VitePress, Docusaurus; Starlight wins on accessibility defaults. Implemented 2026-11-03 (`apps/docs`, Astro 7.4.2, Starlight 0.42.7; `docs.yml` builds it and runs axe on every change, and deploys once Pages is on and `DOCS_DEPLOY` is `true`).
 - **D-40 Brand:** the name Pragu and the tagline stay. A wordmark only; no logo spend before 1.0.
-- **D-41 Governance:**
+- **D-41 Governance:** Implemented 2026-11-03 (`GOVERNANCE.md`, `CODE_OF_CONDUCT.md`, templates, `dco.yml`).
   - BDFL (Florent), written down in `GOVERNANCE.md`;
   - the current Contributor Covenant before v0.1;
   - DCO sign-off enforced on outside pull requests (Florent's own commits are exempt: he owns the copyright);
