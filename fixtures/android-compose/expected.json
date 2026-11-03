@@ -34,7 +34,8 @@
         { "rule": "target/size", "testID": "twin-expanded-info", "note": "as twin-expanded-clear" },
         { "rule": "target/size", "testID": "twin-star-1", "note": "end star: it gains the free side's enlargement" },
         { "rule": "target/size", "testID": "twin-star-5", "note": "end star: it gains the free side's enlargement" },
-        { "rule": "structure/no-headings", "node": "0", "note": "the screen has a heading" }
+        { "rule": "structure/no-headings", "node": "0", "note": "the screen has a heading" },
+        { "rule": "target/platform-size", "testID": "twin-labeled-back", "note": "48 x 47.6 dp: a 48 dp IconButton, rounded to whole pixels" }
       ]
     },
     {
@@ -86,10 +87,16 @@
       "marker": "screen-help",
       "barriers": [
         { "rule": "structure/no-headings", "node": "0", "note": "eleven texts; the titles are bold, but none is marked as a heading" },
-        { "rule": "name/role-in-label", "testID": "seed-role-in-label-close", "note": "\"Close button\": TalkBack says the role twice" }
+        { "rule": "name/role-in-label", "testID": "seed-role-in-label-close", "note": "\"Close button\": TalkBack says the role twice" },
+        { "rule": "name/generic", "testID": "seed-generic-name", "note": "named just \"Icon\"" },
+        { "rule": "contrast/non-text", "testID": "seed-pale-icon", "note": "#C8C8C8 icon on white, 1.6:1" }
       ],
       "correctTwins": [
-        { "rule": "name/role-in-label", "testID": "twin-labeled-back-help", "note": "named just \"Back\"" }
+        { "rule": "name/role-in-label", "testID": "twin-labeled-back-help", "note": "named just \"Back\"" },
+        { "rule": "name/generic", "testID": "twin-labeled-back-help", "note": "\"Back\" says what it does" },
+        { "rule": "contrast/non-text", "testID": "twin-labeled-back-help", "note": "dark icon on white" },
+        { "rule": "target/platform-size", "testID": "twin-labeled-back-help", "note": "Material IconButton, 48 dp" },
+        { "rule": "target/platform-size", "testID": "twin-enlarged-small-target", "note": "drawn at 40 dp; Compose enlarges its touch area to 48 dp and reports that (ADR-009)" }
       ]
     }
   ]

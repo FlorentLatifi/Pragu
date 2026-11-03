@@ -83,7 +83,9 @@
         { "rule": "contrast/text", "testID": "seed-placeholder-only", "note": "placeholder #B0B0B0 on white is 2.1:1" },
         { "rule": "input/missing-label", "testID": "seed-unlabeled-input", "note": "the \"Promo code\" text above is not connected to it; TalkBack says only \"Edit box\"" },
         { "rule": "input/placeholder-label", "testID": "seed-placeholder-only", "note": "placeholder only: it disappears from view as soon as someone types" },
-        { "rule": "state/not-exposed", "testID": "seed-unlabeled-checkbox", "note": "no role either: nothing in the tree says it is a checkbox, so a scan cannot tell it from a button. Seeing it needs a tap (crawler, M3)" }
+        { "rule": "state/not-exposed", "testID": "seed-unlabeled-checkbox", "note": "no role either: nothing in the tree says it is a checkbox, so a scan cannot tell it from a button. Seeing it needs a tap (crawler, M3)" },
+        { "rule": "target/platform-size", "testID": "seed-unlabeled-checkbox", "note": "24 x 24 dp: passes WCAG, misses Android's 48 dp" },
+        { "rule": "target/platform-size", "testID": "twin-labeled-switch", "note": "React Native's stock Switch is 27 dp tall" }
       ],
       "correctTwins": [
         { "rule": "name/interactive-missing", "testID": "twin-labeled-switch" },

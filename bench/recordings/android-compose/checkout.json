@@ -1,7 +1,7 @@
 {
   "protocol": 4,
   "agentVersion": "0.0.5",
-  "capturedAt": "2026-11-03T20:25:12.405589Z",
+  "capturedAt": "2026-11-03T21:37:58.392230Z",
   "packageName": "dev.pragu.fixtures.compose",
   "windowTitle": "Compose shop",
   "screenWidthPx": 1080,
@@ -1343,7 +1343,7 @@
                                 "checked": false,
                                 "enabled": false,
                                 "editable": false,
-                                "visibleToUser": true,
+                                "visibleToUser": false,
                                 "importantForAccessibility": true,
                                 "heading": false,
                                 "screenReaderFocusable": true,
@@ -1376,7 +1376,7 @@
                                     "checked": false,
                                     "enabled": true,
                                     "editable": false,
-                                    "visibleToUser": true,
+                                    "visibleToUser": false,
                                     "importantForAccessibility": true,
                                     "heading": false,
                                     "screenReaderFocusable": false,
@@ -1413,7 +1413,7 @@
                                     "checked": false,
                                     "enabled": true,
                                     "editable": false,
-                                    "visibleToUser": true,
+                                    "visibleToUser": false,
                                     "importantForAccessibility": true,
                                     "heading": false,
                                     "screenReaderFocusable": false,
@@ -1440,8 +1440,22 @@
       }
     },
     {
-      "type": "system",
+      "type": "input_method",
       "layer": 1,
+      "title": "English (US) (QWERTY)",
+      "bounds": [
+        0,
+        1517,
+        1080,
+        2400
+      ],
+      "active": false,
+      "focused": false,
+      "root": null
+    },
+    {
+      "type": "system",
+      "layer": 2,
       "title": null,
       "bounds": [
         0,

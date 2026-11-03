@@ -187,6 +187,66 @@
       "mcc": 1
     },
     {
+      "rule": "name/generic",
+      "severity": "warning",
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1,
+      "precision": 1,
+      "recall": 1,
+      "precisionInterval": {
+        "low": 0.2065,
+        "high": 1
+      },
+      "recallInterval": {
+        "low": 0.2065,
+        "high": 1
+      },
+      "f1": 1,
+      "mcc": 1
+    },
+    {
+      "rule": "contrast/non-text",
+      "severity": "warning",
+      "tp": 1,
+      "fp": 0,
+      "fn": 0,
+      "tn": 1,
+      "precision": 1,
+      "recall": 1,
+      "precisionInterval": {
+        "low": 0.2065,
+        "high": 1
+      },
+      "recallInterval": {
+        "low": 0.2065,
+        "high": 1
+      },
+      "f1": 1,
+      "mcc": 1
+    },
+    {
+      "rule": "target/platform-size",
+      "severity": "info",
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "tn": 3,
+      "precision": 1,
+      "recall": 1,
+      "precisionInterval": {
+        "low": 0.3423,
+        "high": 1
+      },
+      "recallInterval": {
+        "low": 0.3423,
+        "high": 1
+      },
+      "f1": 1,
+      "mcc": 1
+    },
+    {
       "rule": "name/role-in-label",
       "severity": "info",
       "tp": 1,

@@ -1,7 +1,7 @@
 {
   "protocol": 4,
   "agentVersion": "0.0.5",
-  "capturedAt": "2026-11-03T20:25:34.094609Z",
+  "capturedAt": "2026-11-03T21:38:16.514123Z",
   "packageName": "dev.pragu.fixtures.compose",
   "windowTitle": "Compose shop",
   "screenWidthPx": 1080,
@@ -1445,7 +1445,7 @@
       "title": "English (US) (QWERTY)",
       "bounds": [
         0,
-        1396,
+        1517,
         1080,
         2400
       ],
