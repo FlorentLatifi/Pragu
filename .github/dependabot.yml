@@ -1,9 +1,14 @@
 version: 2
+# Dependabot rewrites the lockfile itself, so pnpm's release-age guard never sees its updates.
+# A 7-day cooldown keeps the same rule: no release younger than a week (docs/decisions.md, D-36).
+# Security updates are not delayed by a cooldown.
 updates:
   - package-ecosystem: npm
     directory: /
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
     ignore:
       # Node types follow the oldest supported Node (22); see docs/adr/002-tooling.md.
       - dependency-name: '@types/node'
@@ -18,7 +23,11 @@ updates:
     directory: /agents/android
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
+    cooldown:
+      default-days: 7
