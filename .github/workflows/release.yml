@@ -1,0 +1,104 @@
+name: Release
+
+# Publishes a tagged version (ADR-013): every check, the agent signed with the release key,
+# the agent bundled into the CLI with its SHA-256, npm packages published with trusted
+# publishing (OIDC, provenance), and a GitHub Release with the APK, checksums and an SBOM.
+#
+# Before the first run, Florent sets up (docs/decisions.md, F-1 and F-5):
+#   - secrets PRAGU_KEYSTORE_BASE64, PRAGU_KEYSTORE_PASSWORD, PRAGU_KEY_ALIAS, PRAGU_KEY_PASSWORD;
+#   - the @pragu organisation on npm, and this workflow as the trusted publisher of each package.
+# Then: pnpm changeset version, commit, tag vX.Y.Z, push the tag.
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Release ${{ github.ref_name }}
+    if: github.repository == 'FlorentLatifi/Pragu'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: release
+    permissions:
+      contents: write # the GitHub Release
+      id-token: write # npm trusted publishing and provenance
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
+
+      - name: The tag matches the package versions
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          for pkg in cli core report; do
+            actual=$(node -p "require('./packages/$pkg/package.json').version")
+            if [ "$actual" != "$version" ]; then
+              echo "packages/$pkg is $actual, the tag says $version. Run pnpm changeset version first."; exit 1
+            fi
+          done
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+      - run: pnpm bench
+      - run: pnpm report:a11y
+
+      - name: Build and sign the agent
+        working-directory: agents/android
+        env:
+          KEYSTORE_BASE64: ${{ secrets.PRAGU_KEYSTORE_BASE64 }}
+          PRAGU_KEYSTORE_PASSWORD: ${{ secrets.PRAGU_KEYSTORE_PASSWORD }}
+          PRAGU_KEY_ALIAS: ${{ secrets.PRAGU_KEY_ALIAS }}
+          PRAGU_KEY_PASSWORD: ${{ secrets.PRAGU_KEY_PASSWORD }}
+          PRAGU_VERSION_CODE: ${{ github.run_number }}
+        run: |
+          export PRAGU_KEYSTORE_FILE="$RUNNER_TEMP/release.jks"
+          export PRAGU_VERSION="$VERSION"
+          echo "$KEYSTORE_BASE64" | base64 --decode > "$PRAGU_KEYSTORE_FILE"
+          ./gradlew --no-daemon :agent:assembleRelease :agent:testDebugUnitTest :agent:lintRelease :agent:verifyReleaseNoInternetPermission
+          rm "$PRAGU_KEYSTORE_FILE"
+
+      - name: Bundle the agent into the CLI
+        run: node scripts/bundle-agent.mjs
+
+      - name: Pack
+        run: |
+          mkdir -p "$RUNNER_TEMP/packages"
+          for pkg in core report cli; do (cd "packages/$pkg" && pnpm pack --pack-destination "$RUNNER_TEMP/packages"); done
+          cp packages/cli/agent/pragu-agent.apk "$RUNNER_TEMP/packages/pragu-agent-$VERSION.apk"
+          pnpm sbom --sbom-format cyclonedx --prod > "$RUNNER_TEMP/packages/pragu-$VERSION.cdx.json"
+          (cd "$RUNNER_TEMP/packages" && sha256sum * > SHA256SUMS)
+
+      - name: Publish to npm (trusted publishing, provenance)
+        run: |
+          npm install --global npm@11.21.1
+          for tarball in "$RUNNER_TEMP"/packages/*.tgz; do npm publish "$tarball" --access public --provenance; done
+
+      - name: GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" --title "Pragu $VERSION" --notes-file "packages/cli/CHANGELOG.md" --verify-tag \
+            "$RUNNER_TEMP"/packages/*.apk "$RUNNER_TEMP"/packages/*.cdx.json "$RUNNER_TEMP"/packages/SHA256SUMS

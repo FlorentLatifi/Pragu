@@ -12,15 +12,28 @@ android {
         applicationId = "dev.pragu.agent"
         minSdk = 26
         targetSdk = 37
-        versionCode = 5
-        versionName = "0.0.5"
+        // The release workflow sets both from the tag, so the agent's version is the CLI's (ADR-013).
+        versionCode = System.getenv("PRAGU_VERSION_CODE")?.toInt() ?: 5
+        versionName = System.getenv("PRAGU_VERSION") ?: "0.0.5"
+    }
+
+    // The release keystore lives only in CI secrets (ADR-013); local and pull-request builds use the debug key.
+    val keystore = System.getenv("PRAGU_KEYSTORE_FILE")
+    signingConfigs {
+        if (keystore != null) {
+            create("release") {
+                storeFile = file(keystore)
+                storePassword = System.getenv("PRAGU_KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("PRAGU_KEY_ALIAS")
+                keyPassword = System.getenv("PRAGU_KEY_PASSWORD")
+            }
+        }
     }
 
     buildTypes {
         release {
             isMinifyEnabled = false
-            // Signed with the local debug key until release signing moves to CI secrets (M2).
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName(if (keystore != null) "release" else "debug")
         }
     }
 

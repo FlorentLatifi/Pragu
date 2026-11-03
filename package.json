@@ -21,9 +21,11 @@
     "bench": "node bench/dist/cli.js evaluate",
     "bench:update": "node bench/dist/cli.js evaluate --update",
     "bench:record": "node bench/dist/cli.js record --install",
+    "changeset": "changeset",
     "report:a11y": "node scripts/check-report-a11y.mjs"
   },
   "devDependencies": {
+    "@changesets/cli": "3.0.3",
     "@eslint/js": "10.0.1",
     "@types/node": "22.20.5",
     "@types/pngjs": "6.0.5",

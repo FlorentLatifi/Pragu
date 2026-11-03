@@ -3,6 +3,12 @@
   "version": "0.0.0",
   "description": "Find the accessibility barriers in your mobile app before your users hit them.",
   "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FlorentLatifi/Pragu.git",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://github.com/FlorentLatifi/Pragu#readme",
   "type": "module",
   "bin": {
     "pragu": "./dist/bin.js"
@@ -27,5 +33,9 @@
   },
   "engines": {
     "node": ">=22.18"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }
