@@ -10,6 +10,7 @@ import {
   enabledRules,
   normalizeAndroidCapture,
   parseAndroidCapture,
+  screenshotBlocked,
   summarize,
 } from '@pragu/core';
 import type {
@@ -102,7 +103,8 @@ export function exitCodeFor(issues: readonly Issue[], failOn: FailOn): number {
 
 interface RawCapture {
   capture: AndroidCapture;
-  png: Buffer;
+  /** Null when the app blocks screenshots (FLAG_SECURE): tree rules still run, pixel rules do not. */
+  png: Buffer | null;
 }
 
 /** The 200% capture; its screenshot is kept for people to look at, but no rule reads it. */
@@ -128,10 +130,8 @@ function screenId(index: number): string {
 async function captureOnce(session: AgentSession, appId: string): Promise<RawCapture> {
   const frame = await session.request({ cmd: 'capture', packageName: appId, timeoutMs: 30_000 }, 45_000);
   const tree = frame.payloads.get('tree');
-  const png = frame.payloads.get('screenshot');
-  if (tree === undefined || png === undefined) {
-    throw new PraguError(EXIT.environment, 'The agent answered without a tree or a screenshot.');
-  }
+  if (tree === undefined) throw new PraguError(EXIT.environment, 'The agent answered without a tree.');
+  const png = frame.payloads.get('screenshot') ?? null;
   return { capture: parseAndroidCapture(JSON.parse(tree.toString('utf8'))), png };
 }
 
@@ -349,7 +349,7 @@ async function captureFromDevice(options: ScanOptions, log: (line: string) => vo
 /** Reads one saved capture, with the 200% capture a scan with --check-font-scale saved next to it. */
 async function readCapture(file: string): Promise<RawCapture & { largeText: LargeTextCapture | null }> {
   const pngFile = file.replace(/\.json$/, '.png');
-  if (!existsSync(file) || !existsSync(pngFile)) {
+  if (!existsSync(file)) {
     throw new PraguError(
       EXIT.usage,
       `--from-capture needs ${file} and ${pngFile}.`,
@@ -366,7 +366,8 @@ async function readCapture(file: string): Promise<RawCapture & { largeText: Larg
     : null;
   return {
     capture: parseAndroidCapture(JSON.parse(await readFile(file, 'utf8'))),
-    png: await readFile(pngFile),
+    // A screen that blocked screenshots was saved without one.
+    png: existsSync(pngFile) ? await readFile(pngFile) : null,
     largeText,
   };
 }
@@ -432,7 +433,7 @@ async function saveCaptures(captureDir: string, raws: readonly RawScreen[]): Pro
   await mkdir(captureDir, { recursive: true });
   for (const raw of raws) {
     await writeFile(join(captureDir, `${raw.id}.json`), `${JSON.stringify(raw.capture, null, 2)}\n`);
-    await writeFile(join(captureDir, `${raw.id}.png`), raw.png);
+    if (raw.png !== null) await writeFile(join(captureDir, `${raw.id}.png`), raw.png);
     if (raw.largeText !== null) {
       const base = join(captureDir, `${raw.id}${LARGE_TEXT_SUFFIX}`);
       await writeFile(`${base}.json`, `${JSON.stringify(raw.largeText.capture, null, 2)}\n`);
@@ -464,14 +465,19 @@ export async function scan(options: ScanOptions, log: (line: string) => void): P
     const normalized = normalizeAndroidCapture(raw.capture, {
       screenId: raw.id,
       screenName: raw.name,
-      screenshotFile: relative(options.outDir, join(captureDir, `${raw.id}.png`)).replaceAll('\\', '/'),
+      screenshotFile:
+        raw.png === null ? null : relative(options.outDir, join(captureDir, `${raw.id}.png`)).replaceAll('\\', '/'),
     });
-    const decoded = PNG.sync.read(raw.png);
+    const decoded = raw.png === null ? null : PNG.sync.read(raw.png);
+    const raster = decoded === null ? null : { width: decoded.width, height: decoded.height, data: decoded.data };
+    // A secure window comes back painted black: keep the file, but check and show no pixels.
+    const blocked = raster !== null && screenshotBlocked(normalized.screen, raster);
+    const screen = withLargeText(normalized.screen, raw.largeText);
     return {
       raw,
       device: normalized.device,
-      screen: withLargeText(normalized.screen, raw.largeText),
-      raster: { width: decoded.width, height: decoded.height, data: decoded.data },
+      screen: blocked ? { ...screen, screenshot: null } : screen,
+      raster: blocked ? null : raster,
     };
   });
   const first = prepared[0];
@@ -482,7 +488,9 @@ export async function scan(options: ScanOptions, log: (line: string) => void): P
   const found = analyze({
     device,
     screens,
-    rasters: new Map(prepared.map((entry) => [entry.raw.id, entry.raster])),
+    rasters: new Map(
+      prepared.flatMap((entry) => (entry.raster === null ? [] : [[entry.raw.id, entry.raster] as const])),
+    ),
     rules,
   });
   const configured = applyConfig(found, options.config, new Map(screens.map((screen) => [screen.id, screen.name])));
@@ -512,7 +520,11 @@ export async function scan(options: ScanOptions, log: (line: string) => void): P
     reportFile,
     renderReport({
       result,
-      screenshots: new Map(prepared.map((entry) => [entry.raw.id, reportScreenshot(entry.raw.png)])),
+      screenshots: new Map(
+        prepared.flatMap(({ raw, raster }) =>
+          raw.png === null || raster === null ? [] : [[raw.id, reportScreenshot(raw.png)] as const],
+        ),
+      ),
     }),
   );
   // With a baseline, only new issues can fail the build.

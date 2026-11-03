@@ -360,6 +360,23 @@ describe('scan --from-capture (whole pipeline, no device)', () => {
     expect(missing.io.stderr).toContain('Tell Pragu which scan result to render.');
   });
 
+  it('checks a screen that blocked screenshots by its tree alone, and says why contrast is missing', async () => {
+    const captureFile = await writeFixtureCapture();
+    await rm(join(dir, 'screen-1.png'));
+    const { sink } = capturingIo();
+    const out = join(dir, 'secure');
+
+    await main(['scan', '--from-capture', captureFile, '--out', out, '--fail-on', 'never'], sink);
+
+    const result = JSON.parse(await readFile(join(out, 'pragu-result.json'), 'utf8')) as ScanResult;
+    expect(result.screens[0]?.screenshot).toBeNull();
+    expect(result.issues.map((issue) => issue.ruleId)).toEqual(['target/size', 'name/interactive-missing']);
+    const report = await readFile(join(out, 'pragu-report.html'), 'utf8');
+    expect(report).toContain('The app blocks screenshots on this screen (FLAG_SECURE');
+    expect(report).toContain('No screenshot was captured for this screen.');
+    expect(existsSync(join(out, 'capture', 'screen-1.png'))).toBe(false);
+  });
+
   it('explains a missing capture file', async () => {
     const { io, sink } = capturingIo();
     expect(await main(['scan', '--from-capture', 'nope.json'], sink)).toBe(2);

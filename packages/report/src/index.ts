@@ -230,6 +230,11 @@ export function screenNotes(screen: PamScreen): string[] {
       'This screen contains web content (a WebView). Pragu checks native UI only; test web content with a web tool such as axe-core.',
     );
   }
+  if (screen.screenshot === null) {
+    notes.push(
+      'The app blocks screenshots on this screen (FLAG_SECURE, common in banking apps), so text contrast was not checked.',
+    );
+  }
   const foreground = screen.windows.findIndex((window) => window.foreground);
   if (screen.nodes.some((node) => node.scrollable && node.window === foreground)) {
     notes.push('This screen scrolls. Only the part on screen was checked; scroll and scan again for the rest.');
