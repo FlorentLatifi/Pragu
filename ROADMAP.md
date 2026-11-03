@@ -6,7 +6,7 @@ Milestones come from the [founding brief](docs/00-founding-brief.md); dates depe
 |---|---|---|
 | M0 Foundations | Environment, docs, repo, CI, walking skeleton | Done (approved) |
 | M1 Android MVP | Full initial rule set, transcript, report v1, config, JSON/SARIF, `doctor`, baselines, Pragu Bench v1 | Closing: owner tasks and the TalkBack check left ([plan](docs/plans/m1.md)) |
-| M2 CI + public v0.1 | Several screens per scan, Pragu score, real-app bench, GitHub Action, PR comment, SARIF upload, docs site, launch | Proposed ([plan](docs/plans/m2.md)) |
+| M2 CI + public v0.1 | Several screens per scan, Pragu score, real-app bench, GitHub Action, PR comment, SARIF upload, docs site, launch | In progress ([plan](docs/plans/m2.md)) |
 | M3 Coverage | Maestro/Detox flows, safe crawler, font-scale and theme matrix, Expo config plugin | Planned |
 | M4 Intelligence | Label suggestions (local first), React Native source mapping | Planned |
 | M5 Fixes + 1.0 | Verified auto-fix PRs, API stability, benchmark write-up | Planned |

@@ -24,7 +24,6 @@ The full register is [docs/decisions.md](decisions.md) (2026-11-03, 45 decisions
 
 Section L of [docs/decisions.md](decisions.md) has each one with a recommendation. The most urgent:
 
-- Approve moving M1's "20 screens" to the real bench (D-16) and the [M2 plan](plans/m2.md).
 - Reserve the `@pragu` npm organisation (F-1); turn on private vulnerability reporting (F-6).
 - Merge the three green Dependabot PRs once each release is a week old (F-10).
 
@@ -89,7 +88,7 @@ All error rules meet the 0.90 bar. Known misses stay published: home-made checkb
 1. **Florent:** the decisions in section L of `docs/decisions.md`; the M1 walkthrough and its three questions (`docs/plans/m1-walkthrough.md`).
 2. **Florent:** check the transcript on a phone with TalkBack's "Display speech output" (D-14): rn-shop cart and Compose checkout, every spoken line written down.
 3. **Florent's owner tasks**, briefs ready: SARIF writer (`docs/plans/owner-task-sarif.md`); `target/size` platform tier, `name/generic`, `contrast/non-text` (`docs/plans/owner-tasks-rules.md`).
-4. **Claude, once the M2 plan is approved,** in its order, without touching the owner tasks' files: several screens per scan (work package 1), then the honest edges (work package 2), then distribution (work package 6).
+4. **Claude** (the M2 plan was approved on 2026-11-03), in its order, without touching the owner tasks' files: several screens per scan (work package 1), then the honest edges (work package 2), then distribution (work package 6).
 
 ## Notes and risks
 

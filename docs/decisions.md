@@ -34,7 +34,7 @@
 - **D-13 Real-app bench:** blind labelling, a held-out test set, Wilson intervals, and ATF as a comparator (ADR-015).
 - **D-14 Checking the transcript against TalkBack:** Florent, on a physical phone, with TalkBack's developer setting "Display speech output". He swipes through the rn-shop cart and the Compose checkout and writes down each line. Shell-injected gestures could not move TalkBack's focus on the emulator (2026-10-29). A later automation idea: Pragu moves accessibility focus itself and reads TalkBack's spoken-text toasts from accessibility events. That checks wording, not order.
 - **D-15 `focus/order` waits for D-14.**
-- **D-16 The M1 exit criterion "20 screens"** is met by the real bench in M2 (at least 20 distinct screens across at least 5 apps), not by fixtures. **Needs Florent's approval.**
+- **D-16 The M1 exit criterion "20 screens"** is met by the real bench in M2 (at least 20 distinct screens across at least 5 apps), not by fixtures. Approved by Florent on 2026-11-03.
 - **D-17 Thesis (recommendation; Florent decides):**
   - RQ1: precision and recall of Pragu versus ATF on the held-out real bench.
   - RQ2: do "who it hurts" messages change how fast and how well developers fix barriers (a small controlled study)?
@@ -109,7 +109,7 @@ The composite action, `pragu comment`, "new" meaning not in the latest `main` re
 - **F-1** Reserve the `@pragu` npm organisation. [Now: it is free, and the name could be taken.]
 - **F-2** Buy `pragu.dev` before launch. [Yes; until then, the GitHub Pages address.]
 - **F-3** Where the repository lives. [Stay on `FlorentLatifi/Pragu` until there is a second maintainer: no overhead, clear authorship.]
-- **F-4** Approve D-16 and the M2 plan (`docs/plans/m2.md`).
+- **F-4** ~~Approve D-16 and the M2 plan~~: approved on 2026-11-03.
 - **F-5** Create the release keystore and the GitHub secrets; set up npm trusted publishing (ADR-013).
 - **F-6** Turn on private vulnerability reporting (`SECURITY.md` depends on it).
 - **F-7** Choose 3 design partners, under this protocol: Pragu runs on their machine and their test build; screenshots, results and recordings stay with them; Florent receives only what they choose (by default, per-rule counts of confirmed and false findings); their app never enters the public bench or a public post without written permission.
