@@ -9,7 +9,7 @@ The brief asks for a Google-style launch checklist before every public release. 
 - [ ] Every error rule meets precision 0.90 on the seeded bench and, where it has 5+ labelled barriers, on the real bench's test half (D-08); results published with counts and intervals.
 - [ ] The real bench has at least 20 distinct screens across 5 apps (D-16).
 - [ ] The transcript checked on a phone with TalkBack (D-14), and the report's wording matches.
-- [ ] Report, docs and CLI pass the axe checks (CI); a keyboard walk-through and a screen-reader pass of the report and the docs, recorded in the release notes.
+- [ ] Report, docs and CLI pass the axe checks (CI: `report:a11y` 24 runs and `docs:a11y` 24 runs pass, 2026-11-03); still to do: a keyboard walk-through and a screen-reader pass of the report and the docs, recorded in the release notes.
 
 ## Facts and claims
 
@@ -21,8 +21,8 @@ The brief asks for a Google-style launch checklist before every public release. 
 ## Security and privacy
 
 - [ ] **F** Private vulnerability reporting turned on (SECURITY.md depends on it).
-- [ ] Threat model reviewed for the GitHub Action (D-38): artifacts, fork pull requests, tokens.
-- [ ] `--redact` checked on a real report: no app text in the HTML or JSON.
+- [x] Threat model reviewed for the GitHub Action and the release pipeline (D-38), 2026-11-03: `docs/security/threat-model.md`, with a test that app text cannot inject Markdown or HTML into the comment.
+- [x] `--redact` checked on a real report (five rn-shop screens on the emulator, 2026-11-03): none of the app texts checked is left in the HTML or JSON.
 - [ ] The release APK has no INTERNET permission (`verifyReleaseNoInternetPermission` in the release workflow).
 
 ## Release
@@ -31,13 +31,13 @@ The brief asks for a Google-style launch checklist before every public release. 
 - [ ] **F** Release keystore and its four secrets.
 - [ ] `pnpm changeset version`, review `CHANGELOG.md`, tag `v0.1.0`; the release workflow is green; `v0` tag moved to it for the action.
 - [ ] npm shows provenance on all three packages; the GitHub Release has the APK, `SHA256SUMS` and the SBOM.
-- [ ] Each package has a README (npm shows it).
+- [x] Each package has a README (npm shows it); `pnpm package:check` installs the packed tarballs with npm into an empty folder and runs them, in CI on Linux, Windows and macOS.
 
 ## Docs and community
 
 - [ ] **F** GitHub Pages on, `DOCS_DEPLOY` set; the site is live and its links work.
 - [ ] **F** The code of conduct's contact is set.
-- [ ] README: a GIF of a scan and the report, the quickstart from npm, the comparison, what checks miss.
+- [ ] README: a report screenshot (done, `docs/images/report.png`), what checks miss (done); still to do: the quickstart from npm once published, and a link to the comparison page once the docs are live.
 - [ ] "good first issue" labels on a few owner-task-sized issues.
 
 ## Launch

@@ -8,6 +8,8 @@ Pragu finds accessibility barriers in your mobile app, shows who they hurt, and 
 
 ## What works today
 
+![Pragu's report for a product screen: the screenshot with numbered yellow signs such as "1 no name", "3 1.53 : 1" and "6 20.2 × 19.8 dp" on the elements, next to the first issue, "Interactive element has no accessible name", with who it affects, what they experience and the fix in React Native, Jetpack Compose and Android Views.](docs/images/report.png)
+
 The React Native fixture's cart screen, re-analysed from a capture recorded on an emulator (no device needed):
 
 ```text
