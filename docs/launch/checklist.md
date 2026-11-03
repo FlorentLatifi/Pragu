@@ -36,7 +36,7 @@ The brief asks for a Google-style launch checklist before every public release. 
 ## Docs and community
 
 - [ ] **F** GitHub Pages on, `DOCS_DEPLOY` set; the site is live and its links work.
-- [ ] **F** The code of conduct's contact is set.
+- [x] **F** The code of conduct's contact is set (2026-11-04).
 - [ ] README: a report screenshot (done, `docs/images/report.png`), what checks miss (done); still to do: the quickstart from npm once published, and a link to the comparison page once the docs are live.
 - [ ] "good first issue" labels on a few owner-task-sized issues.
 

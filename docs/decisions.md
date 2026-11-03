@@ -116,7 +116,7 @@ The composite action, `pragu comment`, "new" meaning not in the latest `main` re
 - **F-6** ~~Turn on private vulnerability reporting~~: done on 2026-11-04.
 - **F-7** Choose 3 design partners, under this protocol: Pragu runs on their machine and their test build; screenshots, results and recordings stay with them; Florent receives only what they choose (by default, per-rule counts of confirmed and false findings); their app never enters the public bench or a public post without written permission.
 - **F-8** The launch date, and approval of the posts (Show HN, r/reactnative, Expo).
-- **F-9** A trademark search (EUIPO TMview) before launch, and a contact email for the code of conduct.
+- **F-9** A trademark search (EUIPO TMview) before launch. The code of conduct's contact is set (2026-11-04).
 - **F-10** Dependabot PRs #3 (AGP 9.5.0), #4 (setup-gradle 6.4.1) and #5 (ESLint 10.14.0, typescript-eslint 8.72.1): all green. [Merge, once each release is a week old.]
 - **F-11** Thesis questions (D-17).
 - **F-12** GitHub Sponsors. [After 1.0, if there is traction.]

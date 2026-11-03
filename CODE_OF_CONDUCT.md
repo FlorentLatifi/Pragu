@@ -10,6 +10,6 @@ In short:
 
 ## Reporting
 
-Report anything that breaks this code to the maintainer, Florent Latifi, at **[contact to be set before v0.1]**. Reports are read only by the maintainer and handled in confidence. The maintainer may correct, warn, temporarily ban or permanently ban a participant, following the Covenant's enforcement guidelines.
+Report anything that breaks this code to the maintainer, Florent Latifi, at **[florentlatifi123@gmail.com](mailto:florentlatifi123@gmail.com)**. Reports are read only by the maintainer and handled in confidence. The maintainer may correct, warn, temporarily ban or permanently ban a participant, following the Covenant's enforcement guidelines.
 
 Security problems go through [SECURITY.md](SECURITY.md) instead.
