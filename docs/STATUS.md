@@ -73,7 +73,8 @@ Walking skeleton on the emulator, CI, docs (PRD, technical design, ADR-001 to 00
 - **Several screens per scan** (work package 1, first part; D-02): `screens: [{ name, deepLink?, waitFor? }]` in `pragu.config.ts`. One scan opens each screen on a fresh start, in one agent session, and waits for the `waitFor` element so a splash screen is never checked under the screen's name. `--screen <name>` picks one. With `--check-font-scale` the scale changes once and every screen is opened again at 200%. Captures and a `capture/screens.json` stay next to the report, so `--from-capture` re-runs the whole scan without a device.
   - On the emulator (2026-11-03), all five rn-shop screens in one scan took 42 s on an emulator still settling after boot (load average 8) and found the 18 issues the bench finds on those screens; with the 200% pass, 93 s and 19 issues, the 19th the seeded truncation; the font scale was back at 1.0 afterwards. A bad deep link and a missing `waitFor` element each stop the scan with a fix.
   - The five-screen report is 777 KB, about 155 KB per screen: screenshot downscaling (D-20, work package 2) is next.
-- Checks: 279 TypeScript tests (plus 18 owner-task todos), lint, typecheck.
+- **The rest of work package 1:** `pragu rules [--explain <id>]` (from rule metadata); `pragu report <pragu-result.json>` (re-renders from a result and its kept screenshots; refuses another schema version and says how to re-analyse); `--verbose` (each adb command and agent request with its duration, checked on the emulator); the report lists the screens with their counts when a scan has several, and counts issues per WCAG principle. The axe check now includes a three-screen report (24 runs, passing).
+- Checks: 283 TypeScript tests (plus 18 owner-task todos), lint, typecheck, bench, report axe check.
 
 ## Bench results (8 screens: rn-shop, android-compose)
 
@@ -96,7 +97,7 @@ All error rules meet the 0.90 bar. Known misses stay published: home-made checkb
 1. **Florent:** the decisions in section L of `docs/decisions.md`; the M1 walkthrough and its three questions (`docs/plans/m1-walkthrough.md`).
 2. **Florent:** check the transcript on a phone with TalkBack's "Display speech output" (D-14): rn-shop cart and Compose checkout, every spoken line written down.
 3. **Florent's owner tasks**, briefs ready: SARIF writer (`docs/plans/owner-task-sarif.md`); `target/size` platform tier, `name/generic`, `contrast/non-text` (`docs/plans/owner-tasks-rules.md`).
-4. **Claude** (the M2 plan was approved on 2026-11-03), in its order, without touching the owner tasks' files: the rest of work package 1 (screen grid and counts by WCAG principle in the report, `pragu report`, `pragu rules`, `--verbose`), then the honest edges (work package 2), then distribution (work package 6).
+4. **Claude** (the M2 plan was approved on 2026-11-03), in its order, without touching the owner tasks' files: the honest edges (work package 2), then distribution (work package 6).
 
 ## Notes and risks
 

@@ -34,7 +34,7 @@ Device / emulator                         Developer machine or CI
 
 Around the scan: `pragu.config.ts` (`defineConfig()`, loaded with Node's own type stripping) turns rules off or changes their severity, ignores issues with a reason (counted in `summary.ignored`), and sets defaults that flags override. `pragu init` writes a starter config; `pragu doctor` checks Node, adb, the device, the agent and the config with exact fixes. With `--baseline <file>` (from `pragu baseline create --from <pragu-result.json>`), only issues not in the baseline fail the scan; results mark `inBaseline` and summarise new, known and fixed (ADR-004).
 
-`--from-capture` re-runs steps 8–9 from a saved capture, or from a `screens.json` for the whole scan. Tests use it to cover the whole pipeline without a device.
+`--from-capture` re-runs steps 8–9 from a saved capture, or from a `screens.json` for the whole scan. Tests use it to cover the whole pipeline without a device. `pragu report <pragu-result.json>` only re-renders the HTML, without running rules; `pragu rules [--explain <id>]` prints the rule metadata; `--verbose` traces every adb command and agent request with its duration.
 
 ## Pragu Accessibility Model (PAM)
 
