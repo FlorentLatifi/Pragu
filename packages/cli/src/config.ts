@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs';
-import { writeFile } from 'node:fs/promises';
-import { join, relative, resolve } from 'node:path';
+import { mkdir, writeFile } from 'node:fs/promises';
+import { dirname, join, relative, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parseConfig } from '@pragu/core';
 import type { PraguConfig } from '@pragu/core';
@@ -83,6 +83,69 @@ export default defineConfig({
   // ignore: [{ rule: 'contrast/text', resourceId: 'promo-banner', reason: 'Brand colours; fix tracked in #123' }],
 });
 `;
+
+const WORKFLOW = `name: Accessibility
+
+# Written by "pragu init --github". Scans the app on an emulator on every pull request and
+# on pushes to the default branch, so each pull request is compared with the latest scan of it.
+on:
+  pull_request:
+  push:
+    branches: [main] # your default branch
+
+permissions:
+  contents: read
+  pull-requests: write # the comment
+  actions: read # the default branch's latest report
+  security-events: write # SARIF in code scanning
+
+jobs:
+  pragu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+
+      # Build your app's APK here, for example with Expo:
+      #   - run: npm ci && npx expo prebuild --platform android && (cd android && ./gradlew assembleRelease)
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - name: Scan on an emulator
+        uses: ReactiveCircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
+        with:
+          api-level: 36
+          target: google_apis
+          arch: x86_64
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          # Public repositories get --redact: anyone signed in to GitHub can download their artifacts.
+          script: npx --yes pragu scan --install android/app/build/outputs/apk/release/app-release.apk --out pragu-report \${{ github.event.repository.private && ' ' || '--redact' }}
+
+      - uses: FlorentLatifi/Pragu@v0
+        if: always()
+`;
+
+/** Writes a starter GitHub Actions workflow (ADR-014); never overwrites one. */
+export async function initWorkflow(cwd: string): Promise<string> {
+  const file = join(cwd, '.github', 'workflows', 'pragu.yml');
+  if (existsSync(file)) {
+    throw new PraguError(
+      EXIT.usage,
+      `This project already has ${relative(cwd, file)}.`,
+      'Edit it, or delete it first if you want a fresh one.',
+    );
+  }
+  await mkdir(dirname(file), { recursive: true });
+  await writeFile(file, WORKFLOW);
+  return file;
+}
 
 /** Writes a starter pragu.config.ts; never overwrites an existing config. */
 export async function initConfig(cwd: string): Promise<string> {

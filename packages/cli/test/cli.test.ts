@@ -7,7 +7,7 @@ import { PNG } from 'pngjs';
 import { afterEach, describe, expect, it } from 'vitest';
 import { captureOf, createRaster, fillRect, paintText, rawNode, rect } from '../../core/test/helpers.js';
 import { Adb, parseDevices } from '../src/adb.js';
-import { initConfig, loadConfig } from '../src/config.js';
+import { initConfig, initWorkflow, loadConfig } from '../src/config.js';
 import { formatError, PraguError } from '../src/errors.js';
 import { main } from '../src/main.js';
 import { installAgent } from '../src/scan.js';
@@ -601,6 +601,15 @@ describe('pragu.config.ts', () => {
     const file = await initConfig(dir);
     expect(await readFile(file, 'utf8')).toContain("import { defineConfig } from 'pragu';");
     await expect(initConfig(dir)).rejects.toThrow('This project already has pragu.config.ts.');
+  });
+
+  it('pragu init --github writes a workflow that scans, comments and redacts on public repositories', async () => {
+    dir = await mkdtemp(join(tmpdir(), 'pragu-config-'));
+    const workflow = await readFile(await initWorkflow(dir), 'utf8');
+    expect(workflow).toContain('uses: FlorentLatifi/Pragu@v0');
+    expect(workflow).toContain("${{ github.event.repository.private && ' ' || '--redact' }}");
+    expect(workflow).toContain('pull-requests: write');
+    await expect(initWorkflow(dir)).rejects.toThrow('already has');
   });
 });
 

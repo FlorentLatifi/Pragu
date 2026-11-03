@@ -6,7 +6,7 @@ import { Adb, findAdb } from './adb.js';
 import { runBaseline } from './baseline.js';
 import { syncedFolderWarning } from './cloud.js';
 import { runComment } from './comment.js';
-import { initConfig, loadConfig } from './config.js';
+import { initConfig, initWorkflow, loadConfig } from './config.js';
 import { formatChecks, runDoctor } from './doctor.js';
 import { runReport } from './report.js';
 import { runRules } from './rules.js';
@@ -29,7 +29,7 @@ const HELP = `Pragu finds accessibility barriers in your mobile app.
 
 Usage
   pragu scan --app <applicationId> [options]
-  pragu init               Write a starter pragu.config.ts
+  pragu init [--github]    Write a starter pragu.config.ts, and with --github a GitHub Actions workflow
   pragu doctor             Check Node, adb, the device and the agent, with exact fixes
   pragu rules [--explain <id>]
                            List what Pragu checks, or explain one rule and its fixes
@@ -252,8 +252,20 @@ export async function main(argv: string[], io: Io = defaultIo): Promise<number> 
       return checks.every((check) => check.ok) ? EXIT.ok : EXIT.environment;
     }
     if (command === 'init') {
+      const unknown = rest.filter((arg) => arg !== '--github');
+      if (unknown.length > 0) {
+        throw new PraguError(
+          EXIT.usage,
+          `Unknown option ${unknown.join(' ')}.`,
+          'Use "pragu init" or "pragu init --github".',
+        );
+      }
       const file = await initConfig(process.cwd());
       io.out(`Wrote ${file}. Set "app" to your applicationId, then run "pragu scan".\n`);
+      if (rest.includes('--github')) {
+        const workflow = await initWorkflow(process.cwd());
+        io.out(`Wrote ${workflow}. Add the step that builds your APK, and check the path given to --install.\n`);
+      }
       return EXIT.ok;
     }
     if (command === 'rules') return runRules(rest, io);
