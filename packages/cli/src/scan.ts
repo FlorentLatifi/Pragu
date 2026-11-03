@@ -1,7 +1,6 @@
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { dirname, join, relative } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import {
   RESULT_SCHEMA_VERSION,
   analyze,
@@ -31,6 +30,7 @@ import type { ReportScreenshot } from '@pragu/report';
 import { PNG } from 'pngjs';
 import { Adb, findAdb, selectDevice } from './adb.js';
 import { AGENT_PACKAGE, startAgentSession } from './agent.js';
+import { agentApkPath, ensureAgent } from './agent-apk.js';
 import type { AgentSession } from './agent.js';
 import { readBaseline } from './baseline.js';
 import { EXIT, PraguError } from './errors.js';
@@ -40,6 +40,7 @@ import type { Pixels } from './screenshot.js';
 import { toolVersion } from './version.js';
 
 export type { FailOn };
+export { agentApkPath, installAgent } from './agent-apk.js';
 
 export interface ScanOptions {
   appId: string | undefined;
@@ -74,32 +75,8 @@ export interface ScanOutcome {
 }
 
 const SEVERITY_RANK: Record<Severity, number> = { error: 0, warning: 1, info: 2 };
-// In the monorepo the CLI finds the agent APK that `pnpm agent:build` produced.
-const DEV_AGENT_APK = fileURLToPath(
-  new URL('../../../agents/android/agent/build/outputs/apk/release/agent-release.apk', import.meta.url),
-);
 /** Lists the captured screens and their names, so --from-capture can re-run a whole scan. */
 const SCREENS_FILE = 'screens.json';
-
-/**
- * Installs the agent, replacing one signed with another key: every machine signs its own
- * build with its own debug key, so an agent left on a device by another machine cannot be
- * updated in place. The agent keeps no data, so reinstalling loses nothing.
- */
-export async function installAgent(device: Pick<Adb, 'run'>, agentApk: string): Promise<void> {
-  try {
-    await device.run(['install', '-r', agentApk], 120_000);
-  } catch (error) {
-    if (!(error instanceof PraguError) || !error.message.includes('INSTALL_FAILED_UPDATE_INCOMPATIBLE')) throw error;
-    await device.run(['uninstall', AGENT_PACKAGE], 60_000);
-    await device.run(['install', agentApk], 120_000);
-  }
-}
-
-/** The agent APK a scan installs: --agent-apk, then PRAGU_AGENT_APK, then the one built in this repo. */
-export function agentApkPath(explicit: string | undefined): string {
-  return explicit ?? process.env.PRAGU_AGENT_APK ?? DEV_AGENT_APK;
-}
 
 export function exitCodeFor(issues: readonly Issue[], failOn: FailOn): number {
   if (failOn === 'never') return EXIT.ok;
@@ -328,7 +305,7 @@ async function captureFromDevice(options: ScanOptions, log: (line: string) => vo
       'Build it with "pnpm agent:build".',
     );
   }
-  await installAgent(device, agentApk);
+  await ensureAgent(device, agentApk);
 
   if (options.screens === undefined && options.launch) await launchApp(device, appId);
 

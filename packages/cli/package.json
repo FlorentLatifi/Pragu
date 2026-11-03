@@ -14,7 +14,8 @@
     }
   },
   "files": [
-    "dist"
+    "dist",
+    "agent"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.build.json"

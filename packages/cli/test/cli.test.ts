@@ -11,6 +11,7 @@ import { initConfig, loadConfig } from '../src/config.js';
 import { formatError, PraguError } from '../src/errors.js';
 import { main } from '../src/main.js';
 import { installAgent } from '../src/scan.js';
+import { ensureAgent, sha256, verifyBundledAgent } from '../src/agent-apk.js';
 import { syncedFolder, syncedFolderWarning } from '../src/cloud.js';
 import { downscale, reportScreenshot } from '../src/screenshot.js';
 import { FrameDecoder, parseHeader } from '../src/protocol.js';
@@ -564,6 +565,64 @@ describe('pragu.config.ts', () => {
     const file = await initConfig(dir);
     expect(await readFile(file, 'utf8')).toContain("import { defineConfig } from 'pragu';");
     await expect(initConfig(dir)).rejects.toThrow('This project already has pragu.config.ts.');
+  });
+});
+
+describe('the agent APK', () => {
+  let dir = '';
+  afterEach(async () => {
+    if (dir !== '') await rm(dir, { recursive: true, force: true });
+  });
+
+  async function apk(bytes: string): Promise<string> {
+    dir = await mkdtemp(join(tmpdir(), 'pragu-agent-'));
+    const file = join(dir, 'pragu-agent.apk');
+    await writeFile(file, bytes);
+    return file;
+  }
+
+  it('refuses a bundled agent that does not match its checksum, or has none', async () => {
+    const file = await apk('agent bytes');
+    expect(() => {
+      verifyBundledAgent(file);
+    }).toThrow('has no checksum beside it');
+    await writeFile(join(dir, 'pragu-agent.sha256'), `${sha256(file)}  pragu-agent.apk\n`);
+    expect(() => {
+      verifyBundledAgent(file);
+    }).not.toThrow();
+    await writeFile(file, 'changed bytes');
+    expect(() => {
+      verifyBundledAgent(file);
+    }).toThrow('does not match its checksum');
+  });
+
+  it('installs only when the device lacks these exact bytes', async () => {
+    const file = await apk('agent bytes');
+    const device = (installed: string | null) => {
+      const runs: string[][] = [];
+      return {
+        runs,
+        run: (args: string[]) => {
+          runs.push(args);
+          return Promise.resolve('Success');
+        },
+        shell: (args: string[]) => {
+          if (installed === null) return Promise.reject(new Error('not installed'));
+          return Promise.resolve(
+            args[0] === 'pm' ? 'package:/data/app/agent/base.apk\n' : `${installed}  /data/app/agent/base.apk\n`,
+          );
+        },
+      };
+    };
+    const same = device(sha256(file));
+    await ensureAgent(same, file);
+    expect(same.runs).toEqual([]);
+    const older = device('0'.repeat(64));
+    await ensureAgent(older, file);
+    expect(older.runs).toEqual([['install', '-r', file]]);
+    const none = device(null);
+    await ensureAgent(none, file);
+    expect(none.runs).toEqual([['install', '-r', file]]);
   });
 });
 
