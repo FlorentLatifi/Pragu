@@ -6,6 +6,7 @@ import { Adb, findAdb } from './adb.js';
 import { runBaseline } from './baseline.js';
 import { syncedFolderWarning } from './cloud.js';
 import { runComment } from './comment.js';
+import { writeSarif } from './locate.js';
 import { initConfig, initWorkflow, loadConfig } from './config.js';
 import { formatChecks, runDoctor } from './doctor.js';
 import { runReport } from './report.js';
@@ -60,6 +61,7 @@ Flags win over pragu.config.ts, which wins over the defaults. With "screens" in 
   --from-capture <json>  Re-analyse a capture saved by an earlier scan, without a device
   --agent-apk <path>     Use this agent APK instead of the bundled one
   --verbose              Print each adb command and agent request with its duration
+  --format <list>        Also write SARIF for code scanning: --format sarif (HTML and JSON are always written)
   --redact               Write a report for sharing: the app's text covered in screenshots and
                          replaced in names, quotes and the JSON; no raw captures are kept
 
@@ -93,6 +95,7 @@ function parseScanArgs(args: string[]) {
         'agent-apk': { type: 'string' },
         verbose: { type: 'boolean', default: false },
         redact: { type: 'boolean', default: false },
+        format: { type: 'string' },
         help: { type: 'boolean', short: 'h', default: false },
       },
     }).values;
@@ -157,7 +160,16 @@ async function runScan(args: string[], io: Io): Promise<number> {
     io.out(HELP);
     return EXIT.ok;
   }
-  const { config } = await loadConfig(process.cwd(), values.config);
+  const { config, file: configFile } = await loadConfig(process.cwd(), values.config);
+  const formats = new Set((values.format ?? 'html,json').split(',').map((format) => format.trim()));
+  const unknownFormat = [...formats].find((format) => !['html', 'json', 'sarif'].includes(format));
+  if (unknownFormat !== undefined) {
+    throw new PraguError(
+      EXIT.usage,
+      `--format does not know "${unknownFormat}".`,
+      'Use html, json and sarif, e.g. --format html,json,sarif.',
+    );
+  }
   const failOn = (values['fail-on'] ?? config.failOn ?? 'error') as FailOn;
   if (!FAIL_ON.includes(failOn)) {
     throw new PraguError(EXIT.usage, `--fail-on must be one of ${FAIL_ON.join(', ')}.`);
@@ -220,6 +232,9 @@ async function runScan(args: string[], io: Io): Promise<number> {
     io.out(describeIssue(issue, index));
   });
   io.out(`Report: ${outcome.reportFile}\nJSON:   ${outcome.resultFile}\n`);
+  if (formats.has('sarif')) {
+    io.out(`SARIF:  ${await writeSarif(result, outDir, process.cwd(), configFile)}\n`);
+  }
   return outcome.exitCode;
 }
 

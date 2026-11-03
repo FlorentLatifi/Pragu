@@ -1,0 +1,222 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "Pragu",
+          "version": "0.1.0",
+          "semanticVersion": "0.1.0",
+          "informationUri": "https://github.com/FlorentLatifi/Pragu",
+          "rules": [
+            {
+              "id": "name/interactive-missing",
+              "name": "Interactive element has no accessible name",
+              "shortDescription": {
+                "text": "Interactive element has no accessible name"
+              },
+              "fullDescription": {
+                "text": "People who use a screen reader (TalkBack, VoiceOver) or voice control. The screen reader announces only what kind of control it is, so they cannot tell what it does. Voice control users have no name to say."
+              },
+              "help": {
+                "text": "React Native: Describe the action with accessibilityLabel, e.g. <Pressable accessibilityLabel=\"Remove item\">.\nJetpack Compose: Give the icon a contentDescription, or add Modifier.semantics { contentDescription = \"Remove item\" }.\nAndroid Views: Set android:contentDescription=\"@string/remove_item\" on the button or ImageButton.",
+                "markdown": "**Who it affects:** People who use a screen reader (TalkBack, VoiceOver) or voice control.\n\n**What they experience:** The screen reader announces only what kind of control it is, so they cannot tell what it does. Voice control users have no name to say.\n\n**How to fix it**\n\n- React Native: Describe the action with accessibilityLabel, e.g. <Pressable accessibilityLabel=\"Remove item\">.\n- Jetpack Compose: Give the icon a contentDescription, or add Modifier.semantics { contentDescription = \"Remove item\" }.\n- Android Views: Set android:contentDescription=\"@string/remove_item\" on the button or ImageButton."
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "precision": "high",
+                "tags": [
+                  "accessibility",
+                  "wcag-4.1.2"
+                ]
+              }
+            },
+            {
+              "id": "target/size",
+              "name": "Touch target is too small",
+              "shortDescription": {
+                "text": "Touch target is too small"
+              },
+              "fullDescription": {
+                "text": "People with tremors or limited dexterity, people with large fingers, and anyone using a phone one-handed or on the move. They miss the control or hit the one next to it by accident."
+              },
+              "help": {
+                "text": "React Native: Make the pressable at least 24×24 dp (Android recommends 48×48 dp) with minWidth/minHeight or padding. hitSlop enlarges the touch area, but accessibility tools cannot see it.\nJetpack Compose: Use Modifier.minimumInteractiveComponentSize(), or size the control to at least 48.dp.\nAndroid Views: Set android:minWidth and android:minHeight to 48dp, or add padding around the icon.",
+                "markdown": "**Who it affects:** People with tremors or limited dexterity, people with large fingers, and anyone using a phone one-handed or on the move.\n\n**What they experience:** They miss the control or hit the one next to it by accident.\n\n**How to fix it**\n\n- React Native: Make the pressable at least 24×24 dp (Android recommends 48×48 dp) with minWidth/minHeight or padding. hitSlop enlarges the touch area, but accessibility tools cannot see it.\n- Jetpack Compose: Use Modifier.minimumInteractiveComponentSize(), or size the control to at least 48.dp.\n- Android Views: Set android:minWidth and android:minHeight to 48dp, or add padding around the icon."
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "precision": "medium",
+                "tags": [
+                  "accessibility",
+                  "wcag-2.5.8"
+                ]
+              }
+            },
+            {
+              "id": "name/role-in-label",
+              "name": "Name repeats the control’s role",
+              "shortDescription": {
+                "text": "Name repeats the control’s role"
+              },
+              "fullDescription": {
+                "text": "People who use a screen reader. They hear the role twice, as in \"Delete button, Button\", which slows every pass through the screen and sounds careless."
+              },
+              "help": {
+                "text": "React Native: Leave the role out of accessibilityLabel: \"Delete\", with accessibilityRole=\"button\" saying the rest.\nJetpack Compose: Leave the role out of contentDescription: \"Delete\"; Role.Button or the component already says \"Button\".\nAndroid Views: Leave the role out of android:contentDescription: \"Delete\"; the Button class already says \"Button\".",
+                "markdown": "**Who it affects:** People who use a screen reader.\n\n**What they experience:** They hear the role twice, as in \"Delete button, Button\", which slows every pass through the screen and sounds careless.\n\n**How to fix it**\n\n- React Native: Leave the role out of accessibilityLabel: \"Delete\", with accessibilityRole=\"button\" saying the rest.\n- Jetpack Compose: Leave the role out of contentDescription: \"Delete\"; Role.Button or the component already says \"Button\".\n- Android Views: Leave the role out of android:contentDescription: \"Delete\"; the Button class already says \"Button\"."
+              },
+              "defaultConfiguration": {
+                "level": "note"
+              },
+              "properties": {
+                "precision": "high",
+                "tags": [
+                  "accessibility"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "results": [
+        {
+          "ruleId": "name/interactive-missing",
+          "ruleIndex": 0,
+          "level": "error",
+          "message": {
+            "text": "This button has no accessible name."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/Cart.tsx"
+                },
+                "region": {
+                  "startLine": 41,
+                  "startColumn": 1,
+                  "endLine": 41,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "Cart › remove-item"
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "pragu/v1": "abc123"
+          },
+          "baselineState": "new",
+          "properties": {
+            "screen": "Cart",
+            "element": "remove-item",
+            "confidence": "high",
+            "wcag": [
+              "4.1.2"
+            ],
+            "en301549": [
+              "11.4.1.2"
+            ],
+            "evidence": {
+              "role": "button"
+            }
+          }
+        },
+        {
+          "ruleId": "target/size",
+          "ruleIndex": 1,
+          "level": "warning",
+          "message": {
+            "text": "This button has no accessible name."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "pragu.config.ts"
+                },
+                "region": {
+                  "startLine": 3,
+                  "startColumn": 1,
+                  "endLine": 3,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "Cart"
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "pragu/v1": "def456"
+          },
+          "baselineState": "unchanged",
+          "properties": {
+            "screen": "Cart",
+            "element": null,
+            "confidence": "medium",
+            "wcag": [
+              "2.5.8"
+            ],
+            "en301549": [],
+            "evidence": {
+              "role": "button"
+            }
+          }
+        },
+        {
+          "ruleId": "name/role-in-label",
+          "ruleIndex": 2,
+          "level": "note",
+          "message": {
+            "text": "This button has no accessible name."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "src/Cart.tsx"
+                },
+                "region": {
+                  "startLine": 41,
+                  "startColumn": 1,
+                  "endLine": 41,
+                  "endColumn": 1
+                }
+              },
+              "message": {
+                "text": "Cart › remove-item"
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "pragu/v1": "ghi789"
+          },
+          "baselineState": "new",
+          "properties": {
+            "screen": "Cart",
+            "element": "remove-item",
+            "confidence": "high",
+            "wcag": [],
+            "en301549": [],
+            "evidence": {
+              "role": "button"
+            }
+          }
+        }
+      ],
+      "properties": {
+        "app": "com.example.shop",
+        "redacted": false,
+        "score": 80
+      }
+    }
+  ]
+}

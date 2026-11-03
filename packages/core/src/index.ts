@@ -5,6 +5,8 @@ export { screenshotBlocked } from './blocked-screenshot.js';
 export { REDACTED, coverText, redactMessage, redactResult } from './redact.js';
 export { SCORE_VERSION, comparableScores, penaltyShare, ruleWeight, scoreResult, scoreScreen } from './score.js';
 export type { Score } from './score.js';
+export { toSarif } from './sarif.js';
+export type { SarifPlace } from './sarif.js';
 export {
   ANDROID_AGENT_PROTOCOL,
   accessibleName,

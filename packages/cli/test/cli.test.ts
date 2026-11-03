@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs';
-import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -13,6 +13,7 @@ import { initConfig, initWorkflow, loadConfig } from '../src/config.js';
 import { formatError, PraguError } from '../src/errors.js';
 import { main } from '../src/main.js';
 import { installAgent } from '../src/scan.js';
+import { makeLocator } from '../src/locate.js';
 import { ensureAgent, sha256, verifyBundledAgent } from '../src/agent-apk.js';
 import { syncedFolder, syncedFolderWarning } from '../src/cloud.js';
 import { downscale, reportScreenshot } from '../src/screenshot.js';
@@ -637,6 +638,40 @@ describe('pragu.config.ts', () => {
     expect(workflow).toContain("${{ github.event.repository.private && ' ' || '--redact' }}");
     expect(workflow).toContain('pull-requests: write');
     await expect(initWorkflow(dir)).rejects.toThrow('already has');
+  });
+});
+
+describe('locating issues for SARIF', () => {
+  let dir = '';
+  afterEach(async () => {
+    if (dir !== '') await rm(dir, { recursive: true, force: true });
+  });
+
+  it('points at the one line naming the testID, else the screen in the config, else its first line', async () => {
+    dir = await mkdtemp(join(tmpdir(), 'pragu-locate-'));
+    await mkdir(join(dir, 'src'), { recursive: true });
+    await mkdir(join(dir, 'node_modules', 'lib'), { recursive: true });
+    const lines = (...text: string[]) => `${text.join('\n')}\n`;
+    await writeFile(
+      join(dir, 'src', 'Cart.tsx'),
+      lines('export function Cart() {', '  return (', '    <Pressable testID="remove-item" />', '  );', '}'),
+    );
+    await writeFile(join(dir, 'src', 'A.tsx'), lines('<View testID="row" />'));
+    await writeFile(join(dir, 'src', 'B.tsx'), lines('<View testID="row" />'));
+    await writeFile(join(dir, 'node_modules', 'lib', 'x.js'), lines('testID="remove-item"'));
+    const config = join(dir, 'pragu.config.ts');
+    await writeFile(config, lines('export default {', "  screens: [{ name: 'Cart', deepLink: 'shop://cart' }],", '};'));
+    const result = {
+      screens: [
+        { id: 'screen-1', name: 'Cart' },
+        { id: 'screen-2', name: 'Home' },
+      ],
+    } as unknown as ScanResult;
+    const locate = makeLocator(dir, config, result);
+    const at = (resourceId: string | null, screenId = 'screen-1') => locate({ resourceId, screenId } as Issue);
+    expect(at('remove-item')).toEqual({ uri: 'src/Cart.tsx', line: 3 });
+    expect(at('row')).toEqual({ uri: 'pragu.config.ts', line: 2 });
+    expect(at(null, 'screen-2')).toEqual({ uri: 'pragu.config.ts', line: 1 });
   });
 });
 
