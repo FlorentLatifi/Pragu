@@ -11,6 +11,7 @@ import { initConfig, loadConfig } from '../src/config.js';
 import { formatError, PraguError } from '../src/errors.js';
 import { main } from '../src/main.js';
 import { installAgent } from '../src/scan.js';
+import { syncedFolder, syncedFolderWarning } from '../src/cloud.js';
 import { downscale, reportScreenshot } from '../src/screenshot.js';
 import { FrameDecoder, parseHeader } from '../src/protocol.js';
 import { exitCodeFor } from '../src/scan.js';
@@ -374,6 +375,25 @@ describe('exitCodeFor', () => {
     expect(exitCodeFor([issue('error')], 'info')).toBe(1);
     expect(exitCodeFor([issue('error')], 'never')).toBe(0);
     expect(exitCodeFor([], 'info')).toBe(0);
+  });
+});
+
+describe('synced folders', () => {
+  it('recognises the folders sync apps create, by path segment only', () => {
+    expect(syncedFolder('C:\\Users\\ana\\OneDrive\\Desktop\\app')).toBe('OneDrive');
+    expect(syncedFolder('/Users/ana/OneDrive - Contoso/app')).toBe('OneDrive');
+    expect(syncedFolder('/Users/ana/Dropbox (Personal)/app')).toBe('Dropbox');
+    expect(syncedFolder('/Users/ana/Library/Mobile Documents/com~apple~CloudDocs/app')).toBe('iCloud Drive');
+    expect(syncedFolder('G:\\My Drive\\app')).toBe('Google Drive');
+    expect(syncedFolder('reports', '/home/ana/dev/app')).toBeNull();
+    expect(syncedFolder('/home/ana/onedrive-notes/app')).toBeNull();
+  });
+
+  it('warns with the folder, the service and the way out', () => {
+    expect(syncedFolderWarning('out', '/Users/ana/Dropbox/app')).toMatch(
+      /inside Dropbox, which uploads it\..*--out\.$/,
+    );
+    expect(syncedFolderWarning('out', '/home/ana/dev/app')).toBeNull();
   });
 });
 

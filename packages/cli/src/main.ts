@@ -4,6 +4,7 @@ import { existsSync } from 'node:fs';
 import { relative } from 'node:path';
 import { Adb, findAdb } from './adb.js';
 import { runBaseline } from './baseline.js';
+import { syncedFolderWarning } from './cloud.js';
 import { initConfig, loadConfig } from './config.js';
 import { formatChecks, runDoctor } from './doctor.js';
 import { runReport } from './report.js';
@@ -168,10 +169,14 @@ async function runScan(args: string[], io: Io): Promise<number> {
     );
   }
 
+  const outDir = values.out ?? config.out ?? 'pragu-report';
+  const synced = syncedFolderWarning(outDir);
+  if (synced !== null) io.err(`${synced}\n`);
+
   const outcome = await scan(
     {
       appId,
-      outDir: values.out ?? config.out ?? 'pragu-report',
+      outDir,
       serial: values.serial,
       installApk: values.install,
       agentApk: values['agent-apk'],
