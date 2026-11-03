@@ -395,6 +395,11 @@ describe('measurement', () => {
     expect(measurement(issue({ ruleId: 'name/interactive-missing' }))).toBe('no name');
     expect(measurement(issue({ ruleId: 'state/not-exposed' }))).toBe('no state');
     expect(measurement(issue({ ruleId: 'text/scaling-truncation' }))).toBe('cut at 200%');
+    expect(measurement(issue({ ruleId: 'contrast/non-text', evidence: { ratio: 1.6 } }))).toBe('1.6 : 1');
+    expect(measurement(issue({ ruleId: 'target/platform-size', evidence: { widthDp: 40, heightDp: 40 } }))).toBe(
+      '40 × 40 dp',
+    );
+    expect(measurement(issue({ ruleId: 'name/generic' }))).toBe('vague name');
   });
 
   it('prints nothing when the evidence is missing or the rule has nothing to measure', () => {

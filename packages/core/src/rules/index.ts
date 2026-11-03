@@ -1,9 +1,12 @@
 import { duplicateName } from './duplicate-name.js';
 import { focusUnreachable } from './focus-unreachable.js';
+import { genericName } from './generic-name.js';
 import { imageMissingName } from './image-missing-name.js';
 import { inputMissingLabel } from './input-missing-label.js';
 import { interactiveMissingName } from './interactive-missing-name.js';
 import { noHeadings } from './no-headings.js';
+import { nonTextContrast } from './non-text-contrast.js';
+import { platformTargetSize } from './platform-target-size.js';
 import { roleInLabel } from './role-in-label.js';
 import { stateNotExposed } from './state-not-exposed.js';
 import { targetSize } from './target-size.js';
@@ -14,10 +17,13 @@ import type { Rule } from './types.js';
 export {
   duplicateName,
   focusUnreachable,
+  genericName,
   imageMissingName,
   inputMissingLabel,
   interactiveMissingName,
   noHeadings,
+  nonTextContrast,
+  platformTargetSize,
   roleInLabel,
   stateNotExposed,
   targetSize,
@@ -39,6 +45,9 @@ export const defaultRules: readonly Rule[] = [
   textScalingTruncation,
   targetSize,
   duplicateName,
+  genericName,
+  nonTextContrast,
+  platformTargetSize,
   roleInLabel,
   noHeadings,
 ];

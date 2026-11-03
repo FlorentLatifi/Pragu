@@ -12,4 +12,4 @@
 
   </details>
 
-Pragu score 85 → 74 · 1 screen checked · 2 known issues not listed (compared with the latest scan of the main branch) · Full report: [pragu-report](https://github.com/o/r/actions/runs/1) · Automated checks find some barriers, not all; test with TalkBack too.
+Pragu score 86 → 75 · 1 screen checked · 2 known issues not listed (compared with the latest scan of the main branch) · Full report: [pragu-report](https://github.com/o/r/actions/runs/1) · Automated checks find some barriers, not all; test with TalkBack too.

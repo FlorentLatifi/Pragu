@@ -423,10 +423,12 @@ export function measurement(issue: Issue): string | null {
   const { evidence } = issue;
   switch (issue.ruleId) {
     case 'target/size':
+    case 'target/platform-size':
       return typeof evidence.widthDp === 'number' && typeof evidence.heightDp === 'number'
         ? `${String(evidence.widthDp)} × ${String(evidence.heightDp)} dp`
         : null;
     case 'contrast/text':
+    case 'contrast/non-text':
       return typeof evidence.ratio === 'number' ? `${String(evidence.ratio)} : 1` : null;
     case 'text/scaling-truncation':
       return 'cut at 200%';
@@ -437,6 +439,8 @@ export function measurement(issue: Issue): string | null {
       return 'no label';
     case 'state/not-exposed':
       return 'no state';
+    case 'name/generic':
+      return 'vague name';
     case 'focus/unreachable':
       return 'hidden';
     default:
