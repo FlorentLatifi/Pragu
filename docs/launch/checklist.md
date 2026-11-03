@@ -20,7 +20,7 @@ The brief asks for a Google-style launch checklist before every public release. 
 
 ## Security and privacy
 
-- [ ] **F** Private vulnerability reporting turned on (SECURITY.md depends on it).
+- [x] **F** Private vulnerability reporting turned on (SECURITY.md depends on it): on, checked with the GitHub API on 2026-11-04.
 - [x] Threat model reviewed for the GitHub Action and the release pipeline (D-38), 2026-11-03: `docs/security/threat-model.md`, with a test that app text cannot inject Markdown or HTML into the comment.
 - [x] `--redact` checked on a real report (five rn-shop screens on the emulator, 2026-11-03): none of the app texts checked is left in the HTML or JSON.
 - [ ] The release APK has no INTERNET permission (`verifyReleaseNoInternetPermission` in the release workflow).

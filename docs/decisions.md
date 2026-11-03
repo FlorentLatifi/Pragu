@@ -113,7 +113,7 @@ The composite action, `pragu comment`, "new" meaning not in the latest `main` re
 - **F-3** Where the repository lives. [Stay on `FlorentLatifi/Pragu` until there is a second maintainer: no overhead, clear authorship.]
 - **F-4** ~~Approve D-16 and the M2 plan~~: approved on 2026-11-03.
 - **F-5** Create the release keystore and the GitHub secrets; set up npm trusted publishing (ADR-013).
-- **F-6** Turn on private vulnerability reporting (`SECURITY.md` depends on it).
+- **F-6** ~~Turn on private vulnerability reporting~~: done on 2026-11-04.
 - **F-7** Choose 3 design partners, under this protocol: Pragu runs on their machine and their test build; screenshots, results and recordings stay with them; Florent receives only what they choose (by default, per-rule counts of confirmed and false findings); their app never enters the public bench or a public post without written permission.
 - **F-8** The launch date, and approval of the posts (Show HN, r/reactnative, Expo).
 - **F-9** A trademark search (EUIPO TMview) before launch, and a contact email for the code of conduct.
