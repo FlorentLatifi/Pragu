@@ -49,10 +49,21 @@ describe('pragu command line', () => {
     expect(io.stderr).toBe('pragu: Unknown command "scna".\n  Fix: Run "pragu --help" to see the commands.\n');
   });
 
-  it('is honest about commands planned for later milestones', async () => {
-    const { io, sink } = capturingIo();
-    expect(await main(['report'], sink)).toBe(2);
-    expect(io.stderr).toContain('"pragu report" is planned for M1');
+  it('lists the rules, explains one with its fixes, and names the known ones for a typo', async () => {
+    const list = capturingIo();
+    expect(await main(['rules'], list.sink)).toBe(0);
+    expect(list.io.stdout).toMatch(/^9 rules\./);
+    expect(list.io.stdout).toMatch(/ {2}contrast\/text +error +Text contrast is too low +WCAG 1\.4\.3/);
+
+    const one = capturingIo();
+    expect(await main(['rules', '--explain', 'target/size'], one.sink)).toBe(0);
+    expect(one.io.stdout).toContain('Severity: warning (confidence medium)');
+    expect(one.io.stdout).toContain('Fix in Jetpack Compose:');
+
+    const typo = capturingIo();
+    expect(await main(['rules', '--explain', 'contrast'], typo.sink)).toBe(2);
+    expect(typo.io.stderr).toContain('There is no rule "contrast".');
+    expect(typo.io.stderr).toContain('contrast/text');
   });
 
   it('validates scan arguments before touching a device', async () => {
@@ -320,6 +331,31 @@ describe('scan --from-capture (whole pipeline, no device)', () => {
     const none = capturingIo();
     expect(await main(['scan', '--app', 'com.example.shop', '--screen', 'Cart'], none.sink)).toBe(2);
     expect(none.io.stderr).toContain('pragu.config.ts lists no screens');
+  });
+
+  it('renders the report again from a result and its kept screenshots', async () => {
+    const captureFile = await writeFixtureCapture();
+    const { sink } = capturingIo();
+    const out = join(dir, 'scan');
+    await main(['scan', '--from-capture', captureFile, '--out', out, '--fail-on', 'never'], sink);
+    const original = await readFile(join(out, 'pragu-report.html'), 'utf8');
+
+    const again = capturingIo();
+    const copy = join(dir, 'again.html');
+    expect(await main(['report', join(out, 'pragu-result.json'), '--out', copy], again.sink)).toBe(0);
+    expect(again.io.stdout).toContain(`Report: ${copy}`);
+    expect(await readFile(copy, 'utf8')).toBe(original);
+
+    const resultFile = join(out, 'pragu-result.json');
+    const old = JSON.parse(await readFile(resultFile, 'utf8')) as ScanResult;
+    await writeFile(resultFile, JSON.stringify({ ...old, schemaVersion: '0.1.0' }));
+    const stale = capturingIo();
+    expect(await main(['report', resultFile], stale.sink)).toBe(2);
+    expect(stale.io.stderr).toContain('uses result schema 0.1.0');
+
+    const missing = capturingIo();
+    expect(await main(['report'], missing.sink)).toBe(2);
+    expect(missing.io.stderr).toContain('Tell Pragu which scan result to render.');
   });
 
   it('explains a missing capture file', async () => {

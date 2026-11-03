@@ -28,7 +28,7 @@ export async function readBaseline(file: string): Promise<Baseline> {
   }
 }
 
-async function readResult(file: string): Promise<ScanResult> {
+export async function readResult(file: string): Promise<ScanResult> {
   if (!existsSync(file)) {
     throw new PraguError(
       EXIT.usage,

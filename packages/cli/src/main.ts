@@ -6,6 +6,8 @@ import { Adb, findAdb } from './adb.js';
 import { runBaseline } from './baseline.js';
 import { initConfig, loadConfig } from './config.js';
 import { formatChecks, runDoctor } from './doctor.js';
+import { runReport } from './report.js';
+import { runRules } from './rules.js';
 import { EXIT, PraguError, formatError } from './errors.js';
 import { agentApkPath, scan } from './scan.js';
 import type { FailOn } from './scan.js';
@@ -27,6 +29,10 @@ Usage
   pragu scan --app <applicationId> [options]
   pragu init               Write a starter pragu.config.ts
   pragu doctor             Check Node, adb, the device and the agent, with exact fixes
+  pragu rules [--explain <id>]
+                           List what Pragu checks, or explain one rule and its fixes
+  pragu report <pragu-result.json> [--out <file>]
+                           Render the HTML report again from a scan's result
   pragu baseline create|update --from <pragu-result.json> [--out <file>]
                            Accept a scan's issues, so later scans fail only on new ones
   pragu --version
@@ -56,7 +62,6 @@ Exit codes
 Automated checks find some barriers, not all. Pragu never certifies compliance.
 `;
 
-const PLANNED = new Set(['report', 'rules']);
 const FAIL_ON: readonly FailOn[] = ['error', 'warning', 'info', 'never'];
 
 function parseScanArgs(args: string[]) {
@@ -236,13 +241,8 @@ export async function main(argv: string[], io: Io = defaultIo): Promise<number> 
       io.out(`Wrote ${file}. Set "app" to your applicationId, then run "pragu scan".\n`);
       return EXIT.ok;
     }
-    if (PLANNED.has(command)) {
-      throw new PraguError(
-        EXIT.usage,
-        `"pragu ${command}" is planned for M1 and is not available yet.`,
-        'Run "pragu --help" for what works today.',
-      );
-    }
+    if (command === 'rules') return runRules(rest, io);
+    if (command === 'report') return await runReport(rest, io);
     throw new PraguError(EXIT.usage, `Unknown command "${command}".`, 'Run "pragu --help" to see the commands.');
   } catch (error) {
     const { text, exitCode } = formatError(error);
