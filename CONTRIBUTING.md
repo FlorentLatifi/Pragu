@@ -22,4 +22,4 @@ Precision matters more than recall: if a check cannot be confident, lower its co
 
 ## Code of conduct
 
-Be kind and assume good intent. A full code of conduct (Contributor Covenant) arrives before the first public release.
+Be kind and assume good intent: see the [code of conduct](CODE_OF_CONDUCT.md) (Contributor Covenant 2.1) and how the project is run, in [GOVERNANCE.md](GOVERNANCE.md).

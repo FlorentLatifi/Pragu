@@ -1,0 +1,24 @@
+name: Bug
+description: Pragu failed, crashed or did something unexpected.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened, and what you expected
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: Command and output
+      description: The command you ran and its output, ideally with --verbose.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: doctor
+    attributes:
+      label: pragu doctor
+      description: Output of pragu doctor (Node, adb, device and API level, agent).
+      render: text

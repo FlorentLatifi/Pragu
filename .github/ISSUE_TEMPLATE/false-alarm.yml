@@ -1,0 +1,33 @@
+name: False alarm
+description: Pragu reported a barrier that is not there. For Pragu, a false alarm is a bug.
+labels: [false-alarm]
+body:
+  - type: input
+    id: rule
+    attributes:
+      label: Rule
+      description: The rule id from the report, e.g. contrast/text.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it is not a barrier
+      description: What TalkBack says there, or what you measured. Please leave out personal data.
+    validations:
+      required: true
+  - type: textarea
+    id: element
+    attributes:
+      label: The element
+      description: Toolkit (React Native, Compose, Views, Flutter), the component's code if you can share it, and the issue's message.
+  - type: input
+    id: version
+    attributes:
+      label: Pragu version
+      description: Output of pragu --version.
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: A capture (pragu-result.json and screenshot) helps most, but reports contain your app's screens; attach one only if it shows nothing private, or scan with --redact.
