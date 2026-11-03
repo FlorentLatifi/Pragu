@@ -22,17 +22,19 @@ Device / emulator                         Developer machine or CI
 
 1. Find adb (`ANDROID_HOME/platform-tools`, else PATH) and select exactly one ready device. Otherwise exit 2 or 3, with the fix.
 2. Optionally `adb install -r <app.apk>`. Always `adb install -r` the agent, then `am force-stop` any old agent.
-3. Launch the app with `monkey -p <id> -c android.intent.category.LAUNCHER 1`.
+3. Launch the app with `monkey -p <id> -c android.intent.category.LAUNCHER 1`. With `screens` in the config, this step happens per screen inside step 6 instead.
 4. `am instrument -w -e socket pragu-<random> dev.pragu.agent/.PraguInstrumentation`, then `adb forward tcp:0 localabstract:pragu-<random>`.
 5. Connect, and retry `hello` until it answers. adb accepts the connection before the agent listens.
 6. `capture {packageName, timeoutMs}`. The agent polls until the app's topmost window is on screen and every window is the same twice, with content in the app. It returns all windows as JSON (protocol 4: trees only for the app's own windows, each node's `labeledBy` label, and characters an ellipsis hides) and the screenshot as PNG.
+   - With `screens: [{ name, deepLink?, waitFor? }]` (D-02), each screen gets `am force-stop`, then `am start -W -a android.intent.action.VIEW -d '<deep link>'` (or the launcher), then a capture, all in one agent session. With `waitFor`, the CLI captures again (after 1, 2 and 4 s) until an element with that testID or resource id is there, so a splash screen is never checked under the screen's name. `--screen <name>` picks one.
+   - With `--check-font-scale`, the scale changes once and every screen is opened again at 200%.
 7. `shutdown`, then remove the forward.
-8. Validate the capture (`parseAndroidCapture`), normalise it to PAM, decode the PNG, run the rules, and write `pragu-result.json`, `pragu-report.html` and the raw capture.
+8. Validate each capture (`parseAndroidCapture`), normalise it to PAM, decode the PNG, run the rules, and write `pragu-result.json`, `pragu-report.html` and the raw captures with a `capture/screens.json` that lists them by name.
 9. Exit 0, or 1 when issues reach `--fail-on` (default: error).
 
 Around the scan: `pragu.config.ts` (`defineConfig()`, loaded with Node's own type stripping) turns rules off or changes their severity, ignores issues with a reason (counted in `summary.ignored`), and sets defaults that flags override. `pragu init` writes a starter config; `pragu doctor` checks Node, adb, the device, the agent and the config with exact fixes. With `--baseline <file>` (from `pragu baseline create --from <pragu-result.json>`), only issues not in the baseline fail the scan; results mark `inBaseline` and summarise new, known and fixed (ADR-004).
 
-`--from-capture` re-runs steps 8–9 from a saved capture. Tests use it to cover the whole pipeline without a device.
+`--from-capture` re-runs steps 8–9 from a saved capture, or from a `screens.json` for the whole scan. Tests use it to cover the whole pipeline without a device.
 
 ## Pragu Accessibility Model (PAM)
 
