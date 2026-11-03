@@ -19,5 +19,6 @@ Not in any milestone yet; noted so they don't creep into code early. Decisions a
 - `state/not-exposed` for home-made toggles with no role: tap the element during a crawl (M3) and report it when its pixels change but no state does.
 - `text/scaling-truncation` for text cut off by a fixed-height box, which character positions cannot show (ADR-011); and running `--check-font-scale` by default once the bench shows it is safe on more apps.
 - `input/placeholder-label`: type into each field during a crawl (M3) and report fields whose only label disappears. Labelled in both fixtures already (ADR-010).
+- `text/scaling-truncation` on Android 11 (API 30): the weekly run found none of the seeded cut-off texts there, while Android 16 finds all four of those it is labelled for. Find which API level the character-position data starts to work at, and have `doctor` and the report say so below it.
 - Tell which toolkit built the app (Compose host views, React Native libraries in the APK), so reports lead with that toolkit's fix.
 - Per-role fixes in `name/interactive-missing`: for a switch or checkbox, a toggleable row that its text names beats a content description.

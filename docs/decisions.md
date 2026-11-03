@@ -53,7 +53,7 @@
 
 ## E. Platforms
 
-- **D-25 Android versions:** API 30+ (Android 11) is supported. API 26–29 runs with a `doctor` warning that some checks are less reliable. CI: the emulator e2e on API 36 for every push (exact bench), plus API 30 weekly (precision ≥ 0.90, not exact equality, because rendering differs). `minSdk` stays 26. Implemented: weekly API 30 run with `bench evaluate --bar-only`.
+- **D-25 Android versions:** API 30+ (Android 11) is supported. API 26–29 runs with a `doctor` warning that some checks are less reliable. CI: the emulator e2e on API 36 for every push (exact bench), plus API 30 weekly (precision ≥ 0.90, not exact equality, because rendering differs). `minSdk` stays 26. Implemented: weekly API 30 run with `bench evaluate --bar-only`, which fails on false alarms and warns about rules that go silent. *First run, 2026-11-03:* no false alarms; `text/scaling-truncation` silent on API 30 (ROADMAP).
 - **D-26 Compile and target SDK 37** in M2, verified on the emulator. This clears the lint warning. Implemented.
 - **D-27 The CLI runs on Windows, macOS and Linux.** CI adds `windows-latest` and `macos-latest` to the unit-test matrix (free on public repositories). The emulator job stays on Linux. Implemented.
 - **D-28 Flutter on Android** already exposes its semantics through Android accessibility. A Flutter fixture and Flutter fixes come in M3. A separate Views fixture is not needed (React Native exercises the View system) unless a design partner needs one.
