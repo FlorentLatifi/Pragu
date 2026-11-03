@@ -15,7 +15,7 @@ The brief asks for a Google-style launch checklist before every public release. 
 
 - [x] Competitors re-checked with sources (`apps/docs/.../concepts/comparison.md`, 2026-11-03). Re-check again in the week of launch.
 - [ ] Every number and legal date in README, docs and posts has a source, re-checked in the week of launch (WHO, ICSE 2020, EAA, DOJ Title II).
-- [ ] No "compliant", "certified" or "100%" anywhere: `grep -riE "complian|certif|100%" README.md apps/docs/src` reviewed by hand.
+- [x] No "compliant", "certified" or "100%" claims: on 2026-11-04, `grep -riE "complian|certif|100%"` over README, docs site, report and CLI found only denials ("never certifies compliance") and CSS widths. Repeat in the week of launch.
 - [ ] **F** Trademark search for "Pragu" (EUIPO TMview), and the result noted.
 
 ## Security and privacy

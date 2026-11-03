@@ -1,6 +1,6 @@
 # Pragu status
 
-Last updated: 2026-11-03, M1 session 5. **M0 approved. M1 in progress:** Pragu Bench covers two fixtures (React Native and Jetpack Compose); agent hardening mostly done; all five planned M1 error rules have landed (`input/missing-label`, `state/not-exposed`, `name/image-missing`, `focus/unreachable`, `text/scaling-truncation`).
+Last updated: 2026-11-04, M1 session 5. **M0 approved. M1 in progress:** Pragu Bench covers two fixtures (React Native and Jetpack Compose); agent hardening mostly done; all five planned M1 error rules have landed (`input/missing-label`, `state/not-exposed`, `name/image-missing`, `focus/unreachable`, `text/scaling-truncation`).
 
 ## Decisions made
 
@@ -85,6 +85,7 @@ Walking skeleton on the emulator, CI, docs (PRD, technical design, ADR-001 to 00
   - `FLAG_SECURE` screens (D-03): Android 16 paints a secure window black instead of refusing the screenshot. When every visible text sits on pure black, Pragu checks the screen by its tree alone, skips contrast and says why; the agent (0.0.5) also sends the tree alone if a device does refuse. Checked on the emulator with the Compose fixture's new `composeshop://secure`: 4 issues, no contrast check, the note in the report.
   - `--redact` (D-33, the wider scope Florent approved): covered screenshots in `screenshots/`, `[redacted]` for the app's text in the result and report, no `capture/`, `redacted: true` in the result (schema 0.11.0). On the emulator, five rn-shop screens: none of the app texts checked ("Hand-thrown", "Free shipping", "Ceramic", "Prishtina") is left in the JSON or the HTML, and the report is 337 KB.
 - Checks: 296 TypeScript tests (plus 18 owner-task todos), 26 JVM tests, lint, typecheck, bench, report axe check (24 runs). After work packages 6, 7 and 4: 303 TypeScript tests (plus 28 owner-task todos).
+- **Launch readiness (2026-11-04):** a README for each npm package; `pnpm package:check` installs the packed tarballs with npm into an empty folder and runs them (in CI on Linux, Windows and macOS); the threat model reviewed for the GitHub Action and release pipeline (D-38), with a test that app text cannot inject Markdown or HTML into the pull-request comment; a real report screenshot in the README; `docs/launch/checklist.md` ticked where there is evidence. **What is left before v0.1 needs Florent:** accounts and secrets (npm organisation, trusted publishing, keystore, Pages, private vulnerability reporting, code-of-conduct contact), blind labelling of the real bench (20 screens, D-16), the TalkBack check on a phone (D-14), the trademark search, design partners and the launch posts.
 - **The owner tasks, built by Claude at Florent's request (2026-11-03; walkthrough: `docs/plans/owner-tasks-walkthrough.md`):**
   - Wilson 95% intervals on every precision and recall in the bench, widened outward.
   - The Pragu score (ADR-012, result schema 0.12.0) in the CLI, report and pull-request comment, with property tests and the ADR's worked example.
