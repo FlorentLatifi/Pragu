@@ -252,6 +252,30 @@ describe('screen-reader transcript', () => {
   });
 });
 
+describe('screens and principles', () => {
+  it('lists every screen with its counts when a scan has several, linking to each', () => {
+    const base = result([issue(), issue({ severity: 'warning', ruleId: 'target/size', nodeId: '0.4' })]);
+    const second = { ...base.screens[0], id: 'screen-2', name: 'Checkout' } as (typeof base.screens)[number];
+    const html = renderReport({ result: { ...base, screens: [...base.screens, second] }, screenshots });
+    expect(html).toContain('<h2 id="screens-heading">Screens</h2>');
+    expect(html).toContain('<a href="#screen-1">Cart</a><span class="screen-count">1 error · 1 warning</span>');
+    expect(html).toContain(
+      '<a href="#screen-2">Checkout</a><span class="screen-count screen-clear">Nothing found</span>',
+    );
+    expect(html).toContain('<section class="screen" id="screen-2"');
+    expect(renderReport({ result: base, screenshots })).not.toContain('screens-heading');
+  });
+
+  it('counts issues per WCAG principle, an issue under two criteria in both', () => {
+    const html = renderReport({
+      result: result([issue(), issue({ ruleId: 'focus/unreachable', nodeId: '0.5', wcag: ['2.1.1', '4.1.2'] })]),
+      screenshots,
+    });
+    expect(html).toContain('By WCAG principle: Perceivable 0 · Operable 1 · Understandable 0 · Robust 2.');
+    expect(renderReport({ result: result([]), screenshots })).not.toContain('By WCAG principle');
+  });
+});
+
 describe('rule index', () => {
   const contrast = (nodeId: string) =>
     issue({ ruleId: 'contrast/text', title: 'Text contrast is too low', nodeId, wcag: ['1.4.3'] });

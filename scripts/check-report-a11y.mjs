@@ -4,7 +4,7 @@
 // Usage: pnpm build && node scripts/check-report-a11y.mjs
 // Uses the installed Chrome (or Edge); PRAGU_BROWSER=msedge|chrome|chromium picks one.
 import { spawnSync } from 'node:child_process';
-import { mkdtemp, readFile, rm, writeFile, mkdir } from 'node:fs/promises';
+import { copyFile, mkdtemp, readFile, rm, writeFile, mkdir } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -34,6 +34,20 @@ async function renderCases(dir) {
   pragu(['scan', '--from-capture', join(recordings, 'rn-shop/cart.json'), '--out', join(dir, 'cart')]);
   pragu(['scan', '--from-capture', join(recordings, 'rn-shop/product.json'), '--out', join(dir, 'product')]);
 
+  // Several screens in one scan: the screen list and numbering across screens.
+  const many = join(dir, 'many-captures');
+  await mkdir(many, { recursive: true });
+  const screens = ['cart', 'form', 'summary'];
+  for (const screen of screens) {
+    for (const ext of ['json', 'png'])
+      await copyFile(join(recordings, `rn-shop/${screen}.${ext}`), join(many, `${screen}.${ext}`));
+  }
+  await writeFile(
+    join(many, 'screens.json'),
+    JSON.stringify({ screens: screens.map((screen) => ({ name: screen, capture: `${screen}.json` })) }),
+  );
+  pragu(['scan', '--from-capture', join(many, 'screens.json'), '--out', join(dir, 'multi')]);
+
   const settings = join(recordings, 'android-compose/settings.json');
   pragu(['scan', '--from-capture', settings, '--out', join(dir, 'settings')]);
   const baselineFile = join(dir, 'baseline.json');
@@ -56,7 +70,10 @@ async function renderCases(dir) {
   await mkdir(join(dir, 'empty'), { recursive: true });
   await writeFile(join(dir, 'empty/pragu-report.html'), renderReport({ result: empty, screenshots }));
 
-  return ['cart', 'product', 'diff', 'empty'].map((name) => ({ name, file: join(dir, name, 'pragu-report.html') }));
+  return ['cart', 'product', 'multi', 'diff', 'empty'].map((name) => ({
+    name,
+    file: join(dir, name, 'pragu-report.html'),
+  }));
 }
 
 async function launch() {

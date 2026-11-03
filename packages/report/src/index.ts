@@ -90,11 +90,13 @@ export function renderReport({ result, screenshots }: ReportInput): string {
     <div><dt>Info</dt><dd>${String(summary.infos)}</dd></div>
     <div><dt>Screens</dt><dd>${String(result.screens.length)}</dd></div>
   </dl>
+  ${renderPrinciples(issues)}
   <p class="rules">Rules run: ${summary.rulesRun.map((id) => `<code>${escapeHtml(id)}</code>`).join(', ')}</p>
   ${summary.baseline === null ? '' : `<p class="baseline">${escapeHtml(`Compared with ${summary.baseline.file}: ${String(summary.baseline.newIssues)} new · ${String(summary.baseline.known)} already in the baseline · ${String(summary.baseline.fixed)} fixed since`)}</p>`}
   ${summary.ignored === 0 ? '' : `<p class="rules">${escapeHtml(plural(summary.ignored, 'issue', 'issues'))} ignored by the project's config (pragu.config.ts), not counted above.</p>`}
   ${renderFilters(issues, summary.baseline !== null)}
 </section>
+${renderScreenGrid(result.screens, issues)}
 ${renderRuleIndex(numbered, summary.rulesRun)}
 ${screens}
 ${summary.baseline === null ? '' : renderFixed(summary.baseline)}
@@ -110,6 +112,46 @@ ${summary.baseline === null ? '' : renderFixed(summary.baseline)}
 </body>
 </html>
 `;
+}
+
+const PRINCIPLES: readonly (readonly [string, string])[] = [
+  ['1', 'Perceivable'],
+  ['2', 'Operable'],
+  ['3', 'Understandable'],
+  ['4', 'Robust'],
+];
+
+/** Issues per WCAG principle, from each criterion's first digit. An issue that maps to two principles counts in both. */
+function renderPrinciples(issues: readonly Issue[]): string {
+  if (issues.length === 0) return '';
+  const counts = PRINCIPLES.map(
+    ([digit, name]) =>
+      `${name} ${String(issues.filter((issue) => issue.wcag.some((criterion) => criterion.startsWith(`${digit}.`))).length)}`,
+  );
+  return `<p class="rules">By WCAG principle: ${escapeHtml(counts.join(' · '))}. An issue under two criteria counts under both.</p>`;
+}
+
+function severityCounts(issues: readonly Issue[]): string {
+  const parts = (['error', 'warning', 'info'] as const)
+    .map((severity) => ({ severity, count: issues.filter((issue) => issue.severity === severity).length }))
+    .filter(({ count }) => count > 0)
+    .map(({ severity, count }) => plural(count, severity, severity === 'info' ? 'info' : `${severity}s`));
+  return parts.length === 0 ? 'Nothing found' : parts.join(' · ');
+}
+
+/** With several screens, one line each, so a reader sees at once where the barriers are. */
+function renderScreenGrid(screens: readonly PamScreen[], issues: readonly Issue[]): string {
+  if (screens.length < 2) return '';
+  const items = screens
+    .map((screen) => {
+      const own = issues.filter((issue) => issue.screenId === screen.id);
+      return `<li><a href="#${screen.id}">${escapeHtml(screen.name)}</a><span class="screen-count${own.length === 0 ? ' screen-clear' : ''}">${escapeHtml(severityCounts(own))}</span></li>`;
+    })
+    .join('');
+  return `<section class="screens" aria-labelledby="screens-heading">
+  <h2 id="screens-heading">Screens</h2>
+  <ol class="screen-list">${items}</ol>
+</section>`;
 }
 
 interface NumberedIssue {
@@ -304,7 +346,7 @@ function renderScreen(
   const notes = screenNotes(screen);
   const notesList =
     notes.length === 0 ? '' : `<ul class="notes">${notes.map((note) => `<li>${escapeHtml(note)}</li>`).join('')}</ul>`;
-  return `<section class="screen" aria-labelledby="${headingId}">
+  return `<section class="screen" id="${screen.id}" aria-labelledby="${headingId}">
   <h2 id="${headingId}">${escapeHtml(screen.name)} <span class="screen-app">${escapeHtml(screen.appId)}</span></h2>
   ${notesList}
   <div class="screen-grid">
@@ -586,6 +628,12 @@ figcaption { margin-top: 12px; }
 .screen-sign.is-dimmed, .plate.is-dimmed { background: var(--surface); color: var(--muted); border-style: dashed; border-color: var(--muted); z-index: 0; }
 .screen-sign.is-dimmed .sign-measure { border-left-color: var(--muted); }
 .screen-sign.is-dimmed { pointer-events: none; }
+.screens { padding: 32px 0; border-bottom: 1px solid var(--line); }
+.screen-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); }
+.screen-list li { display: flex; flex-direction: column; gap: 4px; padding: 12px 16px; background: var(--surface); border-left: 4px solid var(--signal); }
+.screen-list a { font-weight: 700; min-height: 24px; overflow-wrap: anywhere; }
+.screen-count { font: 14px var(--font-mono); color: var(--muted); }
+.screen-list li:has(.screen-clear) { border-left-color: var(--line); }
 .by-rule { padding: 32px 0; border-bottom: 1px solid var(--line); }
 .rule-index { list-style: none; margin: 0 0 12px; padding: 0; }
 .rule-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px 16px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
