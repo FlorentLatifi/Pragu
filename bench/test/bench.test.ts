@@ -265,7 +265,7 @@ describe('markdown report', () => {
     const markdown = renderMarkdown(result);
     // MCC = (0·1 − 1·2) / √(1·2·2·3) = −0.577…, truncated toward zero.
     expect(markdown).toContain(
-      '| `name/interactive-missing` | error | 0 | 1 | 2 | 1 | 0.00 | 0.00 | n/a | -0.57 | **below 0.90** |',
+      '| `name/interactive-missing` | error | 0 | 1 | 2 | 1 | 0.00 [0.00, 0.80] | 0.00 [0.00, 0.66] | n/a | -0.57 | **below 0.90** |',
     );
     expect(markdown).toContain(
       '- `name/interactive-missing` on `twin-b` (shop › cart): labelled by its child text — name/interactive-missing finding',

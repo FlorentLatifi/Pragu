@@ -4,6 +4,8 @@
 - The founding brief stays the source of truth for scope. Entries that change a milestone or an exit criterion say **needs Florent's approval** and are not in force until he gives it.
 - Bigger decisions have their own ADR; this register links to it.
 
+**Budget: zero** (Florent, 2026-11-03). Only free tools and services; an option that costs money is not an option. **Owner tasks:** Florent asked Claude to implement them too (2026-11-03); each gets a walkthrough so he can still explain it.
+
 **For every future session:** read this before deciding anything. Do not re-decide an entry. If its "revisit" trigger fires, or evidence contradicts it, write an ADR that supersedes the entry, then update this file. Section L lists what only Florent can decide: do not act on those without him.
 
 ## A. Product and scope
@@ -57,7 +59,7 @@
 - **D-26 Compile and target SDK 37** in M2, verified on the emulator. This clears the lint warning. Implemented.
 - **D-27 The CLI runs on Windows, macOS and Linux.** CI adds `windows-latest` and `macos-latest` to the unit-test matrix (free on public repositories). The emulator job stays on Linux. Implemented.
 - **D-28 Flutter on Android** already exposes its semantics through Android accessibility. A Flutter fixture and Flutter fixes come in M3. A separate Views fixture is not needed (React Native exercises the View system) unless a design partner needs one.
-- **D-29 iOS:** a spike in M3 on GitHub's macOS runners (free on public repositories), so no Mac is needed for the spike. *Revisit:* if CI-only development proves too slow, Florent decides on a Mac (money).
+- **D-29 iOS:** a spike in M3 on GitHub's macOS runners (free on public repositories); no Mac is bought (zero budget, Florent, 2026-11-03). If CI-only development proves too slow, iOS waits.
 
 ## F. More than one screen (M3)
 
@@ -107,7 +109,7 @@ The composite action, `pragu comment`, "new" meaning not in the latest `main` re
 ## L. Florent decides (recommendation in brackets)
 
 - **F-1** Reserve the `@pragu` npm organisation. [Now: it is free, and the name could be taken.]
-- **F-2** Buy `pragu.dev` before launch. [Yes; until then, the GitHub Pages address.]
+- **F-2** ~~Buy `pragu.dev`~~: no paid domain (zero budget, Florent, 2026-11-03). The docs stay at `florentlatifi.github.io/Pragu`.
 - **F-3** Where the repository lives. [Stay on `FlorentLatifi/Pragu` until there is a second maintainer: no overhead, clear authorship.]
 - **F-4** ~~Approve D-16 and the M2 plan~~: approved on 2026-11-03.
 - **F-5** Create the release keystore and the GitHub secrets; set up npm trusted publishing (ADR-013).

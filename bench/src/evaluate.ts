@@ -1,6 +1,6 @@
 import type { Issue, Severity } from '@pragu/core';
-import { f1, mcc, precision, recall, truncate } from './metrics.js';
-import type { Counts } from './metrics.js';
+import { f1, mcc, precision, publishInterval, recall, truncate, wilson } from './metrics.js';
+import type { Counts, Interval } from './metrics.js';
 import { labelKey } from './truth.js';
 import type { TruthScreen } from './truth.js';
 
@@ -30,6 +30,9 @@ export interface RuleResult extends Counts {
   severity: Severity;
   precision: number | null;
   recall: number | null;
+  /** Wilson 95% intervals (ADR-015): how much the counts behind each ratio can tell. */
+  precisionInterval: Interval | null;
+  recallInterval: Interval | null;
   f1: number | null;
   mcc: number | null;
 }
@@ -92,6 +95,8 @@ export function evaluate(
       ...counts,
       precision: fourDecimals(precision(counts)),
       recall: fourDecimals(recall(counts)),
+      precisionInterval: publishInterval(wilson(counts.tp, counts.tp + counts.fp)),
+      recallInterval: publishInterval(wilson(counts.tp, counts.tp + counts.fn)),
       f1: fourDecimals(f1(counts)),
       mcc: fourDecimals(mcc(counts)),
     };
