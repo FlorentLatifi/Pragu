@@ -83,6 +83,7 @@ Walking skeleton on the emulator, CI, docs (PRD, technical design, ADR-001 to 00
   - `FLAG_SECURE` screens (D-03): Android 16 paints a secure window black instead of refusing the screenshot. When every visible text sits on pure black, Pragu checks the screen by its tree alone, skips contrast and says why; the agent (0.0.5) also sends the tree alone if a device does refuse. Checked on the emulator with the Compose fixture's new `composeshop://secure`: 4 issues, no contrast check, the note in the report.
   - `--redact` (D-33, the wider scope Florent approved): covered screenshots in `screenshots/`, `[redacted]` for the app's text in the result and report, no `capture/`, `redacted: true` in the result (schema 0.11.0). On the emulator, five rn-shop screens: none of the app texts checked ("Hand-thrown", "Free shipping", "Ceramic", "Prishtina") is left in the JSON or the HTML, and the report is 337 KB.
 - Checks: 296 TypeScript tests (plus 18 owner-task todos), 26 JVM tests, lint, typecheck, bench, report axe check (24 runs). After work packages 6, 7 and 4: 303 TypeScript tests (plus 28 owner-task todos).
+- **Work package 5 (rules), part one:** `name/role-in-label` (info, best practice) and `structure/no-headings` (info, low confidence), each with unit tests and a barrier and twin on the Compose fixture's new `composeshop://help` screen; both 1 TP and no false positive on the 9 bench screens, and nothing else on the bench changed. `focus/order` still waits for the transcript check on a phone (D-14).
 - **Work package 4 (real-app bench), the tooling; the labelling is Florent's:**
   - `bench/real/PROTOCOL.md`: choosing apps, recording, blind labelling for every rule, a second labeller on 20% with Cohen's kappa, and when the test half may be scored.
   - `bench/real/<app>/expected.json` with labels keyed by node id (real apps rarely have ids), licence, source and `dev`/`test` split; `evaluate --real dev|test` scores one half.
@@ -100,7 +101,7 @@ Walking skeleton on the emulator, CI, docs (PRD, technical design, ADR-001 to 00
   - Release pipeline (`release.yml`, on a version tag): every check, the agent signed with the release key from secrets, bundled, packed, published with npm trusted publishing and provenance, and a GitHub Release with the APK, `SHA256SUMS` and a CycloneDX SBOM. Changesets keeps the three packages on one version. **Not run yet:** it needs the keystore secrets and the npm setup (F-1, F-5). Signing with a release key could not be tried locally: a hook blocks any command touching a keystore file, so the first release run is its first test.
 
 
-## Bench results (8 screens: rn-shop, android-compose)
+## Bench results (9 screens: rn-shop, android-compose)
 
 | Rule | Severity | TP | FP | FN | TN | Precision | Recall |
 |---|---|---|---|---|---|---|---|
@@ -113,6 +114,8 @@ Walking skeleton on the emulator, CI, docs (PRD, technical design, ADR-001 to 00
 | `contrast/text` | error | 6 | 0 | 0 | 11 | 1.00 | 1.00 |
 | `target/size` | warning | 3 | 1 | 3 | 11 | 0.75 | 0.50 |
 | `name/duplicate` | warning | 2 | 0 | 0 | 2 | 1.00 | 1.00 |
+| `name/role-in-label` | info | 1 | 0 | 0 | 1 | 1.00 | 1.00 |
+| `structure/no-headings` | info | 1 | 0 | 0 | 3 | 1.00 | 1.00 |
 
 All error rules meet the 0.90 bar. Known misses stay published: home-made checkboxes with no role (`state/not-exposed`), Compose `hideFromAccessibility()` (`focus/unreachable`), text cut by fixed-height boxes (`text/scaling-truncation`), React Native `hitSlop` and crowded Compose targets (`target/size`). Small sample: early signals, not final quality figures. Full page: `docs/bench/results.md`.
 
@@ -121,7 +124,7 @@ All error rules meet the 0.90 bar. Known misses stay published: home-made checkb
 1. **Florent:** the decisions in section L of `docs/decisions.md`; the M1 walkthrough and its three questions (`docs/plans/m1-walkthrough.md`).
 2. **Florent:** check the transcript on a phone with TalkBack's "Display speech output" (D-14): rn-shop cart and Compose checkout, every spoken line written down.
 3. **Florent's owner tasks**, briefs ready: Wilson intervals and the Pragu score (`docs/plans/owner-tasks-m2.md`; also review `pragu comment`, which Claude built although it was an owner-task candidate); SARIF writer (`docs/plans/owner-task-sarif.md`); `target/size` platform tier, `name/generic`, `contrast/non-text` (`docs/plans/owner-tasks-rules.md`).
-4. **Claude** (the M2 plan was approved on 2026-11-03), in its order, without touching the owner tasks' files: the remaining rules (work package 5) and the docs site (work package 8).
+4. **Claude** (the M2 plan was approved on 2026-11-03), in its order, without touching the owner tasks' files: the docs site (work package 8); `focus/order` once D-14 is done.
 
 ## Notes and risks
 

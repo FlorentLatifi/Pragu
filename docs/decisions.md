@@ -23,7 +23,7 @@
 - **D-08 Severity gate.** An error rule needs precision ≥ 0.90 on the seeded bench. From v0.1 it also needs ≥ 0.90 on the real bench once the rule has at least 5 labelled barriers there; otherwise it ships as a warning. At 1.0: a Wilson 95% lower bound ≥ 0.80 on the real test set. Counts and intervals are always published (ADR-015). *Why:* 1.00 on one or two seeded cases is not evidence.
 - **D-09 Order of the remaining rules:**
   1. Florent's three owner-task rules;
-  2. `name/role-in-label` (info) and `structure/no-headings` (info);
+  2. `name/role-in-label` (info) and `structure/no-headings` (info); implemented 2026-11-03;
   3. `focus/order` (warning, low confidence), only after the transcript order is checked on a real phone (D-14). Before that, it would compare against an unverified model.
 - **D-10 No rule plugins before 1.0.** Config turns rules off, changes severities and ignores issues, nothing more. *Why:* precision gates cannot cover outside rules, and the rule API will still change.
 - **D-11 The Pragu score:** ADR-012.

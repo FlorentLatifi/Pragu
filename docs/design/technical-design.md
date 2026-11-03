@@ -74,6 +74,8 @@ Defined in `packages/core/src/model.ts`. It is platform-neutral, so rules never 
 | `text/scaling-truncation` | Text with no ellipsis at the normal size that has one at 200% (`--check-font-scale`), fully on screen in both captures | Text cut off by a fixed-height box looks the same as text that fits, and since Android 14 large text grows far less than 2x, so it is a known miss (ADR-011). |
 | `name/duplicate` | Two or more visible controls in one window with the same accessible name (case and spaces ignored) | Warning, medium confidence: sometimes two controls really do the same thing. A row and a control inside it are one place, not two. |
 | `target/size` | Interactive targets under 24×24 dp, unless WCAG's spacing exception applies | The exception: a 24 dp circle around the target touches no other target and no other undersized target's circle. Parent and child targets are not counted as neighbours. Silent where two Compose touch areas meet, because the real split is invisible (ADR-009). Medium confidence, and a warning rather than an error, because `hitSlop` and `TouchDelegate` are invisible to the tree (ADR-007). |
+| `name/role-in-label` | A visible, exposed element whose name repeats its role as a whole word ("Delete button" on a button) | Info, best practice (no WCAG criterion). A name that is only the role word ("Button") is left to `name/generic`. |
+| `structure/no-headings` | The app's topmost window shows 8 or more texts and no heading | Info, low confidence: whether the screen has sections is a judgement. Reported once, on the window's root element. |
 
 ### WCAG CSS pixels in dp and pt
 
