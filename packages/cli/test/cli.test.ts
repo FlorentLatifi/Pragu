@@ -14,6 +14,7 @@ import { formatError, PraguError } from '../src/errors.js';
 import { main } from '../src/main.js';
 import { installAgent } from '../src/scan.js';
 import { makeLocator } from '../src/locate.js';
+import { renderComment } from '../src/comment.js';
 import { ensureAgent, sha256, verifyBundledAgent } from '../src/agent-apk.js';
 import { syncedFolder, syncedFolderWarning } from '../src/cloud.js';
 import { downscale, reportScreenshot } from '../src/screenshot.js';
@@ -650,6 +651,38 @@ describe('pragu.config.ts', () => {
     expect(workflow).toContain("${{ github.event.repository.private && ' ' || '--redact' }}");
     expect(workflow).toContain('pull-requests: write');
     await expect(initWorkflow(dir)).rejects.toThrow('already has');
+  });
+});
+
+describe('pull-request comment safety', () => {
+  it('escapes Markdown and HTML that come from the scanned app', () => {
+    const hostile = '<img src=x onerror=alert(1)> [click](javascript:alert(1)) **bold** `code`';
+    const result = {
+      screens: [{ id: 'screen-1', name: hostile, windows: [], nodes: [] }],
+      issues: [
+        {
+          ruleId: 'name/generic',
+          title: 'Name does not say what the control does',
+          severity: 'warning',
+          screenId: 'screen-1',
+          nodeId: '0.1',
+          resourceId: 'a`b',
+          fingerprint: 'f',
+          message: hostile,
+          wcag: ['2.4.6'],
+          fix: { reactNative: hostile, compose: '', androidViews: '' },
+          inBaseline: false,
+        },
+      ],
+      score: { version: 1, value: null, screens: {} },
+      summary: { rulesRun: [] },
+    } as unknown as ScanResult;
+    const markdown = renderComment(result, { base: null, reportUrl: null });
+    // Every < and ] from the app is escaped, so no tag or link survives.
+    expect(markdown).not.toMatch(/(^|[^\\])<img/);
+    expect(markdown).not.toMatch(/[^\\]\]\(javascript/);
+    expect(markdown).toContain('\\<img');
+    expect(markdown).toContain('`ab`');
   });
 });
 

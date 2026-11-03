@@ -1,6 +1,6 @@
 # Threat model and privacy review (M0)
 
-Method: STRIDE over the M0 architecture, in the spirit of Microsoft's SDL. Review it again whenever a trust boundary changes: flows (M3), AI providers (M4), auto-fix PRs (M5).
+Method: STRIDE over the M0 architecture, in the spirit of Microsoft's SDL. Review it again whenever a trust boundary changes: flows (M3), AI providers (M4), auto-fix PRs (M5). The GitHub Action and release pipeline were reviewed on 2026-11-03 (below).
 
 ## Assets
 
@@ -31,6 +31,20 @@ Machine ↔ device (adb) · agent ↔ other apps on the device · CLI ↔ the fi
 | **Denial of service** | An orphaned agent keeps running, or a huge request exhausts memory | `force-stop` before each session; `shutdown` command; 64 kB request-line limit; capture timeout clamped to 120 s | Done (idle timeout in M1) |
 | **Elevation of privilege** | Another app triggers the agent to use its `UiAutomation` | No exported components; only `adb shell am instrument` (shell uid) can start it; the APK requests no permissions | Done |
 | Elevation of privilege | A compromised dependency in CI steals secrets | Actions pinned by SHA; `permissions: contents: read`; pnpm release-age guard; Dependabot | Done in M0 CI |
+
+## Review: the GitHub Action and the release pipeline (2026-11-03, D-38)
+
+New trust boundaries: the user's CI ↔ GitHub (comments, artifacts, code scanning) and Pragu's release workflow ↔ npm.
+
+| Threat | Example | Mitigation | Status |
+|---|---|---|---|
+| Spoofing | A fork's pull request posts a comment, or reads secrets, through the action | The action comments only when the pull request comes from the same repository; forks get the job summary. It never uses `pull_request_target` (ADR-014) | Done |
+| Tampering | App text crafted to inject Markdown or HTML into the comment | `pragu comment` escapes Markdown in every text from the app; the comment is plain Markdown with no raw HTML from the app | Done |
+| Tampering | Shell injection through action inputs | Inputs reach shell steps only as environment variables, never inlined into scripts | Done |
+| Information disclosure | Screenshots in a public repository's artifact | `--redact` on by default for public repositories in the starter workflow; 7-day retention; no raw captures in a redacted report (D-33) | Done |
+| Elevation of privilege | Excess token permissions | `contents: read`, `pull-requests: write`, `actions: read`, `security-events: write`, documented; nothing else | Done |
+| Tampering | A hijacked release publishes a malicious agent | Tag-only release workflow in a `release` environment; npm trusted publishing (OIDC, no long-lived token) with provenance; the CLI checks the bundled agent's SHA-256 before installing it (ADR-013) | Ready, first release pending |
+| Information disclosure | The release keystore leaks | Only in GitHub secrets, decoded to a temporary file during the build and deleted after; never in the repository or on a developer machine | Pending: Florent creates it |
 
 Out of scope: an attacker who already has adb access. adb is full control of the device by design.
 
