@@ -1,11 +1,20 @@
 // Ground truth lives with each fixture (fixtures/<name>/expected.json). Elements are
 // identified by testID, which React Native exposes to accessibility tools as the
-// view's resource id, so labels survive layout changes.
+// view's resource id, so labels survive layout changes. Real apps (bench/real, ADR-015)
+// rarely have ids, so their labels name the element's node id in the committed recording.
 
 export interface LabelledElement {
   rule: string;
-  testID: string;
+  /** testID or resource id; fixtures use this. */
+  testID?: string;
+  /** Node id in the committed recording, e.g. "0.3.1"; real apps use this. */
+  node?: string;
   note?: string;
+}
+
+/** How a label and a reported issue are matched: by id when the label has one, else by node. */
+export function labelKey(label: LabelledElement): string {
+  return label.testID ?? `node:${label.node ?? ''}`;
 }
 
 export interface TruthScreen {
@@ -60,7 +69,10 @@ function elements(value: unknown, path: string): LabelledElement[] {
   return value.map((item: unknown, index) => {
     const itemPath = `${path}[${String(index)}]`;
     const entry = record(item, itemPath);
-    const element: LabelledElement = { rule: text(entry, 'rule', itemPath), testID: text(entry, 'testID', itemPath) };
+    const hasNode = typeof entry.node === 'string' && entry.node !== '';
+    const element: LabelledElement = hasNode
+      ? { rule: text(entry, 'rule', itemPath), node: text(entry, 'node', itemPath) }
+      : { rule: text(entry, 'rule', itemPath), testID: text(entry, 'testID', itemPath) };
     if (typeof entry.note === 'string') element.note = entry.note;
     return element;
   });

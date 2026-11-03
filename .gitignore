@@ -13,6 +13,8 @@ agents/android/**/build/
 agents/android/local.properties
 # The agent copied into the CLI package at release (scripts/bundle-agent.mjs)
 packages/cli/agent/
+# Labelling pages embed the screenshot; they are made again from the recording when needed
+bench/real/**/*.label.html
 
 # Editors and OS
 .idea/

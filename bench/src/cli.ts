@@ -10,10 +10,20 @@ import { formatMetric } from './metrics.js';
 import { recordAll } from './record.js';
 import { loadFixtures, loadOutcomes } from './recordings.js';
 import { renderMarkdown } from './report.js';
+import { renderLabelPage } from './label.js';
+import { loadRealApps, loadRealOutcomes, realRecordingFiles } from './real.js';
+import type { Split } from './real.js';
+import { execFile } from 'node:child_process';
+import { copyFile, mkdtemp, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { promisify } from 'node:util';
 
 // Usage:
 //   node bench/dist/cli.js evaluate [--update]                 score the recordings (CI runs this)
 //   node bench/dist/cli.js evaluate --bar-only                  only check the 0.90 bar for error rules (other Android versions)
+//   node bench/dist/cli.js evaluate --real dev|test [--update]  score the real-app bench (ADR-015; test only at releases)
+//   node bench/dist/cli.js record-real --app <folder> --package <applicationId> --screen <id> [--large-text] [--serial <id>]
+//                                                              record the screen on show for a real app, plus its labelling page
 //   node bench/dist/cli.js record [--install] [--only <fixture>] [--serial <id>] [--budget-seconds <n>]   refresh recordings on a device
 
 const root = fileURLToPath(new URL('../../', import.meta.url));
@@ -71,6 +81,79 @@ async function evaluateCommand(update: boolean, barOnly: boolean): Promise<numbe
   return gate.ok ? 0 : 1;
 }
 
+const RULE_IDS = defaultRules.map((rule) => rule.meta.id);
+
+/** Scores one half of the real-app bench. The test half is for releases only (ADR-015). */
+async function evaluateReal(split: Split, update: boolean): Promise<number> {
+  const apps = await loadRealApps(root, split);
+  if (apps.length === 0) {
+    console.log(`No real apps are labelled in the ${split} set yet (bench/real/<app>/expected.json).`);
+    return 0;
+  }
+  const result = evaluate(
+    await loadRealOutcomes(root, apps),
+    defaultRules.map((rule) => ({ id: rule.meta.id, severity: rule.meta.severity })),
+  );
+  printTable(result);
+  if (update) {
+    const file = join(root, 'bench', 'real', `results-${split}.json`);
+    await writeFile(file, `${JSON.stringify(result, null, 2)}\n`);
+    console.log(`Updated ${file}.`);
+  }
+  return 0;
+}
+
+/**
+ * Captures the screen on show with the real CLI and keeps it as a real-app recording, with
+ * a labelling page next to it. Navigating to the screen is done by hand, on purpose: real
+ * apps have no deep links into every screen, and a person checks that it is the right one.
+ */
+async function recordReal(
+  app: string,
+  appId: string,
+  screenId: string,
+  largeText: boolean,
+  serial: string | undefined,
+): Promise<void> {
+  const out = await mkdtemp(join(tmpdir(), 'pragu-real-'));
+  try {
+    const args = [
+      join(root, 'packages', 'cli', 'dist', 'bin.js'),
+      'scan',
+      '--no-launch',
+      '--screen-name',
+      screenId,
+      '--out',
+      out,
+      '--fail-on',
+      'never',
+    ];
+    if (largeText) args.push('--check-font-scale');
+    if (serial !== undefined) args.push('--serial', serial);
+    await promisify(execFile)(process.execPath, [...args, '--app', appId], { timeout: 180_000, windowsHide: true });
+    const files = realRecordingFiles(root, app, screenId);
+    await mkdir(dirname(files.json), { recursive: true });
+    const capture = join(out, 'capture');
+    await copyFile(join(capture, 'screen-1.json'), files.json);
+    await copyFile(join(capture, 'screen-1.png'), files.png);
+    if (existsSync(join(capture, 'screen-1-large-text.json')))
+      await copyFile(join(capture, 'screen-1-large-text.json'), files.largeTextJson);
+    const page = files.json.replace(/\.json$/, '.label.html');
+    await writeFile(
+      page,
+      renderLabelPage(
+        JSON.parse(await readFile(files.json, 'utf8')),
+        await readFile(files.png),
+        { id: screenId, name: screenId },
+        RULE_IDS,
+      ),
+    );
+    console.log(`Recorded ${files.json}\nLabel it blind in ${page}`);
+  } finally {
+    await rm(out, { recursive: true, force: true });
+  }
+}
+
 function budgetFrom(value: string | undefined): number | undefined {
   if (value === undefined) return undefined;
   const seconds = Number(value);
@@ -86,8 +169,20 @@ function valueAfter(args: readonly string[], flag: string): string | undefined {
 
 const [command = 'evaluate', ...args] = process.argv.slice(2);
 try {
-  if (command === 'evaluate') {
+  const real = valueAfter(args, '--real');
+  if (command === 'evaluate' && real !== undefined) {
+    if (real !== 'dev' && real !== 'test') throw new Error('--real must be "dev" or "test".');
+    process.exitCode = await evaluateReal(real, args.includes('--update'));
+  } else if (command === 'evaluate') {
     process.exitCode = await evaluateCommand(args.includes('--update'), args.includes('--bar-only'));
+  } else if (command === 'record-real') {
+    const app = valueAfter(args, '--app');
+    const appId = valueAfter(args, '--package');
+    const screen = valueAfter(args, '--screen');
+    if (app === undefined || appId === undefined || screen === undefined) {
+      throw new Error('record-real needs --app <folder>, --package <applicationId> and --screen <id>.');
+    }
+    await recordReal(app, appId, screen, args.includes('--large-text'), valueAfter(args, '--serial'));
   } else if (command === 'record') {
     const options = {
       install: args.includes('--install'),

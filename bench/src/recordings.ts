@@ -63,7 +63,8 @@ export function analyzeRecording(
       nodes: large.nodes,
     };
   }
-  if (!normalized.screen.nodes.some((node) => node.resourceId === screen.marker)) {
+  // Real-app screens have no marker: they are recorded by hand and checked by the labeller.
+  if (screen.marker !== '' && !normalized.screen.nodes.some((node) => node.resourceId === screen.marker)) {
     throw new Error(
       `The recording for "${screen.id}" does not show that screen (marker "${screen.marker}" is missing).`,
     );

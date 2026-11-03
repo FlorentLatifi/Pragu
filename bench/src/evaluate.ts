@@ -1,7 +1,13 @@
 import type { Issue, Severity } from '@pragu/core';
 import { f1, mcc, precision, recall, truncate } from './metrics.js';
 import type { Counts } from './metrics.js';
+import { labelKey } from './truth.js';
 import type { TruthScreen } from './truth.js';
+
+/** The keys a reported issue matches labels by: its resource id, and its node id. */
+function issueKeys(issue: Issue): string[] {
+  return [...(issue.resourceId === null ? [] : [issue.resourceId]), `node:${issue.nodeId}`];
+}
 
 export interface ScreenOutcome {
   fixture: string;
@@ -57,28 +63,28 @@ export function evaluate(
       const barriers = screen.barriers.filter((label) => label.rule === id);
       const twins = screen.correctTwins.filter((label) => label.rule === id);
       const reported = issues.filter((issue) => issue.ruleId === id);
-      const reportedIds = new Set(reported.flatMap((issue) => (issue.resourceId === null ? [] : [issue.resourceId])));
-      const barrierIds = new Set(barriers.map((label) => label.testID));
+      const reportedIds = new Set(reported.flatMap(issueKeys));
+      const barrierIds = new Set(barriers.map(labelKey));
 
       for (const barrier of barriers) {
-        if (reportedIds.has(barrier.testID)) counts.tp++;
+        if (reportedIds.has(labelKey(barrier))) counts.tp++;
         else {
           counts.fn++;
           falseNegatives.push(
-            withNote({ fixture, screen: screen.id, rule: id, element: barrier.testID }, barrier.note),
+            withNote({ fixture, screen: screen.id, rule: id, element: labelKey(barrier) }, barrier.note),
           );
         }
       }
       for (const issue of reported) {
-        if (issue.resourceId !== null && barrierIds.has(issue.resourceId)) continue;
+        if (issueKeys(issue).some((key) => barrierIds.has(key))) continue;
         counts.fp++;
         const element = issue.resourceId ?? `node ${issue.nodeId}`;
-        const twin = twins.find((label) => label.testID === issue.resourceId);
+        const twin = twins.find((label) => issueKeys(issue).includes(labelKey(label)));
         falsePositives.push(
           withNote({ fixture, screen: screen.id, rule: id, element, message: issue.message }, twin?.note),
         );
       }
-      counts.tn += twins.filter((label) => !reportedIds.has(label.testID)).length;
+      counts.tn += twins.filter((label) => !reportedIds.has(labelKey(label))).length;
     }
     return {
       rule: id,

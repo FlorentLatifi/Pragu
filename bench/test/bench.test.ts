@@ -9,6 +9,8 @@ import { f1, formatMetric, mcc, precision, recall, truncate } from '../src/metri
 import { checkBudget, containsResourceId, isBlank } from '../src/record.js';
 import { analyzeRecording } from '../src/recordings.js';
 import { renderMarkdown } from '../src/report.js';
+import { renderLabelPage } from '../src/label.js';
+import { parseRealApp } from '../src/real.js';
 import { parseGroundTruth } from '../src/truth.js';
 import type { TruthScreen } from '../src/truth.js';
 
@@ -308,5 +310,76 @@ describe('checkBudget', () => {
       summary:
         '2 scans in 17.6 s; slowest rn-shop › cart at 200% (11.4 s). Over the 10 s budget: rn-shop › cart at 200% (11.4 s).',
     });
+  });
+});
+
+describe('real-app bench', () => {
+  const app = {
+    app: 'notes',
+    appId: 'org.example.notes',
+    split: 'dev',
+    license: 'GPL-3.0-only',
+    source: 'https://f-droid.org/packages/org.example.notes/',
+    screens: [
+      {
+        id: 'list',
+        name: 'Note list',
+        barriers: [{ rule: 'name/interactive-missing', node: '0.4' }],
+        correctTwins: [],
+      },
+    ],
+  };
+
+  it('reads labels keyed by node, with licence, source and split', () => {
+    const real = parseRealApp(app, 'expected.json');
+    expect(real.split).toBe('dev');
+    expect(real.truth.screens[0]?.barriers[0]).toEqual({ rule: 'name/interactive-missing', node: '0.4' });
+    expect(real.truth.screens[0]?.marker).toBe('');
+    expect(() => parseRealApp({ ...app, split: 'train' }, 'expected.json')).toThrow('"split" must be "dev" or "test"');
+    expect(() => parseRealApp({ ...app, license: '' }, 'expected.json')).toThrow(
+      '"license" must be a non-empty string',
+    );
+  });
+
+  it('matches a node label to the issue on that node, whatever its resource id', () => {
+    const screen = parseRealApp(app, 'expected.json').truth.screens[0];
+    if (screen === undefined) throw new Error('app has a screen');
+    const found = {
+      ruleId: 'name/interactive-missing',
+      resourceId: 'org.example.notes:id/fab',
+      nodeId: '0.4',
+    } as Issue;
+    const elsewhere = { ...found, nodeId: '0.9', resourceId: null };
+    const result = evaluate(
+      [{ fixture: 'notes', screen, issues: [found, elsewhere] }],
+      [{ id: 'name/interactive-missing', severity: 'error' }],
+    );
+    expect(result.rules[0]).toMatchObject({ tp: 1, fp: 1, fn: 0 });
+  });
+
+  it('builds a labelling page from the tree alone, with no findings on it', () => {
+    const root = rawNode({
+      bounds: [0, 0, 400, 400],
+      children: [
+        rawNode({
+          resourceId: 'fab',
+          className: 'android.widget.Button',
+          clickable: true,
+          bounds: [300, 300, 380, 380],
+        }),
+        rawNode({ text: 'Groceries', bounds: [10, 10, 200, 40] }),
+      ],
+    });
+    const png = new PNG({ width: 4, height: 4 });
+    const html = renderLabelPage(
+      { ...captureOf(root), screenWidthPx: 400, screenHeightPx: 400 },
+      PNG.sync.write(png),
+      { id: 'list', name: 'Note list' },
+      ['name/interactive-missing', 'contrast/text'],
+    );
+    expect(html).toContain('data-node="0.0"');
+    expect(html).toContain('<td>Groceries</td>');
+    expect(html).toContain('<option>contrast/text</option>');
+    expect(html).not.toContain('has no accessible name');
   });
 });
