@@ -21,7 +21,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: e2e-${{ github.ref }}
+  group: e2e-${{ github.ref }}-${{ github.event_name == 'schedule' && '30' || inputs.api-level || '36' }}
   cancel-in-progress: true
 
 env:
