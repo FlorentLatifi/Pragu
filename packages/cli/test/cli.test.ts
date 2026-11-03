@@ -11,6 +11,7 @@ import { initConfig, loadConfig } from '../src/config.js';
 import { formatError, PraguError } from '../src/errors.js';
 import { main } from '../src/main.js';
 import { installAgent } from '../src/scan.js';
+import { downscale, reportScreenshot } from '../src/screenshot.js';
 import { FrameDecoder, parseHeader } from '../src/protocol.js';
 import { exitCodeFor } from '../src/scan.js';
 
@@ -373,6 +374,31 @@ describe('exitCodeFor', () => {
     expect(exitCodeFor([issue('error')], 'info')).toBe(1);
     expect(exitCodeFor([issue('error')], 'never')).toBe(0);
     expect(exitCodeFor([], 'info')).toBe(0);
+  });
+});
+
+describe('report screenshots', () => {
+  it('averages each target pixel over its source area, and leaves narrow images alone', () => {
+    // 4 × 2: a black and a white column pair; halved, each target pixel is the mean of a 2 × 2 block.
+    const data = new Uint8Array(4 * 2 * 4);
+    for (let i = 0; i < 8; i++) data.set(i % 4 < 2 ? [0, 0, 0, 255] : [255, 255, 255, 255], i * 4);
+    const small = downscale({ width: 4, height: 2, data }, 2);
+    expect([small.width, small.height]).toEqual([2, 1]);
+    expect([...small.data]).toEqual([0, 0, 0, 255, 255, 255, 255, 255]);
+    const odd = downscale(
+      { width: 3, height: 1, data: new Uint8Array([0, 0, 0, 255, 90, 90, 90, 255, 30, 30, 30, 255]) },
+      2,
+    );
+    expect(odd.width).toBe(2);
+    expect(downscale({ width: 2, height: 1, data }, 720).width).toBe(2);
+  });
+
+  it('embeds a 1080 px capture at 720 px wide', () => {
+    const png = new PNG({ width: 1080, height: 1920 });
+    png.data.fill(200);
+    const embedded = reportScreenshot(PNG.sync.write(png));
+    const decoded = PNG.sync.read(Buffer.from(embedded.base64, 'base64'));
+    expect([decoded.width, decoded.height]).toEqual([720, 1280]);
   });
 });
 

@@ -7,6 +7,7 @@ import type { ReportScreenshot } from '@pragu/report';
 import { renderReport } from '@pragu/report';
 import { readResult } from './baseline.js';
 import { EXIT, PraguError } from './errors.js';
+import { reportScreenshot } from './screenshot.js';
 import type { Io } from './main.js';
 
 /**
@@ -49,7 +50,7 @@ export async function runReport(args: string[], io: Io): Promise<number> {
       io.err(`The screenshot ${path} is missing; the report shows ${screen.name} without it.\n`);
       continue;
     }
-    screenshots.set(screen.id, { mimeType: 'image/png', base64: (await readFile(path)).toString('base64') });
+    screenshots.set(screen.id, reportScreenshot(await readFile(path)));
   }
   const out = parsed.values.out ?? join(dirname(file), 'pragu-report.html');
   await writeFile(out, renderReport({ result, screenshots }));

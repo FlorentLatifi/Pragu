@@ -31,6 +31,7 @@ import type { AgentSession } from './agent.js';
 import { readBaseline } from './baseline.js';
 import { EXIT, PraguError } from './errors.js';
 import { LARGE_TEXT_SCALE, withFontScale } from './font-scale.js';
+import { reportScreenshot } from './screenshot.js';
 import { toolVersion } from './version.js';
 
 export type { FailOn };
@@ -511,9 +512,7 @@ export async function scan(options: ScanOptions, log: (line: string) => void): P
     reportFile,
     renderReport({
       result,
-      screenshots: new Map(
-        prepared.map((entry) => [entry.raw.id, { mimeType: 'image/png', base64: entry.raw.png.toString('base64') }]),
-      ),
+      screenshots: new Map(prepared.map((entry) => [entry.raw.id, reportScreenshot(entry.raw.png)])),
     }),
   );
   // With a baseline, only new issues can fail the build.
