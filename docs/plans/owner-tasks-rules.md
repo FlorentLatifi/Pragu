@@ -1,3 +1,5 @@
+> **Implemented by Claude on 2026-11-03 at Florent's request.** What was built and why: `docs/plans/owner-tasks-walkthrough.md`.
+
 # Owner tasks: three rules
 
 **Who:** Florent writes them; Claude reviews. M1 plan, owner-implements tasks 1–3. Each is small, teaches one part of Pragu, and follows the same path as every rule so far (look at `packages/core/src/rules/state-not-exposed.ts` and its tests for the shape).

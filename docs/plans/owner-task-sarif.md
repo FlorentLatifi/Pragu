@@ -1,3 +1,5 @@
+> **Implemented by Claude on 2026-11-03 at Florent's request.** What was built and why: `docs/plans/owner-tasks-walkthrough.md`.
+
 # Owner task: the SARIF writer
 
 **Who:** Florent writes it; Claude reviews. M1 plan, owner-implements task 4. It is a mapping exercise against a spec, and the GitHub Action (M2) needs it to show findings as code scanning alerts.

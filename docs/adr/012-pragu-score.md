@@ -29,7 +29,7 @@ Wording everywhere: "Pragu score 72/100 (automated checks)", and the report and 
 - No per-rule denominators: adding passing elements cannot inflate the score, and rules do not have to report what they checked.
 - Default weights keep scores comparable across projects: lowering a rule's severity in config changes what fails the build, not the score.
 
-## Worked example (bench recordings, 2026-11-03, all nine rules)
+## Worked example (bench recordings, 2026-11-03, the nine rules of that day)
 
 | Screen | Barriers | Screen score |
 |---|---|---|
@@ -37,7 +37,7 @@ Wording everywhere: "Pragu score 72/100 (automated checks)", and the report and 
 | rn-shop summary | 1 error | 89.89 |
 | Compose settings | 3 errors (2 rules), 2 warnings | 75.62 |
 
-The five rn-shop screens together would score 72.
+The five rn-shop screens together would score 72. Rules added since change the denominators, so today's scores differ; the test reproduces the example with those nine rules.
 
 ## Properties to prove (fast-check)
 

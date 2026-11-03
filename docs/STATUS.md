@@ -85,6 +85,12 @@ Walking skeleton on the emulator, CI, docs (PRD, technical design, ADR-001 to 00
   - `FLAG_SECURE` screens (D-03): Android 16 paints a secure window black instead of refusing the screenshot. When every visible text sits on pure black, Pragu checks the screen by its tree alone, skips contrast and says why; the agent (0.0.5) also sends the tree alone if a device does refuse. Checked on the emulator with the Compose fixture's new `composeshop://secure`: 4 issues, no contrast check, the note in the report.
   - `--redact` (D-33, the wider scope Florent approved): covered screenshots in `screenshots/`, `[redacted]` for the app's text in the result and report, no `capture/`, `redacted: true` in the result (schema 0.11.0). On the emulator, five rn-shop screens: none of the app texts checked ("Hand-thrown", "Free shipping", "Ceramic", "Prishtina") is left in the JSON or the HTML, and the report is 337 KB.
 - Checks: 296 TypeScript tests (plus 18 owner-task todos), 26 JVM tests, lint, typecheck, bench, report axe check (24 runs). After work packages 6, 7 and 4: 303 TypeScript tests (plus 28 owner-task todos).
+- **The owner tasks, built by Claude at Florent's request (2026-11-03; walkthrough: `docs/plans/owner-tasks-walkthrough.md`):**
+  - Wilson 95% intervals on every precision and recall in the bench, widened outward.
+  - The Pragu score (ADR-012, result schema 0.12.0) in the CLI, report and pull-request comment, with property tests and the ADR's worked example.
+  - SARIF 2.1.0 (`--format sarif`), validated against the official schema, each result located on the line of the project's code that names its testID (all five rn-shop cart barriers land in `CartScreen.tsx`).
+  - `name/generic`, `contrast/non-text` and `target/platform-size`, each 0 false positives on the bench; a Compose 40 dp Box first labelled a barrier turned out not to be one (Compose enlarges and reports a 48 dp touch area) and is now a twin.
+- Zero budget (Florent, 2026-11-03): no paid domain, no Mac; only free tools and services.
 - **Work package 9 (launch), everything that needs no account:** `CODE_OF_CONDUCT.md` (adopts the Contributor Covenant 2.1 by reference; its contact waits for Florent), `GOVERNANCE.md` (D-41), issue templates (false alarm, bug), a pull-request template, a DCO check for outside pull requests (`dco.yml`), the first-release changeset (0.1.0), a comparison page on the docs site with sources checked on 2026-11-03 (ATF, Apple's audit, BrowserStack, Deque, Accessibility Insights for Android), the launch checklist (`docs/launch/checklist.md`) and post drafts for Show HN, r/reactnative and Expo (`docs/launch/posts.md`), not posted.
 - **Work package 8 (docs site), first version:** `apps/docs` with Astro Starlight (D-39) in the Signal tokens and the report's Atkinson Hyperlegible fonts: home, getting started, React Native and Expo, pull requests on GitHub, what checks miss, baselines, how Pragu is measured, Accessibility 101, CLI and config reference, FAQ, and one page per rule generated from rule metadata at build time (never committed, so it cannot drift). `pnpm docs:a11y` runs axe on 6 pages in light and dark at phone and desktop width: its first run found code blocks that scrolled sideways without keyboard access, so code now wraps; 24 runs pass. `docs.yml` builds and checks it on every change and deploys to GitHub Pages once Florent turns Pages on (source: GitHub Actions) and sets the repository variable `DOCS_DEPLOY` to `true`. Not yet: the honest comparison page (needs competitors re-checked with sources, work package 9) and the README GIF.
 - **Work package 5 (rules), part one:** `name/role-in-label` (info, best practice) and `structure/no-headings` (info, low confidence), each with unit tests and a barrier and twin on the Compose fixture's new `composeshop://help` screen; both 1 TP and no false positive on the 9 bench screens, and nothing else on the bench changed. `focus/order` still waits for the transcript check on a phone (D-14).
@@ -114,10 +120,13 @@ Walking skeleton on the emulator, CI, docs (PRD, technical design, ADR-001 to 00
 | `input/missing-label` | error | 2 | 0 | 0 | 4 | 1.00 | 1.00 |
 | `state/not-exposed` | error | 2 | 0 | 2 | 5 | 1.00 | 0.50 |
 | `focus/unreachable` | error | 1 | 0 | 1 | 3 | 1.00 | 0.50 |
-| `text/scaling-truncation` | error | 2 | 0 | 2 | 6 | 1.00 | 0.50 |
 | `contrast/text` | error | 6 | 0 | 0 | 11 | 1.00 | 1.00 |
+| `text/scaling-truncation` | error | 2 | 0 | 2 | 6 | 1.00 | 0.50 |
 | `target/size` | warning | 3 | 1 | 3 | 11 | 0.75 | 0.50 |
 | `name/duplicate` | warning | 2 | 0 | 0 | 2 | 1.00 | 1.00 |
+| `name/generic` | warning | 1 | 0 | 0 | 1 | 1.00 | 1.00 |
+| `contrast/non-text` | warning | 1 | 0 | 0 | 1 | 1.00 | 1.00 |
+| `target/platform-size` | info | 2 | 0 | 0 | 3 | 1.00 | 1.00 |
 | `name/role-in-label` | info | 1 | 0 | 0 | 1 | 1.00 | 1.00 |
 | `structure/no-headings` | info | 1 | 0 | 0 | 3 | 1.00 | 1.00 |
 
@@ -127,7 +136,7 @@ All error rules meet the 0.90 bar. Known misses stay published: home-made checkb
 
 1. **Florent:** the decisions in section L of `docs/decisions.md`; the M1 walkthrough and its three questions (`docs/plans/m1-walkthrough.md`).
 2. **Florent:** check the transcript on a phone with TalkBack's "Display speech output" (D-14): rn-shop cart and Compose checkout, every spoken line written down.
-3. **Florent's owner tasks**, briefs ready: Wilson intervals and the Pragu score (`docs/plans/owner-tasks-m2.md`; also review `pragu comment`, which Claude built although it was an owner-task candidate); SARIF writer (`docs/plans/owner-task-sarif.md`); `target/size` platform tier, `name/generic`, `contrast/non-text` (`docs/plans/owner-tasks-rules.md`).
+3. **Florent:** read `docs/plans/owner-tasks-walkthrough.md` (the owner tasks, built by Claude) and answer its questions; SARIF writer (`docs/plans/owner-task-sarif.md`); `target/size` platform tier, `name/generic`, `contrast/non-text` (`docs/plans/owner-tasks-rules.md`).
 4. **Claude** (the M2 plan was approved on 2026-11-03), in its order, without touching the owner tasks' files: the launch checklist's items that need no account (package READMEs, the README GIF, a clean-machine quickstart run once `pragu` is on npm); `focus/order` once D-14 is done.
 
 ## Notes and risks

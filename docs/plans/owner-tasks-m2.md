@@ -1,3 +1,5 @@
+> **Implemented by Claude on 2026-11-03 at Florent's request.** What was built and why: `docs/plans/owner-tasks-walkthrough.md`.
+
 # Owner tasks: M2
 
 **Who:** Florent writes them; Claude reviews. M2 plan, owner-implements. The third candidate in the plan, `pragu comment`, was built by Claude on 2026-11-03 while doing the GitHub integration; review it instead (`packages/cli/src/comment.ts` and its golden test) and be ready to explain it.
