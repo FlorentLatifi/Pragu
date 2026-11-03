@@ -55,6 +55,7 @@ Test with TalkBack, at 200% text size, and with real users.
 
 ## Roadmap and docs
 
+- **Docs site:** https://florentlatifi.github.io/Pragu/ (getting started, rules, how Pragu compares)
 - [Founding brief](docs/00-founding-brief.md) · [Product requirements](docs/prd.md) · [Technical design](docs/design/technical-design.md)
 - [Decision register](docs/decisions.md) · [ADRs](docs/adr/) · [Threat model](docs/security/threat-model.md) · [Test strategy](docs/testing/strategy.md)
 - [Status](docs/STATUS.md) · [M1 plan](docs/plans/m1.md) · [M2 plan](docs/plans/m2.md) · [Roadmap](ROADMAP.md)
