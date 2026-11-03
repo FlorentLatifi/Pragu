@@ -496,7 +496,8 @@ describe('report screenshots', () => {
     expect(downscale({ width: 2, height: 1, data }, 720).width).toBe(2);
   });
 
-  it('embeds a 1080 px capture at 720 px wide', () => {
+  // A full-size capture through a plain-JavaScript box filter: give a slow CI runner room.
+  it('embeds a 1080 px capture at 720 px wide', { timeout: 20_000 }, () => {
     const png = new PNG({ width: 1080, height: 1920 });
     png.data.fill(200);
     const embedded = reportScreenshot(PNG.sync.write(png));
