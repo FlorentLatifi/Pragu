@@ -407,6 +407,42 @@ describe('scan --from-capture (whole pipeline, no device)', () => {
     expect(await readFile(join(out, 'pragu-report.html'), 'utf8')).toBe(html);
   });
 
+  it('writes the pull-request comment: only new barriers, against main or else the baseline', async () => {
+    const captureFile = await writeFixtureCapture();
+    const { sink } = capturingIo();
+    const out = join(dir, 'pr');
+    await main(['scan', '--from-capture', captureFile, '--out', out, '--fail-on', 'never'], sink);
+    const head = join(out, 'pragu-result.json');
+    const result = JSON.parse(await readFile(head, 'utf8')) as ScanResult;
+
+    // Main already had the target and contrast issues; this change adds the unlabelled button.
+    const base = join(dir, 'main.json');
+    await writeFile(
+      base,
+      JSON.stringify({
+        ...result,
+        issues: result.issues.filter((issue) => issue.ruleId !== 'name/interactive-missing'),
+      }),
+    );
+    const comment = capturingIo();
+    expect(
+      await main(
+        ['comment', head, '--base', base, '--report-url', 'https://github.com/o/r/actions/runs/1'],
+        comment.sink,
+      ),
+    ).toBe(0);
+    await expect(comment.io.stdout).toMatchFileSnapshot('./__snapshots__/comment.md');
+
+    const firstRun = capturingIo();
+    await main(['comment', head, '--base', join(dir, 'no-main-scan-yet.json')], firstRun.sink);
+    expect(firstRun.io.stdout).toContain('### Pragu · 3 new barriers in this pull request');
+    expect(firstRun.io.stdout).toContain('compared with the baseline');
+
+    const none = capturingIo();
+    await main(['comment', head, '--base', head], none.sink);
+    expect(none.io.stdout).toContain('### Pragu · no new barriers in this pull request');
+  });
+
   it('explains a missing capture file', async () => {
     const { io, sink } = capturingIo();
     expect(await main(['scan', '--from-capture', 'nope.json'], sink)).toBe(2);

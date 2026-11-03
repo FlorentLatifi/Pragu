@@ -5,6 +5,7 @@ import { relative } from 'node:path';
 import { Adb, findAdb } from './adb.js';
 import { runBaseline } from './baseline.js';
 import { syncedFolderWarning } from './cloud.js';
+import { runComment } from './comment.js';
 import { initConfig, loadConfig } from './config.js';
 import { formatChecks, runDoctor } from './doctor.js';
 import { runReport } from './report.js';
@@ -34,6 +35,8 @@ Usage
                            List what Pragu checks, or explain one rule and its fixes
   pragu report <pragu-result.json> [--out <file>]
                            Render the HTML report again from a scan's result
+  pragu comment <pragu-result.json> [--base <main-result.json>] [--report-url <url>] [--out <file>]
+                           Write the pull-request comment: only the barriers this change adds
   pragu baseline create|update --from <pragu-result.json> [--out <file>]
                            Accept a scan's issues, so later scans fail only on new ones
   pragu --version
@@ -255,6 +258,7 @@ export async function main(argv: string[], io: Io = defaultIo): Promise<number> 
     }
     if (command === 'rules') return runRules(rest, io);
     if (command === 'report') return await runReport(rest, io);
+    if (command === 'comment') return await runComment(rest, io);
     throw new PraguError(EXIT.usage, `Unknown command "${command}".`, 'Run "pragu --help" to see the commands.');
   } catch (error) {
     const { text, exitCode } = formatError(error);
