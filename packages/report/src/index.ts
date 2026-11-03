@@ -93,6 +93,7 @@ export function renderReport({ result, screenshots }: ReportInput): string {
   ${renderPrinciples(issues)}
   <p class="rules">Rules run: ${summary.rulesRun.map((id) => `<code>${escapeHtml(id)}</code>`).join(', ')}</p>
   ${summary.baseline === null ? '' : `<p class="baseline">${escapeHtml(`Compared with ${summary.baseline.file}: ${String(summary.baseline.newIssues)} new · ${String(summary.baseline.known)} already in the baseline · ${String(summary.baseline.fixed)} fixed since`)}</p>`}
+  ${result.redacted ? '<p class="rules">Redacted for sharing: the app\'s text is covered in the screenshots and replaced in names, quotes and the transcript. Images are not covered.</p>' : ''}
   ${summary.ignored === 0 ? '' : `<p class="rules">${escapeHtml(plural(summary.ignored, 'issue', 'issues'))} ignored by the project's config (pragu.config.ts), not counted above.</p>`}
   ${renderFilters(issues, summary.baseline !== null)}
 </section>

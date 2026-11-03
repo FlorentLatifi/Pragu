@@ -33,6 +33,7 @@ function resultFromRecording(dir: string, screenId: string): ScanResult {
   const issues = analyze({ device, screens: [screen], rasters: new Map() });
   return {
     schemaVersion: RESULT_SCHEMA_VERSION,
+    redacted: false,
     tool: { name: 'pragu', version: '0.0.0' },
     startedAt: '2026-10-29T12:00:00.000Z',
     device,

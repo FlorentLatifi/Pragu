@@ -149,7 +149,7 @@ describe('scan --from-capture (whole pipeline, no device)', () => {
 
     expect(code).toBe(1);
     const result = JSON.parse(await readFile(join(out, 'pragu-result.json'), 'utf8')) as ScanResult;
-    expect(result.schemaVersion).toBe('0.10.0');
+    expect(result.schemaVersion).toBe('0.11.0');
     expect(result.issues.map((issue) => [issue.ruleId, issue.resourceId])).toEqual([
       ['target/size', 'seed-tiny-dismiss'],
       ['name/interactive-missing', 'seed-unlabeled-remove'],
@@ -375,6 +375,35 @@ describe('scan --from-capture (whole pipeline, no device)', () => {
     expect(report).toContain('The app blocks screenshots on this screen (FLAG_SECURE');
     expect(report).toContain('No screenshot was captured for this screen.');
     expect(existsSync(join(out, 'capture', 'screen-1.png'))).toBe(false);
+  });
+
+  it('writes a report for sharing with --redact: no app text, covered screenshots, no raw captures', async () => {
+    const captureFile = await writeFixtureCapture();
+    const { sink } = capturingIo();
+    const out = join(dir, 'shared');
+
+    await main(['scan', '--from-capture', captureFile, '--out', out, '--fail-on', 'never', '--redact'], sink);
+
+    const json = await readFile(join(out, 'pragu-result.json'), 'utf8');
+    const result = JSON.parse(json) as ScanResult;
+    expect(result.redacted).toBe(true);
+    expect(result.issues).toHaveLength(3);
+    const html = await readFile(join(out, 'pragu-report.html'), 'utf8');
+    for (const text of ['Free shipping', 'Apply code', 'Dismiss promotion']) {
+      expect(json).not.toContain(text);
+      expect(html).not.toContain(text);
+    }
+    expect(html).toContain('Redacted for sharing');
+    expect(existsSync(join(out, 'capture'))).toBe(false);
+    expect(result.screens[0]?.screenshot?.file).toBe('screenshots/screen-1.png');
+    const shot = PNG.sync.read(await readFile(join(out, 'screenshots', 'screen-1.png')));
+    // The "Free shipping" text area is now the cover grey.
+    const at = (shot.width * 270 + 200) * 4;
+    expect([shot.data[at], shot.data[at + 1], shot.data[at + 2]]).toEqual([0x76, 0x76, 0x76]);
+
+    const again = capturingIo();
+    expect(await main(['report', join(out, 'pragu-result.json')], again.sink)).toBe(0);
+    expect(await readFile(join(out, 'pragu-report.html'), 'utf8')).toBe(html);
   });
 
   it('explains a missing capture file', async () => {

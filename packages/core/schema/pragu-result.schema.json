@@ -1,13 +1,13 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:pragu:result:0.10.0",
+  "$id": "urn:pragu:result:0.11.0",
   "title": "Pragu scan result",
   "description": "pragu-result.json: what one scan found. The stable machine contract; see packages/core/schema/README.md for the versioning policy.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaVersion", "tool", "startedAt", "device", "app", "screens", "issues", "summary"],
+  "required": ["schemaVersion", "tool", "startedAt", "device", "app", "redacted", "screens", "issues", "summary"],
   "properties": {
-    "schemaVersion": { "const": "0.10.0" },
+    "schemaVersion": { "const": "0.11.0" },
     "tool": {
       "type": "object",
       "additionalProperties": false,
@@ -15,6 +15,10 @@
       "properties": { "name": { "const": "pragu" }, "version": { "type": "string" } }
     },
     "startedAt": { "type": "string", "description": "ISO 8601 time the scan started." },
+    "redacted": {
+      "type": "boolean",
+      "description": "The app's text was replaced for sharing (--redact): names, texts, hints, window titles, quotes in messages, evidence."
+    },
     "device": { "$ref": "#/$defs/device" },
     "app": {
       "type": "object",

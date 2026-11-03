@@ -8,9 +8,9 @@
  * `PamNode.checked` and `stateDescription`; 0.5.0 added `PamNode.focusable`; 0.6.0 added
  * `PamNode.textEllipsized` and `PamScreen.largeText`; 0.7.0 added `ScanSummary.ignored`; 0.8.0 added
  * `Issue.inBaseline` and `ScanSummary.baseline`; 0.9.0 added `ScanSummary.baseline.fixedIssues`; 0.10.0 added
- * `PamNode.scrollable`.
+ * `PamNode.scrollable`; 0.11.0 added `ScanResult.redacted`.
  */
-export const RESULT_SCHEMA_VERSION = '0.10.0';
+export const RESULT_SCHEMA_VERSION = '0.11.0';
 
 export type Platform = 'android' | 'ios';
 export type Severity = 'error' | 'warning' | 'info';
@@ -204,6 +204,8 @@ export interface ScanResult {
   startedAt: string;
   device: DeviceInfo;
   app: { id: string };
+  /** The app's text was replaced for sharing (--redact): names, texts, hints, quotes, evidence. */
+  redacted: boolean;
   screens: PamScreen[];
   issues: Issue[];
   summary: ScanSummary;

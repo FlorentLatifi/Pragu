@@ -9,7 +9,9 @@ import {
   compareWithBaseline,
   enabledRules,
   normalizeAndroidCapture,
+  coverText,
   parseAndroidCapture,
+  redactResult,
   screenshotBlocked,
   summarize,
 } from '@pragu/core';
@@ -25,6 +27,7 @@ import type {
   Severity,
 } from '@pragu/core';
 import { renderReport } from '@pragu/report';
+import type { ReportScreenshot } from '@pragu/report';
 import { PNG } from 'pngjs';
 import { Adb, findAdb, selectDevice } from './adb.js';
 import { AGENT_PACKAGE, startAgentSession } from './agent.js';
@@ -32,7 +35,8 @@ import type { AgentSession } from './agent.js';
 import { readBaseline } from './baseline.js';
 import { EXIT, PraguError } from './errors.js';
 import { LARGE_TEXT_SCALE, withFontScale } from './font-scale.js';
-import { reportScreenshot } from './screenshot.js';
+import { encodeForReport, reportScreenshot } from './screenshot.js';
+import type { Pixels } from './screenshot.js';
 import { toolVersion } from './version.js';
 
 export type { FailOn };
@@ -58,6 +62,8 @@ export interface ScanOptions {
   baselineFile: string | undefined;
   /** Log every adb command and agent request with its duration. */
   verbose: boolean;
+  /** Write a report meant for sharing: the app's text covered and replaced, no raw captures (D-33). */
+  redact: boolean;
 }
 
 export interface ScanOutcome {
@@ -444,6 +450,43 @@ async function saveCaptures(captureDir: string, raws: readonly RawScreen[]): Pro
   await writeFile(join(captureDir, SCREENS_FILE), `${JSON.stringify(list, null, 2)}\n`);
 }
 
+interface PreparedScreen {
+  raw: RawScreen;
+  screen: PamScreen;
+  raster: Pixels | null;
+}
+
+/**
+ * --redact: covers the app's text in the screenshots, saves them small next to the report
+ * (there is no capture folder to point at), and replaces the app's text in the result.
+ */
+async function redactForSharing(
+  result: ScanResult,
+  prepared: readonly PreparedScreen[],
+  outDir: string,
+): Promise<{ result: ScanResult; screenshots: Map<string, ReportScreenshot> }> {
+  const dir = join(outDir, 'screenshots');
+  await mkdir(dir, { recursive: true });
+  const screenshots = new Map<string, ReportScreenshot>();
+  const screens: PamScreen[] = [];
+  for (const { raw, screen, raster } of prepared) {
+    if (raster === null) {
+      screens.push(screen);
+      continue;
+    }
+    const pixels = { ...raster, data: Uint8Array.from(raster.data) };
+    coverText(pixels, screen);
+    const { png, screenshot } = encodeForReport(pixels);
+    await writeFile(join(dir, `${raw.id}.png`), png);
+    screenshots.set(raw.id, screenshot);
+    screens.push({
+      ...screen,
+      screenshot: { file: `screenshots/${raw.id}.png`, widthPx: raster.width, heightPx: raster.height },
+    });
+  }
+  return { result: redactResult({ ...result, screens }), screenshots };
+}
+
 export async function scan(options: ScanOptions, log: (line: string) => void): Promise<ScanOutcome> {
   const startedAt = new Date().toISOString();
   const raws =
@@ -459,7 +502,8 @@ export async function scan(options: ScanOptions, log: (line: string) => void): P
   }
 
   const captureDir = join(options.outDir, 'capture');
-  await saveCaptures(captureDir, raws);
+  // A redacted report is for sharing, so the raw trees and screenshots are not written next to it.
+  if (!options.redact) await saveCaptures(captureDir, raws);
 
   const prepared = raws.map((raw) => {
     const normalized = normalizeAndroidCapture(raw.capture, {
@@ -507,27 +551,28 @@ export async function scan(options: ScanOptions, log: (line: string) => void): P
     startedAt,
     device,
     app: { id: first.raw.capture.packageName },
+    redacted: false,
     screens,
     issues,
     summary,
   };
 
+  const shared = options.redact
+    ? await redactForSharing(result, prepared, options.outDir)
+    : {
+        result,
+        screenshots: new Map(
+          prepared.flatMap(({ raw, raster }) =>
+            raw.png === null || raster === null ? [] : [[raw.id, reportScreenshot(raw.png)] as const],
+          ),
+        ),
+      };
   const resultFile = join(options.outDir, 'pragu-result.json');
   const reportFile = join(options.outDir, 'pragu-report.html');
   await mkdir(dirname(resultFile), { recursive: true });
-  await writeFile(resultFile, `${JSON.stringify(result, null, 2)}\n`);
-  await writeFile(
-    reportFile,
-    renderReport({
-      result,
-      screenshots: new Map(
-        prepared.flatMap(({ raw, raster }) =>
-          raw.png === null || raster === null ? [] : [[raw.id, reportScreenshot(raw.png)] as const],
-        ),
-      ),
-    }),
-  );
+  await writeFile(resultFile, `${JSON.stringify(shared.result, null, 2)}\n`);
+  await writeFile(reportFile, renderReport(shared));
   // With a baseline, only new issues can fail the build.
   const failing = issues.filter((issue) => !issue.inBaseline);
-  return { result, exitCode: exitCodeFor(failing, options.failOn), resultFile, reportFile };
+  return { result: shared.result, exitCode: exitCodeFor(failing, options.failOn), resultFile, reportFile };
 }

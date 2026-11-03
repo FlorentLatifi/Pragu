@@ -2,6 +2,7 @@ export * from './model.js';
 export { contrastRatio, estimateTextColors, formatRatio, relativeLuminance, toHex } from './color.js';
 export type { Raster, TextColors } from './color.js';
 export { screenshotBlocked } from './blocked-screenshot.js';
+export { REDACTED, coverText, redactMessage, redactResult } from './redact.js';
 export {
   ANDROID_AGENT_PROTOCOL,
   accessibleName,

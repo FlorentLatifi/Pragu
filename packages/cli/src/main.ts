@@ -57,6 +57,8 @@ Flags win over pragu.config.ts, which wins over the defaults. With "screens" in 
   --from-capture <json>  Re-analyse a capture saved by an earlier scan, without a device
   --agent-apk <path>     Use this agent APK instead of the bundled one
   --verbose              Print each adb command and agent request with its duration
+  --redact               Write a report for sharing: the app's text covered in screenshots and
+                         replaced in names, quotes and the JSON; no raw captures are kept
 
 Exit codes
   0 no issues at the threshold · 1 issues found · 2 usage error · 3 environment error
@@ -87,6 +89,7 @@ function parseScanArgs(args: string[]) {
         'from-capture': { type: 'string' },
         'agent-apk': { type: 'string' },
         verbose: { type: 'boolean', default: false },
+        redact: { type: 'boolean', default: false },
         help: { type: 'boolean', short: 'h', default: false },
       },
     }).values;
@@ -189,6 +192,7 @@ async function runScan(args: string[], io: Io): Promise<number> {
       config,
       baselineFile: values.baseline ?? config.baseline,
       verbose: values.verbose,
+      redact: values.redact || config.redact === true,
     },
     (line) => {
       io.err(`${line}\n`);

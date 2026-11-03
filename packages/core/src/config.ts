@@ -42,6 +42,8 @@ export interface PraguConfig {
   checkFontScale?: boolean;
   /** Accepted issues; only issues not in it fail the build. */
   baseline?: string;
+  /** Write reports for sharing: the app's text covered and replaced, no raw captures (--redact). */
+  redact?: boolean;
   /** Turn a rule off, or change its severity. */
   rules?: Record<string, Severity | 'off'>;
   ignore?: IgnoreEntry[];
@@ -54,7 +56,17 @@ export function defineConfig(config: PraguConfig): PraguConfig {
 
 const SEVERITIES: readonly string[] = ['error', 'warning', 'info'];
 const FAIL_ON: readonly string[] = [...SEVERITIES, 'never'];
-const KEYS: readonly string[] = ['app', 'screens', 'out', 'failOn', 'checkFontScale', 'baseline', 'rules', 'ignore'];
+const KEYS: readonly string[] = [
+  'app',
+  'screens',
+  'out',
+  'failOn',
+  'checkFontScale',
+  'baseline',
+  'redact',
+  'rules',
+  'ignore',
+];
 const SCREEN_KEYS: readonly string[] = ['name', 'deepLink', 'waitFor'];
 // The deep link travels through the device's shell inside single quotes, so quotes and spaces are refused.
 const DEEP_LINK = /^[a-z][a-z0-9+.-]*:[^\s'"]+$/i;
@@ -153,8 +165,8 @@ export function parseConfig(value: unknown, source: string, rules: readonly Rule
   if (config.failOn !== undefined && !FAIL_ON.includes(config.failOn as string)) {
     fail(source, `"failOn" must be one of ${FAIL_ON.join(', ')}.`);
   }
-  if (config.checkFontScale !== undefined && typeof config.checkFontScale !== 'boolean') {
-    fail(source, '"checkFontScale" must be true or false.');
+  for (const key of ['checkFontScale', 'redact'] as const) {
+    if (config[key] !== undefined && typeof config[key] !== 'boolean') fail(source, `"${key}" must be true or false.`);
   }
   checkRules(
     config.rules,

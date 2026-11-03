@@ -45,6 +45,16 @@ export function downscale(image: Pixels, maxWidth: number): Pixels {
   return { width, height, data };
 }
 
+/** Pixels as the report embeds them: downscaled, as PNG, with the file bytes for saving. */
+export function encodeForReport(pixels: Pixels): { png: Buffer; screenshot: ReportScreenshot } {
+  const small = downscale(pixels, REPORT_SCREENSHOT_WIDTH);
+  const out = new PNG({ width: small.width, height: small.height });
+  out.data = Buffer.from(small.data);
+  // Screenshots are opaque: dropping the alpha channel makes the PNG about a tenth smaller.
+  const png = PNG.sync.write(out, { colorType: 2 });
+  return { png, screenshot: { mimeType: 'image/png', base64: png.toString('base64') } };
+}
+
 /** The screenshot as the report embeds it: downscaled, as PNG. Analysis always uses the full-size capture. */
 export function reportScreenshot(png: Buffer): ReportScreenshot {
   const decoded = PNG.sync.read(png);

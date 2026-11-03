@@ -34,6 +34,7 @@ function issue(overrides: Partial<Issue> = {}): Issue {
 function result(issues: Issue[]): ScanResult {
   return {
     schemaVersion: RESULT_SCHEMA_VERSION,
+    redacted: false,
     tool: { name: 'pragu', version: '0.0.0' },
     startedAt: '2026-10-27T12:00:00.000Z',
     device: {
