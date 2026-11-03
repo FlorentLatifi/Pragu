@@ -22,7 +22,7 @@ export type { TranscriptLine } from './transcript.js';
 export { BASELINE_VERSION, compareWithBaseline, createBaseline, parseBaseline } from './baseline.js';
 export type { Baseline, BaselineComparison, BaselineEntry } from './baseline.js';
 export { applyConfig, defineConfig, enabledRules, parseConfig } from './config.js';
-export type { FailOn, IgnoreEntry, PraguConfig } from './config.js';
+export type { FailOn, IgnoreEntry, PraguConfig, ScreenConfig } from './config.js';
 export type { AnalyzeInput } from './engine.js';
 export { elementKey, fnv1a64, issueFingerprint } from './fingerprint.js';
 export {

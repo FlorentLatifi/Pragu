@@ -14,14 +14,26 @@ export type FailOn = Severity | 'never';
 export interface IgnoreEntry {
   rule?: string;
   resourceId?: string;
-  /** Screen name, as given with --screen-name or the window title. */
+  /** Screen name: from `screens`, from --screen-name, or the window title. */
   screen?: string;
   reason: string;
+}
+
+/** A screen a scan opens and checks. Its name is the key that baselines and ignores match on. */
+export interface ScreenConfig {
+  /** Shown in the report, e.g. "Cart". Keep it stable: baselines tell screens apart by name. */
+  name: string;
+  /** Opened on a fresh app start, e.g. "shop://cart". Without one, the app's launch screen. */
+  deepLink?: string;
+  /** A React Native testID or resource id that is on the screen once it has loaded; the scan waits for it. */
+  waitFor?: string;
 }
 
 export interface PraguConfig {
   /** Android applicationId to scan. */
   app?: string;
+  /** Screens to check, each opened on a fresh app start. Without them, the screen on show after launch. */
+  screens?: ScreenConfig[];
   /** Where to write the report and result (default: pragu-report). */
   out?: string;
   /** Exit 1 on issues at this severity or worse (default: error). */
@@ -42,7 +54,10 @@ export function defineConfig(config: PraguConfig): PraguConfig {
 
 const SEVERITIES: readonly string[] = ['error', 'warning', 'info'];
 const FAIL_ON: readonly string[] = [...SEVERITIES, 'never'];
-const KEYS: readonly string[] = ['app', 'out', 'failOn', 'checkFontScale', 'baseline', 'rules', 'ignore'];
+const KEYS: readonly string[] = ['app', 'screens', 'out', 'failOn', 'checkFontScale', 'baseline', 'rules', 'ignore'];
+const SCREEN_KEYS: readonly string[] = ['name', 'deepLink', 'waitFor'];
+// The deep link travels through the device's shell inside single quotes, so quotes and spaces are refused.
+const DEEP_LINK = /^[a-z][a-z0-9+.-]*:[^\s'"]+$/i;
 
 function fail(source: string, problem: string): never {
   throw new Error(`${source}: ${problem}`);
@@ -64,6 +79,38 @@ function checkRules(value: unknown, source: string, ruleIds: readonly string[]):
       fail(source, `"rules.${id}" must be "off", "error", "warning" or "info".`);
     }
   }
+}
+
+function checkScreen(entry: unknown, path: string, source: string, names: Set<string>): void {
+  if (typeof entry !== 'object' || entry === null || Array.isArray(entry)) fail(source, `${path} must be an object.`);
+  const screen = entry as Record<string, unknown>;
+  for (const key of Object.keys(screen)) {
+    if (!SCREEN_KEYS.includes(key)) {
+      fail(source, `${path} has an unknown setting "${key}". Known settings: ${SCREEN_KEYS.join(', ')}.`);
+    }
+  }
+  if (typeof screen.name !== 'string' || screen.name.trim() === '') {
+    fail(source, `${path} needs a "name", e.g. "Cart": reports, baselines and ignores use it.`);
+  }
+  if (names.has(screen.name)) {
+    fail(source, `${path}: the name "${screen.name}" is used twice. Baselines tell screens apart by name.`);
+  }
+  names.add(screen.name);
+  if (screen.deepLink !== undefined && (typeof screen.deepLink !== 'string' || !DEEP_LINK.test(screen.deepLink))) {
+    fail(source, `${path}.deepLink must be a URL with a scheme and no spaces or quotes, e.g. "shop://cart".`);
+  }
+  optionalString(screen.waitFor, source, `${path}.waitFor`);
+}
+
+function checkScreens(value: unknown, source: string): void {
+  if (value === undefined) return;
+  if (!Array.isArray(value) || value.length === 0) {
+    fail(source, '"screens" must be a non-empty array, e.g. [{ name: "Cart", deepLink: "shop://cart" }].');
+  }
+  const names = new Set<string>();
+  value.forEach((entry: unknown, index) => {
+    checkScreen(entry, `screens[${String(index)}]`, source, names);
+  });
 }
 
 function checkIgnore(value: unknown, source: string): void {
@@ -100,6 +147,7 @@ export function parseConfig(value: unknown, source: string, rules: readonly Rule
     if (!KEYS.includes(key)) fail(source, `unknown setting "${key}". Known settings: ${KEYS.join(', ')}.`);
   }
   optionalString(config.app, source, 'app');
+  checkScreens(config.screens, source);
   optionalString(config.out, source, 'out');
   optionalString(config.baseline, source, 'baseline');
   if (config.failOn !== undefined && !FAIL_ON.includes(config.failOn as string)) {

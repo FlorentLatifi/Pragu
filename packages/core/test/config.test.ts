@@ -27,6 +27,10 @@ describe('parseConfig', () => {
   it('accepts a full config and returns it unchanged, as defineConfig does', () => {
     const config = defineConfig({
       app: 'com.example.shop',
+      screens: [
+        { name: 'Cart', deepLink: 'shop://cart?coupon=SPRING&step=2', waitFor: 'cart-title' },
+        { name: 'Home' },
+      ],
       out: 'reports',
       failOn: 'warning',
       checkFontScale: true,
@@ -45,6 +49,16 @@ describe('parseConfig', () => {
     [{ checkFontScale: 'yes' }, '"checkFontScale" must be true or false'],
     [{ rules: { 'name/missing': 'off' } }, 'unknown rule "name/missing"'],
     [{ rules: { 'target/size': 'loud' } }, '"rules.target/size" must be "off", "error", "warning" or "info"'],
+    [{ screens: {} }, '"screens" must be a non-empty array'],
+    [{ screens: [] }, '"screens" must be a non-empty array'],
+    [{ screens: ['Cart'] }, 'screens[0] must be an object'],
+    [{ screens: [{ name: 'Cart', url: 'shop://cart' }] }, 'screens[0] has an unknown setting "url"'],
+    [{ screens: [{ deepLink: 'shop://cart' }] }, 'screens[0] needs a "name"'],
+    [{ screens: [{ name: 'Cart' }, { name: 'Cart' }] }, 'screens[1]: the name "Cart" is used twice'],
+    [{ screens: [{ name: 'Cart', deepLink: 'cart' }] }, 'screens[0].deepLink must be a URL with a scheme'],
+    [{ screens: [{ name: 'Cart', deepLink: "shop://it's" }] }, 'screens[0].deepLink must be a URL with a scheme'],
+    [{ screens: [{ name: 'Cart', deepLink: 'shop://my cart' }] }, 'screens[0].deepLink must be a URL with a scheme'],
+    [{ screens: [{ name: 'Cart', waitFor: '' }] }, '"screens[0].waitFor" must be a non-empty string'],
     [{ ignore: {} }, '"ignore" must be an array'],
     [{ ignore: [{ reason: 'too broad' }] }, 'an entry matching everything would hide every issue'],
     [{ ignore: [{ rule: 'contrast/text' }] }, 'needs a "reason"'],
