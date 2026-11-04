@@ -30,7 +30,7 @@ The brief asks for a Google-style launch checklist before every public release. 
 - [x] **F** `@pragu` npm organisation (2026-11-04).
 - [x] **F** Trusted publishing for `pragu`, `@pragu/core`, `@pragu/report` (ADR-013).
 - [x] **F** Release keystore and its four secrets (2026-11-04).
-- [ ] `pnpm changeset version`, review `CHANGELOG.md`, tag `v0.1.0`; the release workflow is green; `v0` tag moved to it for the action.
+- [x] `pnpm changeset version`, review `CHANGELOG.md`, tag `v0.1.0`; the release workflow is green; `v0` tag moved to it for the action (2026-11-04).
 - [ ] npm shows provenance on all three packages; the GitHub Release has the APK, `SHA256SUMS` and the SBOM.
 - [x] Each package has a README (npm shows it); `pnpm package:check` installs the packed tarballs with npm into an empty folder and runs them, in CI on Linux, Windows and macOS.
 
