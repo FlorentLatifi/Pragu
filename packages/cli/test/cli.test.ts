@@ -686,6 +686,45 @@ describe('pull-request comment safety', () => {
   });
 });
 
+describe('pull-request comment length', () => {
+  const issue = (ruleId: string, resourceId: string, fix: string) => ({
+    ruleId,
+    title: `Title of ${ruleId}`,
+    severity: 'error',
+    screenId: 'screen-1',
+    nodeId: resourceId,
+    resourceId,
+    fingerprint: resourceId,
+    message: `Problem at ${resourceId}.`,
+    wcag: ['4.1.2'],
+    fix: { reactNative: fix, compose: '', androidViews: '' },
+    inBaseline: false,
+  });
+
+  it('groups new barriers by rule and shows each rule’s fix once', () => {
+    const result = {
+      screens: [{ id: 'screen-1', name: 'Cart', windows: [], nodes: [] }],
+      issues: [
+        issue('name/interactive-missing', 'remove-1', 'Add accessibilityLabel.'),
+        issue('contrast/text', 'price', 'Darken the text.'),
+        issue('name/interactive-missing', 'remove-2', 'Add accessibilityLabel.'),
+      ],
+      score: { version: 1, value: null, screens: {} },
+      summary: { rulesRun: [] },
+    } as unknown as ScanResult;
+    const markdown = renderComment(result, { base: null, reportUrl: null });
+
+    expect(markdown).toContain('### Pragu · 3 new barriers in this pull request');
+    expect(markdown.match(/Add accessibilityLabel\./g)).toHaveLength(1);
+    expect(markdown.match(/<details>/g)).toHaveLength(2);
+    expect(markdown).toContain('**Title of name/interactive-missing** · Error · WCAG 4.1.2 · 2 new');
+    // Both issues of the first rule sit under its header, before the second rule.
+    const first = markdown.indexOf('`remove-1`');
+    expect(markdown.indexOf('`remove-2`')).toBeGreaterThan(first);
+    expect(markdown.indexOf('`remove-2`')).toBeLessThan(markdown.indexOf('`price`'));
+  });
+});
+
 describe('locating issues for SARIF', () => {
   let dir = '';
   afterEach(async () => {
