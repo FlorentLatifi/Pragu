@@ -46,22 +46,42 @@ function renderIssue(result: ScanResult, issue: Issue): string {
   const screen = result.screens.find((candidate) => candidate.id === issue.screenId)?.name ?? issue.screenId;
   const element = issue.resourceId === null ? '' : ` › \`${issue.resourceId.replaceAll('`', '')}\``;
   const said = spoken(result, issue);
-  const lines = [
-    `- **${SEVERITY_LABEL[issue.severity]}** · ${inline(screen)}${element}: ${inline(issue.title)} (${issue.wcag.length === 0 ? 'best practice' : `WCAG ${issue.wcag.join(', ')}`})`,
-    `  ${inline(issue.message)}`,
-  ];
+  const lines = [`- ${inline(screen)}${element}: ${inline(issue.message)}`];
   if (said !== null) lines.push(`  Screen reader says: "${inline(said)}"`);
+  return lines.join('\n');
+}
+
+function renderFix(issue: Issue): string | null {
   const fixes = [
     ['React Native', issue.fix.reactNative],
     ['Jetpack Compose', issue.fix.compose],
     ['Android Views', issue.fix.androidViews],
   ].filter(([, fix]) => fix !== undefined && fix.trim() !== '');
-  if (fixes.length > 0) {
-    lines.push(
-      `  <details><summary>How to fix</summary>\n\n${fixes.map(([toolkit, fix]) => `  - ${toolkit ?? ''}: ${inline(fix ?? '')}`).join('\n')}\n\n  </details>`,
-    );
+  if (fixes.length === 0) return null;
+  return `<details><summary>How to fix</summary>\n\n${fixes.map(([toolkit, fix]) => `- ${toolkit ?? ''}: ${inline(fix ?? '')}`).join('\n')}\n\n</details>`;
+}
+
+/** Issues of one rule, in the order the rule first appears. */
+function byRule(issues: Issue[]): Issue[][] {
+  const groups = new Map<string, Issue[]>();
+  for (const issue of issues) {
+    const group = groups.get(issue.ruleId);
+    if (group === undefined) groups.set(issue.ruleId, [issue]);
+    else group.push(issue);
   }
-  return lines.join('\n');
+  return [...groups.values()];
+}
+
+// The fix comes from the rule's metadata, so it is the same for every issue of a rule: shown once.
+function renderRule(result: ScanResult, issues: Issue[]): string {
+  const [first] = issues;
+  if (first === undefined) return '';
+  const wcag = first.wcag.length === 0 ? 'best practice' : `WCAG ${first.wcag.join(', ')}`;
+  const header = `**${inline(first.title)}** · ${SEVERITY_LABEL[first.severity]} · ${wcag} · ${String(issues.length)} new`;
+  const fix = renderFix(first);
+  const parts = [header, issues.map((issue) => renderIssue(result, issue)).join('\n')];
+  if (fix !== null) parts.push(fix);
+  return parts.join('\n\n');
 }
 
 /**
@@ -75,8 +95,9 @@ export function renderComment(head: ScanResult, options: CommentOptions): string
     added.length === 0
       ? '### Pragu · no new barriers in this pull request'
       : `### Pragu · ${plural(added.length, 'new barrier', 'new barriers')} in this pull request`;
-  const listed = added.slice(0, MAX_LISTED).map((issue) => renderIssue(head, issue));
+  const listed = byRule(added.slice(0, MAX_LISTED)).map((issues) => renderRule(head, issues));
   const more = added.length > MAX_LISTED ? [`…and ${String(added.length - MAX_LISTED)} more in the report.`] : [];
+  const body = [...listed, ...more].join('\n\n');
   const compared = options.base === null ? 'the baseline' : 'the latest scan of the main branch';
   const score =
     head.score.value === null
@@ -90,7 +111,7 @@ export function renderComment(head: ScanResult, options: CommentOptions): string
     options.reportUrl === null ? null : `Full report: [pragu-report](${options.reportUrl})`,
     'Automated checks find some barriers, not all; test with TalkBack too.',
   ].filter((line): line is string => line !== null);
-  return [COMMENT_MARKER, title, '', ...listed, ...more, '', footer.join(' · '), ''].join('\n');
+  return [COMMENT_MARKER, title, '', ...(body === '' ? [] : [body]), '', footer.join(' · '), ''].join('\n');
 }
 
 /** pragu comment <pragu-result.json> [--base <main result>] [--report-url <url>] [--out <file>] */
