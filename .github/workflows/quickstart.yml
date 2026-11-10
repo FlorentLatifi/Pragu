@@ -1,0 +1,133 @@
+name: Quickstart
+
+# Supporting evidence, NOT the "clean machine" exit criterion. GitHub-hosted runners already
+# ship Node, the Android SDK and adb, so a green run here proves that the published package
+# installs and its first commands behave on Linux, Windows and macOS (D-27), not that a
+# developer's fresh laptop can start from nothing. That check stays a manual run by the owner.
+#
+# Nothing is fetched at run time except npx installing the package from npm (ADR-013, D-05):
+# the agent APK is inside the tarball and Pragu sends no telemetry. The Linux job also builds
+# the rn-shop fixture from this repository, which is test setup and not part of the package.
+
+on:
+  # Not `release: published`: release.yml creates the Release with GITHUB_TOKEN, and events
+  # raised by GITHUB_TOKEN do not start other workflows. A finished Release run does.
+  workflow_run:
+    workflows: [Release]
+    types: [completed]
+  # Weekly, Mondays, after the Sunday emulator run (e2e.yml). Checks `latest` on npm.
+  schedule:
+    - cron: '43 4 * * 1'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version of pragu to install from npm, for example 0.1.0, or latest
+        default: latest
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quickstart-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Release runs are triggered by a tag push, so head_branch is the tag (vX.Y.Z); a manual run
+  # says what it wants; the weekly run takes latest. Untrusted text: only used through env.
+  PRAGU_VERSION_RAW: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_branch || inputs.version || 'latest' }}
+  # Seconds the whole `pragu scan` command may take on a CI emulator once the package is cached:
+  # install of the agent, launch, capture and report. e2e.yml budgets 20 s per bare scan;
+  # this adds the agent install and the report, so 60 s absorbs runner noise (assumption,
+  # to be tightened after the first real run).
+  QUICKSTART_BUDGET_SECONDS: 60
+  API_LEVEL: '36'
+
+jobs:
+  cli:
+    name: Empty folder on ${{ matrix.os }}
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      # The script is the only thing taken from the repository; it runs in a fresh temp folder.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - name: Normalise the version
+        shell: bash
+        run: |
+          version="${PRAGU_VERSION_RAW#v}"
+          if ! [[ "$version" =~ ^(latest|[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?)$ ]]; then
+            echo "Not a version: $PRAGU_VERSION_RAW" >&2; exit 1
+          fi
+          echo "PRAGU_VERSION=$version" >> "$GITHUB_ENV"
+      - name: Run --version, rules, init and doctor from npm
+        run: node scripts/quickstart-smoke.mjs cli "$PRAGU_VERSION"
+        shell: bash
+
+  scan-on-emulator:
+    name: Scan the rn-shop fixture (Linux, emulator)
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: pnpm
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@3f5f9adaf7d9fecd50b5935e54106014257a94e6 # v6.4.0
+
+      - name: Normalise the version
+        run: |
+          version="${PRAGU_VERSION_RAW#v}"
+          if ! [[ "$version" =~ ^(latest|[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?)$ ]]; then
+            echo "Not a version: $PRAGU_VERSION_RAW" >&2; exit 1
+          fi
+          echo "PRAGU_VERSION=$version" >> "$GITHUB_ENV"
+      # Only the fixture is built here. The scan below uses the package from npm, not this checkout.
+      - name: Build the rn-shop fixture APK
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm fixture:build rn-shop
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      # Read-only: the key is the one e2e.yml saves. On a miss the runner creates the emulator itself.
+      - name: Restore the emulator image and snapshot
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ env.API_LEVEL }}-google_apis-x86_64-medium_phone-v2
+
+      - name: Install pragu from npm and scan the fixture within the time budget
+        uses: ReactiveCircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
+        with:
+          api-level: ${{ env.API_LEVEL }}
+          target: google_apis
+          arch: x86_64
+          profile: medium_phone
+          force-avd-creation: false
+          # Software rendering: the host-GPU driver crashes app render threads on some machines.
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          script: node scripts/quickstart-smoke.mjs scan "$PRAGU_VERSION" fixtures/rn-shop/android/app/build/outputs/apk/release/app-release.apk ${{ env.QUICKSTART_BUDGET_SECONDS }}
