@@ -20,22 +20,8 @@ const SKIPPED_DIRS = new Set([
 ]);
 const MAX_FILES = 20_000;
 const MAX_FILE_BYTES = 1_000_000;
-
-function sourceFiles(root: string): string[] {
-  const files: string[] = [];
-  const walk = (dir: string) => {
-    for (const entry of readdirSync(dir, { withFileTypes: true })) {
-      if (files.length >= MAX_FILES) return;
-      if (entry.isDirectory()) {
-        if (!SKIPPED_DIRS.has(entry.name) && !entry.name.startsWith('pragu-report')) walk(join(dir, entry.name));
-      } else if (SOURCE_EXTENSIONS.has(extname(entry.name)) && statSync(join(dir, entry.name)).size <= MAX_FILE_BYTES) {
-        files.push(join(dir, entry.name));
-      }
-    }
-  };
-  walk(root);
-  return files;
-}
+// Source text is held in memory for the lookup; a repository bigger than this gets no locations.
+const MAX_TOTAL_BYTES = 32_000_000; // on disk; a JS string can take about twice that in memory
 
 function firstLineWith(file: string, needle: string): number | null {
   const index = readFileSync(file, 'utf8')
@@ -45,29 +31,96 @@ function firstLineWith(file: string, needle: string): number | null {
 }
 
 /**
+ * Source files under root, read once. Anything unreadable is skipped, never fatal: a comment
+ * without a location is better than no comment. Symlinks are neither files nor directories
+ * here (Dirent does not follow them), so nothing outside root is ever read.
+ */
+function readSources(root: string, maxBytes: number, maxFiles: number): { file: string; text: string }[] | null {
+  const sources: { file: string; text: string }[] = [];
+  let total = 0;
+  // An object, not a variable: the walk below changes it, which the compiler cannot see through a closure.
+  const state = { overBudget: false };
+  const walk = (dir: string) => {
+    let entries;
+    try {
+      entries = readdirSync(dir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const entry of entries) {
+      if (state.overBudget) return;
+      const path = join(dir, entry.name);
+      if (entry.isDirectory()) {
+        if (!SKIPPED_DIRS.has(entry.name) && !entry.name.startsWith('pragu-report')) walk(path);
+      } else if (entry.isFile() && SOURCE_EXTENSIONS.has(extname(entry.name))) {
+        try {
+          if (sources.length >= maxFiles) {
+            state.overBudget = true;
+            return;
+          }
+          const size = statSync(path).size;
+          if (size > MAX_FILE_BYTES) continue;
+          total += size;
+          if (total > maxBytes) {
+            state.overBudget = true;
+            return;
+          }
+          sources.push({ file: path, text: readFileSync(path, 'utf8') });
+        } catch {
+          // Unreadable file: skip it.
+        }
+      }
+    }
+  };
+  walk(root);
+  // A partial read could make a second match invisible and so show a wrong "only match": say nothing instead.
+  return state.overBudget ? null : sources;
+}
+
+/**
+ * The exact-match lookup of D-43 tier 1: the one source line that names an element id (a
+ * testID string, or an Android XML id), or null when no line, or more than one line in the
+ * repository, names it. Never guesses, and never falls back to the config. The tree is read
+ * once, on the first lookup, within a memory and file-count budget: past either, no id is located.
+ */
+export function makeIdLocator(
+  root: string,
+  maxBytes = MAX_TOTAL_BYTES,
+  maxFiles = MAX_FILES,
+): (id: string) => SarifPlace | null {
+  let sources: { file: string; text: string }[] | null | undefined;
+  const found = new Map<string, SarifPlace | null>();
+  const toUri = (file: string) => relative(root, file).replaceAll('\\', '/');
+
+  return (id) => {
+    const cached = found.get(id);
+    if (cached !== undefined) return cached;
+    sources ??= readSources(root, maxBytes, maxFiles);
+    if (sources === null) return null;
+    // As a JSX/Kotlin string, or as an Android XML id.
+    const needles = [`"${id}"`, `'${id}'`, `id/${id}"`];
+    const hits: SarifPlace[] = [];
+    for (const { file, text } of sources) {
+      if (!needles.some((needle) => text.includes(needle))) continue;
+      text.split('\n').forEach((line, index) => {
+        if (needles.some((needle) => line.includes(needle))) hits.push({ uri: toUri(file), line: index + 1 });
+      });
+    }
+    const place = hits.length === 1 ? (hits[0] ?? null) : null;
+    found.set(id, place);
+    return place;
+  };
+}
+
+/**
  * Finds where each issue belongs in the project, for SARIF (D-43, tier 1): the one source
  * line that names its testID or resource id, if exactly one does; otherwise the screen's line
  * in the config; otherwise the config's or package.json's first line, so GitHub can show it.
  */
 export function makeLocator(root: string, configFile: string | null, result: ScanResult): (issue: Issue) => SarifPlace {
-  const files = sourceFiles(root);
-  const found = new Map<string, SarifPlace | null>();
+  const byId = makeIdLocator(root);
   const toUri = (file: string) => relative(root, file).replaceAll('\\', '/');
   const fallbackFile = configFile ?? (existsSync(join(root, 'package.json')) ? join(root, 'package.json') : null);
-
-  const byId = (id: string): SarifPlace | null => {
-    const cached = found.get(id);
-    if (cached !== undefined) return cached;
-    // As a JSX/Kotlin string, or as an Android XML id.
-    const needles = [`"${id}"`, `'${id}'`, `id/${id}"`];
-    const hits = files.flatMap((file) => {
-      const line = needles.map((needle) => firstLineWith(file, needle)).find((value) => value !== null);
-      return line === undefined ? [] : [{ uri: toUri(file), line }];
-    });
-    const place = hits.length === 1 ? (hits[0] ?? null) : null;
-    found.set(id, place);
-    return place;
-  };
 
   return (issue) => {
     const exact = issue.resourceId === null ? null : byId(issue.resourceId);

@@ -5,6 +5,7 @@
 
 - Shop › `seed-unlabeled-remove`: This button has no accessible name. A screen reader can only announce "Button".
   Screen reader says: "Unlabelled, Button"
+  Likely here: `src/Cart.tsx:2`
 
 <details><summary>How to fix</summary>
 

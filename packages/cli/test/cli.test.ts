@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs';
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readFile, rm, symlink, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -13,7 +13,7 @@ import { initConfig, initWorkflow, loadConfig } from '../src/config.js';
 import { formatError, PraguError } from '../src/errors.js';
 import { main } from '../src/main.js';
 import { installAgent } from '../src/scan.js';
-import { makeLocator } from '../src/locate.js';
+import { makeIdLocator, makeLocator } from '../src/locate.js';
 import { renderComment } from '../src/comment.js';
 import { ensureAgent, sha256, verifyBundledAgent } from '../src/agent-apk.js';
 import { syncedFolder, syncedFolderWarning } from '../src/cloud.js';
@@ -424,10 +424,23 @@ describe('scan --from-capture (whole pipeline, no device)', () => {
     const mainScan = { ...result, issues: mainIssues, score: scoreResult({ ...result, issues: mainIssues }) };
     const base = join(dir, 'main.json');
     await writeFile(base, JSON.stringify(mainScan));
+    // The one line that names the unlabelled button, so the comment can say where to look.
+    const source = join(dir, 'app-source');
+    await mkdir(join(source, 'src'), { recursive: true });
+    await writeFile(join(source, 'src', 'Cart.tsx'), '<Pressable\n  testID="seed-unlabeled-remove"\n/>\n');
     const comment = capturingIo();
     expect(
       await main(
-        ['comment', head, '--base', base, '--report-url', 'https://github.com/o/r/actions/runs/1'],
+        [
+          'comment',
+          head,
+          '--base',
+          base,
+          '--report-url',
+          'https://github.com/o/r/actions/runs/1',
+          '--source-root',
+          source,
+        ],
         comment.sink,
       ),
     ).toBe(0);
@@ -640,8 +653,49 @@ describe('pragu.config.ts', () => {
   it('pragu init writes a starter config and never overwrites one', async () => {
     dir = await mkdtemp(join(tmpdir(), 'pragu-config-'));
     const file = await initConfig(dir);
-    expect(await readFile(file, 'utf8')).toContain("import { defineConfig } from 'pragu';");
+    const text = await readFile(file, 'utf8');
+    expect(text).toContain("import type { PraguConfig } from 'pragu';");
+    expect(text).toContain('} satisfies PraguConfig;');
+    expect(text).not.toContain('defineConfig');
     await expect(initConfig(dir)).rejects.toThrow('This project already has pragu.config.ts.');
+  });
+
+  it('the starter config loads in an empty folder with no node_modules (npx only)', async () => {
+    dir = await mkdtemp(join(tmpdir(), 'pragu-config-'));
+    await initConfig(dir);
+    const { config, file } = await loadConfig(dir, undefined);
+    expect(file).toBe(join(dir, 'pragu.config.ts'));
+    expect(config.app).toBe('com.example.shop');
+  });
+
+  it('a config that still imports defineConfig loads when pragu is installed, and says why when it is not', async () => {
+    dir = await mkdtemp(join(tmpdir(), 'pragu-config-'));
+    const old = "import { defineConfig } from 'pragu';\nexport default defineConfig({ app: 'com.old.shop' });\n";
+    await writeFile(join(dir, 'pragu.config.ts'), old);
+    const missing = await loadConfig(dir, undefined).catch((error: unknown) => error);
+    expect(missing).toBeInstanceOf(PraguError);
+    expect(formatError(missing).text).toContain("import type { PraguConfig } from 'pragu'");
+    expect(formatError(missing).text).not.toContain('no enums');
+
+    // Node caches a failed import of the same file, so the installed case gets a fresh folder.
+    await rm(dir, { recursive: true, force: true });
+    dir = await mkdtemp(join(tmpdir(), 'pragu-config-'));
+    await writeFile(join(dir, 'pragu.config.ts'), old);
+    const installed = join(dir, 'node_modules', 'pragu');
+    await mkdir(installed, { recursive: true });
+    await writeFile(
+      join(installed, 'package.json'),
+      JSON.stringify({ name: 'pragu', type: 'module', exports: './index.js' }),
+    );
+    await writeFile(join(installed, 'index.js'), 'export const defineConfig = (config) => config;\n');
+    expect((await loadConfig(dir, undefined)).config.app).toBe('com.old.shop');
+  });
+
+  it('keeps the TypeScript hint for other load failures', async () => {
+    dir = await mkdtemp(join(tmpdir(), 'pragu-config-'));
+    await writeFile(join(dir, 'pragu.config.mjs'), 'export default {;\n');
+    const error = await loadConfig(dir, undefined).catch((caught: unknown) => caught);
+    expect(formatError(error).text).toContain('no enums');
   });
 
   it('pragu init --github writes a workflow that scans, comments and redacts on public repositories', async () => {
@@ -722,6 +776,162 @@ describe('pull-request comment length', () => {
     const first = markdown.indexOf('`remove-1`');
     expect(markdown.indexOf('`remove-2`')).toBeGreaterThan(first);
     expect(markdown.indexOf('`remove-2`')).toBeLessThan(markdown.indexOf('`price`'));
+  });
+});
+
+describe('pull-request comment source location', () => {
+  let dir = '';
+  afterEach(async () => {
+    if (dir !== '') await rm(dir, { recursive: true, force: true });
+  });
+
+  const resultWith = (resourceId: string | null) =>
+    ({
+      screens: [{ id: 'screen-1', name: 'Cart', windows: [], nodes: [] }],
+      issues: [
+        {
+          ruleId: 'name/generic',
+          title: 'Name does not say what the control does',
+          severity: 'warning',
+          screenId: 'screen-1',
+          nodeId: '0.1',
+          resourceId,
+          fingerprint: 'f',
+          message: 'Problem.',
+          wcag: ['2.4.6'],
+          fix: { reactNative: '', compose: '', androidViews: '' },
+          inBaseline: false,
+        },
+      ],
+      score: { version: 1, value: null, screens: {} },
+      summary: { rulesRun: [] },
+    }) as unknown as ScanResult;
+
+  async function sourceTree(files: Record<string, string>): Promise<string> {
+    dir = await mkdtemp(join(tmpdir(), 'pragu-comment-src-'));
+    for (const [name, text] of Object.entries(files)) {
+      await mkdir(join(dir, name, '..'), { recursive: true });
+      await writeFile(join(dir, name), text);
+    }
+    return dir;
+  }
+
+  it('shows the line when exactly one line names the id, and nothing for zero or two', async () => {
+    const root = await sourceTree({
+      'src/Cart.tsx': 'a\n<Pressable testID="only-here" />\n<Pressable testID="twice" />\n',
+      'src/Other.tsx': '<View testID="twice" />\n',
+    });
+    const locate = makeIdLocator(root);
+    const render = (id: string) => renderComment(resultWith(id), { base: null, reportUrl: null, locate });
+
+    expect(render('only-here')).toContain('  Likely here: `src/Cart.tsx:2`');
+    expect(render('nowhere')).not.toContain('Likely here');
+    expect(render('twice')).not.toContain('Likely here');
+    expect(renderComment(resultWith(null), { base: null, reportUrl: null, locate })).not.toContain('Likely here');
+    expect(renderComment(resultWith('only-here'), { base: null, reportUrl: null })).not.toContain('Likely here');
+  });
+
+  it('never falls back to the config or package.json', async () => {
+    const root = await sourceTree({ 'package.json': '{"name":"x"}\n', 'pragu.config.json': '"Cart"\n' });
+    const markdown = renderComment(resultWith('missing'), { base: null, reportUrl: null, locate: makeIdLocator(root) });
+    expect(markdown).not.toContain('Likely here');
+  });
+
+  it('keeps hostile ids and paths from becoming Markdown', () => {
+    const hostile = 'x`|\n[a](https://evil.example) <b>';
+    const locate = () => ({ uri: 'src/`a`|b\n[l](javascript:alert(1)).tsx', line: 7 });
+    const markdown = renderComment(resultWith(hostile), { base: null, reportUrl: null, locate });
+    const likely = markdown.split('\n').filter((line) => line.includes('Likely here'));
+    expect(likely).toEqual(['  Likely here: `src/a|b[l](javascript:alert(1)).tsx:7`']);
+    // The id and the path are each one code span on one line, so nothing in them is read as Markdown.
+    expect(markdown).toContain('› `x|[a](https://evil.example) <b>`:');
+    expect(markdown.split('\n').some((line) => line.startsWith('[a]'))).toBe(false);
+  });
+
+  it('works on a redacted result, because ids survive redaction', async () => {
+    const root = await sourceTree({ 'src/Cart.tsx': '<Pressable testID="remove" />\n' });
+    const redacted = { ...resultWith('remove'), redacted: true } as ScanResult;
+    expect(renderComment(redacted, { base: null, reportUrl: null, locate: makeIdLocator(root) })).toContain(
+      'Likely here: `src/Cart.tsx:1`',
+    );
+  });
+
+  it('rejects a --source-root that does not exist', async () => {
+    dir = await mkdtemp(join(tmpdir(), 'pragu-comment-src-'));
+    const file = join(dir, 'r.json');
+    await writeFile(file, JSON.stringify(resultWith('a')));
+    const run = capturingIo();
+    expect(await main(['comment', file, '--source-root', join(dir, 'nope')], run.sink)).toBe(2);
+    expect(run.io.stderr).toContain('does not exist or is not a folder');
+  });
+
+  it('rejects a --source-root that is a file, with exit 2 and not a crash', async () => {
+    dir = await mkdtemp(join(tmpdir(), 'pragu-comment-src-'));
+    const file = join(dir, 'r.json');
+    await writeFile(file, JSON.stringify(resultWith('a')));
+    const run = capturingIo();
+    expect(await main(['comment', file, '--source-root', file], run.sink)).toBe(2);
+    expect(run.io.stderr).toContain('not a folder');
+  });
+
+  it('names a line only when exactly one line in the whole repository does, even within one file', async () => {
+    const root = await sourceTree({ 'src/A.tsx': '<A testID="dup" />\n<B testID="dup" />\n' });
+    expect(makeIdLocator(root)('dup')).toBeNull();
+  });
+
+  it('skips symlinks, so nothing outside the root is read', async (context) => {
+    const root = await sourceTree({ 'src/A.tsx': 'nothing\n' });
+    const outside = await mkdtemp(join(tmpdir(), 'pragu-outside-'));
+    try {
+      await writeFile(join(outside, 'Secret.tsx'), '<X testID="leak" />\n');
+      await symlink(join(outside, 'Secret.tsx'), join(root, 'src', 'Link.tsx'));
+      await symlink(outside, join(root, 'linked-dir'));
+      await symlink(join(root, 'gone.tsx'), join(root, 'src', 'Dangling.tsx'));
+    } catch {
+      await rm(outside, { recursive: true, force: true });
+      context.skip();
+      return;
+    }
+    try {
+      expect(makeIdLocator(root)('leak')).toBeNull();
+    } finally {
+      await rm(outside, { recursive: true, force: true });
+    }
+  });
+
+  it('skips a source file it cannot read instead of failing', async () => {
+    // A directory named like a source file: readFileSync throws EISDIR if it is treated as a file.
+    const root = await sourceTree({ 'src/ok.tsx': '<X testID="fine" />\n' });
+    await mkdir(join(root, 'src', 'weird.tsx'));
+    expect(makeIdLocator(root)('fine')).toEqual({ uri: 'src/ok.tsx', line: 1 });
+  });
+
+  it('locates nothing, rather than guess, when the source is over the memory budget', async () => {
+    const root = await sourceTree({ 'src/A.tsx': '<A testID="one" />\n', 'src/B.tsx': '<B testID="two" />\n' });
+    expect(makeIdLocator(root)('one')).toEqual({ uri: 'src/A.tsx', line: 1 });
+    // Budget of 30 bytes: the second file does not fit, so even the unique id is not claimed.
+    const small = makeIdLocator(root, 30);
+    expect(small('one')).toBeNull();
+    expect(small('two')).toBeNull();
+  });
+
+  it('locates nothing when there are more source files than the cap, instead of a partial read', async () => {
+    const root = await sourceTree({
+      'src/A.tsx': '<A testID="only" />',
+      'src/B.tsx': 'x',
+      'src/C.tsx': '<C testID="only" />',
+    });
+    // Both matches fit under a cap of 3, so the id is ambiguous. Under a cap of 2 the second match
+    // is never read: a partial read would wrongly call the first one unique, so nothing is claimed.
+    expect(makeIdLocator(root, undefined, 3)('only')).toBeNull();
+    expect(makeIdLocator(root, undefined, 2)('only')).toBeNull();
+    const single = await sourceTree({ 'src/A.tsx': '<A testID="solo" />', 'src/B.tsx': 'x' });
+    expect(makeIdLocator(single, undefined, 2)('solo')).toEqual({ uri: 'src/A.tsx', line: 1 });
+    expect(makeIdLocator(single, undefined, 1)('solo')).toBeNull();
+  });
+
+  it('returns nothing for a root that does not exist', () => {
+    expect(makeIdLocator(join(tmpdir(), 'pragu-no-such-folder'))('x')).toBeNull();
   });
 });
 

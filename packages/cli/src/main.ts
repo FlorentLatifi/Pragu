@@ -36,7 +36,7 @@ Usage
                            List what Pragu checks, or explain one rule and its fixes
   pragu report <pragu-result.json> [--out <file>]
                            Render the HTML report again from a scan's result
-  pragu comment <pragu-result.json> [--base <main-result.json>] [--report-url <url>] [--out <file>]
+  pragu comment <pragu-result.json> [--base <main-result.json>] [--report-url <url>] [--source-root <dir>] [--out <file>]
                            Write the pull-request comment: only the barriers this change adds
   pragu baseline create|update --from <pragu-result.json> [--out <file>]
                            Accept a scan's issues, so later scans fail only on new ones
