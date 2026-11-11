@@ -5,9 +5,7 @@ description: Find the accessibility barriers in your mobile app before your user
 
 **Pragu finds accessibility barriers in your Android app, shows who they hurt, and tells you how to fix them in your own code.** _Prag_ is Albanian for threshold: the step a wheelchair can't climb.
 
-:::caution[Pre-release]
-Pragu is not on npm yet. Everything on this site runs from source today; `npx pragu` arrives with v0.1.
-:::
+Pragu 0.1.0 is on npm. It is an early release for Android apps: expect rough edges. Try it with `npx pragu init`, or see [how it compares](/Pragu/concepts/comparison/) with other tools.
 
 One scan of a React Native shop's cart screen, from a recording:
 

@@ -3,9 +3,7 @@ title: Pull requests on GitHub
 description: Comment only the barriers a pull request adds, and keep the report.
 ---
 
-:::caution
-The action is reached as `FlorentLatifi/Pragu@v0` once v0.1 is tagged.
-:::
+The action is `FlorentLatifi/Pragu@v0`.
 
 `pragu init --github` writes a starter workflow, `.github/workflows/pragu.yml`. It:
 

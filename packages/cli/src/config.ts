@@ -33,6 +33,16 @@ async function importQuietly(file: string): Promise<unknown> {
   }
 }
 
+// "Cannot find package 'pragu'" is the usual failure (a config that imports from 'pragu' with
+// no local install, e.g. run through npx), so it gets its own hint instead of the TypeScript one.
+function configLoadHint(error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error);
+  if (/Cannot find (package|module) 'pragu'/.test(message)) {
+    return "The config imports from 'pragu', which is not installed here. Install it (npm install --save-dev pragu), or use \"import type { PraguConfig } from 'pragu'\", which needs no install.";
+  }
+  return 'Pragu reads pragu.config.ts with Node 22.18 or newer. Use plain TypeScript types (no enums), or rename it to pragu.config.mjs.';
+}
+
 /**
  * Finds and validates the project's config. A .ts file is loaded with Node's own type
  * stripping (Node 22.18+), so no loader is needed; it may use types, not TS-only syntax
@@ -55,7 +65,7 @@ export async function loadConfig(cwd: string, explicit: string | undefined): Pro
     throw new PraguError(
       EXIT.usage,
       `Could not load ${shown}: ${error instanceof Error ? error.message : String(error)}`,
-      'Pragu reads pragu.config.ts with Node 22.18 or newer. Use plain TypeScript types (no enums), or rename it to pragu.config.mjs.',
+      configLoadHint(error),
     );
   }
   try {
@@ -69,10 +79,12 @@ export async function loadConfig(cwd: string, explicit: string | undefined): Pro
   }
 }
 
-const STARTER = `import { defineConfig } from 'pragu';
+// The import is type-only on purpose: Node's type stripping erases it, so the file loads with
+// "npx pragu" and no local install. A value import of 'pragu' would fail to resolve there.
+const STARTER = `import type { PraguConfig } from 'pragu';
 
 // Pragu's settings for this project. Flags given to "pragu scan" win over these.
-export default defineConfig({
+export default {
   app: 'com.example.shop',
   failOn: 'error',
   // Screens to check, each opened on a fresh start; waitFor is a testID shown once the screen has loaded:
@@ -81,7 +93,7 @@ export default defineConfig({
   // rules: { 'target/size': 'error' },
   // Issues you decided to live with; every entry needs a reason, and reports count them:
   // ignore: [{ rule: 'contrast/text', resourceId: 'promo-banner', reason: 'Brand colours; fix tracked in #123' }],
-});
+} satisfies PraguConfig;
 `;
 
 const WORKFLOW = `name: Accessibility
