@@ -74,3 +74,89 @@ describe('coverText', () => {
     expect(at(2, 7)).toEqual([255, 255, 255]);
   });
 });
+
+describe('redactResult without trusting quotes in app text', () => {
+  const texts = ['Order "Gold" for Ana', "Ana's order", '“Gold” plan'];
+  const screen = screenOf(texts.map((text, index) => pamNode({ id: `0.${String(index)}`, name: text, text })));
+  const result = {
+    redacted: false,
+    screens: [screen],
+    issues: texts.map((text, index) =>
+      issueOn(`0.${String(index)}`, { message: `"${text}" has a contrast of 2.1:1 (#B0B0B0 on #FFFFFF).` }),
+    ),
+    summary: { baseline: null },
+  } as unknown as ScanResult;
+
+  it('replaces each app string where it occurs, quotes inside it or not', () => {
+    const redacted = redactResult(result);
+    for (const issue of redacted.issues) {
+      expect(issue.message).toBe(`"${REDACTED}" has a contrast of 2.1:1 (#B0B0B0 on #FFFFFF).`);
+    }
+    expect(JSON.stringify(redacted)).not.toMatch(/Gold|Ana/);
+  });
+
+  it('keeps the role word a role-in-label message quotes in lower case', () => {
+    const named = screenOf([pamNode({ id: '0.0', name: 'Save button' })]);
+    const redacted = redactResult({
+      ...result,
+      screens: [named],
+      issues: [
+        issueOn('0.0', {
+          message: 'The name "Save button" repeats the role, so a screen reader says "button" twice.',
+        }),
+      ],
+    });
+    expect(redacted.issues[0]?.message).toBe(
+      `The name "${REDACTED}" repeats the role, so a screen reader says "button" twice.`,
+    );
+  });
+});
+
+describe('redactResult on a screen named after its window title', () => {
+  const titled = { ...screenOf([pamNode({ id: '0.0', name: 'Pay' })]), name: 'Shop' };
+  const configured = { ...screenOf([]), id: 'screen-2', name: 'Cart' };
+  const fixed = {
+    fingerprint: 'f',
+    ruleId: 'contrast/text',
+    screen: 'Shop',
+    resourceId: null,
+    message: '"Shop" is faint.',
+  };
+  const result = {
+    redacted: false,
+    screens: [titled, configured],
+    issues: [issueOn('0.0', { message: '"Pay" in Shop has a contrast of 2.1:1.' })],
+    summary: { baseline: { file: 'b.json', newIssues: 1, known: 0, fixed: 1, fixedIssues: [fixed] } },
+  } as unknown as ScanResult;
+
+  it('names it by its place, in the screens and the fixed baseline issues; a configured name stays', () => {
+    const redacted = redactResult(result);
+    expect(redacted.screens.map((screen) => screen.name)).toEqual(['Screen 1', 'Cart']);
+    expect(redacted.summary.baseline?.fixedIssues[0]).toMatchObject({
+      screen: 'Screen 1',
+      message: `"${REDACTED}" is faint.`,
+    });
+    expect(redacted.issues[0]?.message).toBe(`"${REDACTED}" in ${REDACTED} has a contrast of 2.1:1.`);
+    expect(redacted.issues[0]?.fingerprint).toBe('abc');
+    expect(JSON.stringify(redacted)).not.toContain('Shop');
+  });
+});
+
+describe('coverText behind a dialog', () => {
+  it('covers the text of every app window, visible or not, and skips empty bounds', () => {
+    const raster = createRaster(20, 10, 0xffffff);
+    const base = screenOf([
+      pamNode({ id: '0.0', text: 'Ana', visible: false, boundsPx: rect(0, 0, 5, 5) }),
+      pamNode({ id: '1.0', window: 1, text: 'Remove?', boundsPx: rect(10, 0, 25, 5) }),
+      pamNode({ id: '0.1', text: 'Empty', visible: false, boundsPx: rect(8, 8, 8, 12) }),
+    ]);
+    const content = { kind: 'app' as const, title: 'Shop', boundsPx: rect(0, 0, 20, 10), foreground: false };
+    const card = { kind: 'app' as const, title: null, boundsPx: rect(10, 0, 20, 10), foreground: true };
+    const screen = { ...base, windows: [content, card] };
+    coverText(raster, screen);
+    const at = (x: number, y: number) => [...raster.data.slice((y * 20 + x) * 4, (y * 20 + x) * 4 + 3)];
+    expect(at(2, 2)).toEqual([0x76, 0x76, 0x76]);
+    expect(at(19, 2)).toEqual([0x76, 0x76, 0x76]);
+    expect(at(8, 9)).toEqual([255, 255, 255]);
+  });
+});
