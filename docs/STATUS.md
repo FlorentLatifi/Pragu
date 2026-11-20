@@ -71,6 +71,13 @@ Walking skeleton on the emulator, CI, docs (PRD, technical design, ADR-001 to 00
 ### M2 so far
 
 - **Decision register** (`docs/decisions.md`) and ADR-012 to ADR-016; M2 plan and D-16 approved by Florent (2026-11-03).
+- **Release hardening** (finding A-03 of the 2026-11-20 project audit; Florent chose to land it before 0.1.1), on branch `ci/release-order`:
+  - `release.yml` publishes `@pragu/core`, then `@pragu/report`, then `pragu`. 0.1.0 published `pragu` first, which a failed later publish would have left pointing at versions npm did not have.
+  - Before publishing, it installs the exact tarballs, signed agent included, into an empty folder: `check-package-install.mjs --tarballs <dir> --require-agent`.
+  - Only version tags start it, so moving `v0` no longer fails a release run.
+  - The GitHub Release notes are this version's changelog section only.
+  - A manual run is a dry run: no secrets, the agent signed with the debug key, nothing published.
+  - Checked locally: the new mode passes on release-like tarballs, and fails on a missing agent, a wrong checksum and a folder without tarballs; the notes extraction was run on the real changelog. Not run on GitHub yet: after merging, run the dry run on `main`, then tag 0.1.1.
 - **Several screens per scan** (work package 1, first part; D-02): `screens: [{ name, deepLink?, waitFor? }]` in `pragu.config.ts`. One scan opens each screen on a fresh start, in one agent session, and waits for the `waitFor` element so a splash screen is never checked under the screen's name. `--screen <name>` picks one. With `--check-font-scale` the scale changes once and every screen is opened again at 200%. Captures and a `capture/screens.json` stay next to the report, so `--from-capture` re-runs the whole scan without a device.
   - On the emulator (2026-11-03), all five rn-shop screens in one scan took 42 s on an emulator still settling after boot (load average 8) and found the 18 issues the bench finds on those screens; with the 200% pass, 93 s and 19 issues, the 19th the seeded truncation; the font scale was back at 1.0 afterwards. A bad deep link and a missing `waitFor` element each stop the scan with a fix.
   - The five-screen report is 777 KB, about 155 KB per screen: screenshot downscaling (D-20, work package 2) is next.

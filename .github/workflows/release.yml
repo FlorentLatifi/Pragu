@@ -8,10 +8,16 @@ name: Release
 #   - secrets PRAGU_KEYSTORE_BASE64, PRAGU_KEYSTORE_PASSWORD, PRAGU_KEY_ALIAS, PRAGU_KEY_PASSWORD;
 #   - the @pragu organisation on npm, and this workflow as the trusted publisher of each package.
 # Then: pnpm changeset version, commit, tag vX.Y.Z, push the tag.
+#
+# A manual run (Actions → Release → Run workflow, on main) is a dry run: every check, the agent
+# built with the debug key, the packages packed and installed as a user would, the release notes
+# extracted; nothing is signed with the release key, published to npm or released on GitHub.
 
 on:
   push:
-    tags: ['v*']
+    # Version tags only: moving the action's major tag (v0) must not start a release.
+    tags: ['v[0-9]+.[0-9]+.[0-9]+', 'v[0-9]+.[0-9]+.[0-9]+-*']
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -22,7 +28,7 @@ concurrency:
 
 jobs:
   release:
-    name: Release ${{ github.ref_name }}
+    name: ${{ github.event_name == 'push' && format('Release {0}', github.ref_name) || 'Release dry run' }}
     if: github.repository == 'FlorentLatifi/Pragu'
     runs-on: ubuntu-latest
     timeout-minutes: 45
@@ -48,7 +54,11 @@ jobs:
 
       - name: The tag matches the package versions
         run: |
-          version="${GITHUB_REF_NAME#v}"
+          if [ "$GITHUB_EVENT_NAME" = push ]; then
+            version="${GITHUB_REF_NAME#v}"
+          else
+            version=$(node -p "require('./packages/cli/package.json').version")
+          fi
           for pkg in cli core report; do
             actual=$(node -p "require('./packages/$pkg/package.json').version")
             if [ "$actual" != "$version" ]; then
@@ -65,20 +75,23 @@ jobs:
       - run: pnpm bench
       - run: pnpm report:a11y
 
+      # A dry run gets no secrets at all, so its agent is signed with the debug key.
       - name: Build and sign the agent
         working-directory: agents/android
         env:
-          KEYSTORE_BASE64: ${{ secrets.PRAGU_KEYSTORE_BASE64 }}
-          PRAGU_KEYSTORE_PASSWORD: ${{ secrets.PRAGU_KEYSTORE_PASSWORD }}
-          PRAGU_KEY_ALIAS: ${{ secrets.PRAGU_KEY_ALIAS }}
-          PRAGU_KEY_PASSWORD: ${{ secrets.PRAGU_KEY_PASSWORD }}
+          KEYSTORE_BASE64: ${{ github.event_name == 'push' && secrets.PRAGU_KEYSTORE_BASE64 || '' }}
+          PRAGU_KEYSTORE_PASSWORD: ${{ github.event_name == 'push' && secrets.PRAGU_KEYSTORE_PASSWORD || '' }}
+          PRAGU_KEY_ALIAS: ${{ github.event_name == 'push' && secrets.PRAGU_KEY_ALIAS || '' }}
+          PRAGU_KEY_PASSWORD: ${{ github.event_name == 'push' && secrets.PRAGU_KEY_PASSWORD || '' }}
           PRAGU_VERSION_CODE: ${{ github.run_number }}
         run: |
-          export PRAGU_KEYSTORE_FILE="$RUNNER_TEMP/release.jks"
           export PRAGU_VERSION="$VERSION"
-          echo "$KEYSTORE_BASE64" | base64 --decode > "$PRAGU_KEYSTORE_FILE"
+          if [ "$GITHUB_EVENT_NAME" = push ]; then
+            export PRAGU_KEYSTORE_FILE="$RUNNER_TEMP/release.jks"
+            trap 'rm -f "$PRAGU_KEYSTORE_FILE"' EXIT
+            echo "$KEYSTORE_BASE64" | base64 --decode > "$PRAGU_KEYSTORE_FILE"
+          fi
           ./gradlew --no-daemon :agent:assembleRelease :agent:testDebugUnitTest :agent:lintRelease :agent:verifyReleaseNoInternetPermission
-          rm "$PRAGU_KEYSTORE_FILE"
 
       - name: Bundle the agent into the CLI
         run: node scripts/bundle-agent.mjs
@@ -91,14 +104,32 @@ jobs:
           pnpm sbom --sbom-format cyclonedx --prod > "$RUNNER_TEMP/packages/pragu-$VERSION.cdx.json"
           (cd "$RUNNER_TEMP/packages" && sha256sum * > SHA256SUMS)
 
+      # The bytes about to be published, installed into an empty folder as a user would get them.
+      - name: Install the packed tarballs before publishing them
+        run: node scripts/check-package-install.mjs --tarballs "$RUNNER_TEMP/packages" --require-agent
+
+      - name: Release notes for this version
+        run: |
+          awk -v heading="## $VERSION" '$0 == heading { found = 1; next } found && /^## / { exit } found { print }' \
+            packages/cli/CHANGELOG.md > "$RUNNER_TEMP/notes.md"
+          if ! grep -q '[^[:space:]]' "$RUNNER_TEMP/notes.md"; then
+            echo "packages/cli/CHANGELOG.md has no section for $VERSION. Run pnpm changeset version first."; exit 1
+          fi
+          cat "$RUNNER_TEMP/notes.md"
+
+      # Dependencies first: if a later publish failed, an earlier pragu would point at versions npm does not have.
       - name: Publish to npm (trusted publishing, provenance)
+        if: github.event_name == 'push'
         run: |
           npm install --global npm@11.21.1
-          for tarball in "$RUNNER_TEMP"/packages/*.tgz; do npm publish "$tarball" --access public --provenance; done
+          for name in pragu-core pragu-report pragu; do
+            npm publish "$RUNNER_TEMP/packages/$name-$VERSION.tgz" --access public --provenance
+          done
 
       - name: GitHub Release
+        if: github.event_name == 'push'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" --title "Pragu $VERSION" --notes-file "packages/cli/CHANGELOG.md" --verify-tag \
+          gh release create "$GITHUB_REF_NAME" --title "Pragu $VERSION" --notes-file "$RUNNER_TEMP/notes.md" --verify-tag \
             "$RUNNER_TEMP"/packages/*.apk "$RUNNER_TEMP"/packages/*.cdx.json "$RUNNER_TEMP"/packages/SHA256SUMS
