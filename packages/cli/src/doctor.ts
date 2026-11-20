@@ -1,4 +1,5 @@
 import { parseDevices } from './adb.js';
+import { PraguError } from './errors.js';
 
 /** The agent's minSdk: Android 8.0. */
 const MIN_API_LEVEL = 26;
@@ -97,7 +98,11 @@ async function configCheck(deps: DoctorDeps): Promise<Check> {
     return {
       ok: false,
       summary: error instanceof Error ? error.message : String(error),
-      fix: 'Fix the setting it names; "pragu init" shows a starter config.',
+      // A PraguError carries its own, more specific fix (e.g. the missing 'pragu' package).
+      fix:
+        error instanceof PraguError && error.fix !== undefined
+          ? error.fix
+          : 'Fix the setting it names; "pragu init" shows a starter config.',
     };
   }
 }

@@ -4,9 +4,9 @@ description: Every setting in pragu.config.ts.
 ---
 
 ```ts
-import { defineConfig } from 'pragu';
+import type { PraguConfig } from 'pragu';
 
-export default defineConfig({
+export default {
   app: 'com.example.shop',
   screens: [{ name: 'Cart', deepLink: 'shop://cart', waitFor: 'cart-title' }],
   out: 'pragu-report',
@@ -16,8 +16,10 @@ export default defineConfig({
   redact: false,
   rules: { 'target/size': 'error', 'structure/no-headings': 'off' },
   ignore: [{ rule: 'contrast/text', resourceId: 'promo-banner', reason: 'Brand colours; fix tracked in #123' }],
-});
+} satisfies PraguConfig;
 ```
+
+With npx only, an editor may show "Cannot find module 'pragu'" on the type import; loading is unaffected, and `npm install --save-dev pragu` gives full typing.
 
 | Setting | Meaning |
 |---|---|

@@ -48,6 +48,8 @@ android {
 
     lint {
         abortOnError = true
+        // Version bumps of AGP and Gradle come through Dependabot, delayed 7 days (D-36, F-10); a "newer version" hint is expected noise.
+        disable += "AndroidGradlePluginVersion"
     }
 }
 

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { formatChecks, runDoctor } from '../src/doctor.js';
 import type { DoctorDeps } from '../src/doctor.js';
+import { PraguError } from '../src/errors.js';
 
 function deps(overrides: Partial<DoctorDeps> & { devices?: string; api?: string } = {}): DoctorDeps {
   const { devices = 'List of devices attached\nemulator-5554\tdevice\n', api = '36', ...rest } = overrides;
@@ -62,6 +63,12 @@ describe('pragu doctor', () => {
     const problem = checks.find((check) => !check.ok);
     expect(problem?.fix).toContain(fix);
     expect(formatChecks(checks)).toMatch(/1 problem to fix before scanning\.\n$/);
+  });
+
+  it('shows the fix a config error carries, such as the missing pragu package', async () => {
+    const error = new PraguError(3, 'Could not load pragu.config.ts', "Use import type { PraguConfig } from 'pragu'.");
+    const checks = await runDoctor(deps({ checkConfig: () => Promise.reject(error) }));
+    expect(checks.find((check) => !check.ok)?.fix).toBe("Use import type { PraguConfig } from 'pragu'.");
   });
 
   it('skips the device checks when adb cannot run, and says how to install it', async () => {

@@ -4,7 +4,7 @@
 
 Pragu finds accessibility barriers in your mobile app, shows who they hurt, and tells you how to fix them in your own code. *Prag* is Albanian for threshold: the step a wheelchair can't climb.
 
-> **Status: pre-alpha (M0 approved, milestone M1 in progress).** Android only. The walking skeleton works end to end on an emulator. Nothing is published to npm yet.
+> **Status: 0.1.0 is on npm.** Android only (React Native, Jetpack Compose and Android Views apps). An early release: expect rough edges, and see the [roadmap](ROADMAP.md) for what is not there yet.
 
 ## What works today
 
@@ -30,6 +30,66 @@ JSON:   reports/rn-shop/pragu-result.json
 - [Pragu Bench](docs/bench/results.md) measures each rule's precision and recall on labelled screens, and CI re-checks it on every change.
 - One offline HTML report with numbered markers on the screenshot. Every issue says who it affects, what they experience, and how to fix it in React Native, Jetpack Compose and Android Views.
 - A versioned JSON result for machines.
+
+## Quickstart from npm
+
+You need Node 22.18+, `adb` (Android platform-tools) and an emulator or a phone with USB debugging.
+
+```bash
+npx pragu init
+npx pragu doctor
+npx pragu scan --app com.example.shop
+```
+
+`pragu init` writes the starter config. Set `app` to your applicationId and list the screens to check, each with its deep link:
+
+```ts
+import type { PraguConfig } from 'pragu';
+
+export default {
+  app: 'com.example.shop',
+  screens: [
+    { name: 'Cart', deepLink: 'shop://cart', waitFor: 'cart-title' },
+    { name: 'Product', deepLink: 'shop://product/42' },
+  ],
+} satisfies PraguConfig;
+```
+
+With npx only, an editor may show "Cannot find module 'pragu'" on the type import; loading is unaffected, and `npm install --save-dev pragu` gives full typing.
+
+`pragu doctor` checks Node, adb, the device and the agent. With no device connected, it prints this (real output, exit code 3):
+
+```text
+Pragu doctor
+  OK       Node 26.12.1
+  OK       Android Debug Bridge version 1.0.41 (...\platform-tools\adb.exe)
+  PROBLEM  No Android device or emulator is connected.
+           Fix: Start an emulator (emulator -avd <name>) or connect a phone with USB debugging on.
+  OK       Agent APK found (...\pragu-agent.apk).
+  OK       pragu.config.ts is valid.
+1 problem to fix before scanning.
+```
+
+`pragu scan` needs a running emulator or phone, so it is not shown with output here; it writes `pragu-report/pragu-report.html` and `pragu-report/pragu-result.json`, and exits 1 when it finds errors.
+
+### On every pull request
+
+`npx pragu init --github` writes `.github/workflows/pragu.yml`, which scans on an emulator and then runs Pragu's action. The action comments only the barriers a pull request adds ([ADR-014](docs/adr/014-github-integration.md)):
+
+```yaml
+permissions:
+  contents: read
+  pull-requests: write # the comment
+  actions: read # the default branch's latest report
+  security-events: write # SARIF in code scanning
+
+steps:
+  # ... build your APK, then run "npx pragu scan" on an emulator ...
+  - uses: FlorentLatifi/Pragu@v0
+    if: always()
+```
+
+How Pragu differs from other tools: [comparison](https://florentlatifi.github.io/Pragu/concepts/comparison/).
 
 ## Run it from source
 

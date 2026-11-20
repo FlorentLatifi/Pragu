@@ -23,7 +23,7 @@ The brief asks for a Google-style launch checklist before every public release. 
 - [x] **F** Private vulnerability reporting turned on (SECURITY.md depends on it): on, checked with the GitHub API on 2026-11-04.
 - [x] Threat model reviewed for the GitHub Action and the release pipeline (D-38), 2026-11-03: `docs/security/threat-model.md`, with a test that app text cannot inject Markdown or HTML into the comment.
 - [x] `--redact` checked on a real report (five rn-shop screens on the emulator, 2026-11-03): none of the app texts checked is left in the HTML or JSON.
-- [ ] The release APK has no INTERNET permission (`verifyReleaseNoInternetPermission` in the release workflow).
+- [x] The release APK has no INTERNET permission (`verifyReleaseNoInternetPermission` in the release workflow). Checked on the published v0.1.0 APK on 2026-11-10: no `uses-permission` at all; signed with the release key.
 
 ## Release
 
@@ -31,14 +31,14 @@ The brief asks for a Google-style launch checklist before every public release. 
 - [x] **F** Trusted publishing for `pragu`, `@pragu/core`, `@pragu/report` (ADR-013).
 - [x] **F** Release keystore and its four secrets (2026-11-04).
 - [x] `pnpm changeset version`, review `CHANGELOG.md`, tag `v0.1.0`; the release workflow is green; `v0` tag moved to it for the action (2026-11-04).
-- [ ] npm shows provenance on all three packages; the GitHub Release has the APK, `SHA256SUMS` and the SBOM.
+- [x] npm shows provenance on all three packages; the GitHub Release has the APK, `SHA256SUMS` and the SBOM. Checked 2026-11-10; the APK in the npm tarball is byte-identical to the Release APK. Open: `SHA256SUMS` lists three `.tgz` files the Release does not carry.
 - [x] Each package has a README (npm shows it); `pnpm package:check` installs the packed tarballs with npm into an empty folder and runs them, in CI on Linux, Windows and macOS.
 
 ## Docs and community
 
 - [x] **F** GitHub Pages on, `DOCS_DEPLOY` set; the site is live at https://florentlatifi.github.io/Pragu/ (2026-11-04; home, getting started, a rule page and the comparison answer 200).
 - [x] **F** The code of conduct's contact is set (2026-11-04).
-- [ ] README: a report screenshot (done, `docs/images/report.png`), what checks miss (done); still to do: the quickstart from npm once published, and a link to the comparison page once the docs are live.
+- [ ] README: a report screenshot (done, `docs/images/report.png`), what checks miss (done); done on 2026-11-10: the quickstart from npm and a link to the comparison page (still unreleased on the branch).
 - [ ] "good first issue" labels on a few owner-task-sized issues.
 
 ## Launch

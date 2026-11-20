@@ -7,7 +7,7 @@ Method: STRIDE over the M0 architecture, in the spirit of Microsoft's SDL. Revie
 1. **Screen content of the app under test:** screenshots and accessibility trees. These can contain personal, health or banking data.
 2. **The developer's device and machine:** the agent holds `UiAutomation`, which can read every screen.
 3. **Supply chain:** npm packages, the agent APK, GitHub Actions, and the signing keys (M2).
-4. **Users' source code:** read by source mapping and auto-fix from M4 onwards.
+4. **Users' source code:** read by source mapping and auto-fix from M4 onwards, and since 2026-11-10 by `pragu comment` (the "Likely here" line, ADR-014): it only searches for an element id as plain text under `--source-root`, skips symlinks, never sends anything anywhere and keeps at most 64 MB in memory.
 
 ## Trust boundaries
 
@@ -39,7 +39,7 @@ New trust boundaries: the user's CI ↔ GitHub (comments, artifacts, code scanni
 | Threat | Example | Mitigation | Status |
 |---|---|---|---|
 | Spoofing | A fork's pull request posts a comment, or reads secrets, through the action | The action comments only when the pull request comes from the same repository; forks get the job summary. It never uses `pull_request_target` (ADR-014) | Done |
-| Tampering | App text crafted to inject Markdown or HTML into the comment | `pragu comment` escapes Markdown in every text from the app; the comment is plain Markdown with no raw HTML from the app | Done |
+| Tampering | App text crafted to inject Markdown or HTML into the comment | `pragu comment` escapes Markdown in every text from the app; the comment is plain Markdown with no raw HTML from the app. Element ids and repository file paths in the "Likely here" line are code spans with backticks, control characters and line breaks removed (tested with hostile ids and paths) | Done |
 | Tampering | Shell injection through action inputs | Inputs reach shell steps only as environment variables, never inlined into scripts | Done |
 | Information disclosure | Screenshots in a public repository's artifact | `--redact` on by default for public repositories in the starter workflow; 7-day retention; no raw captures in a redacted report (D-33) | Done |
 | Elevation of privilege | Excess token permissions | `contents: read`, `pull-requests: write`, `actions: read`, `security-events: write`, documented; nothing else | Done |

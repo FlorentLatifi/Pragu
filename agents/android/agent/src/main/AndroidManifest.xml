@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <!-- No INTERNET permission, on purpose: the agent talks to the CLI only through adb. -->
+    <!--
+      No icon on purpose: the agent has no launcher activity, so it never appears in the app drawer
+      and an icon would be dead weight (logo work is ruled out by D-40).
+      allowBackup stays false; fullBackupContent covers API 26-30 and dataExtractionRules API 31+.
+    -->
     <application
         android:allowBackup="false"
-        android:label="Pragu agent" />
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:label="Pragu agent"
+        tools:ignore="MissingApplicationIcon" />
 
     <instrumentation
         android:name=".PraguInstrumentation"

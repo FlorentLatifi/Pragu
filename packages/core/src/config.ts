@@ -151,7 +151,7 @@ export function parseConfig(value: unknown, source: string, rules: readonly Rule
   if (typeof value !== 'object' || value === null || Array.isArray(value)) {
     fail(
       source,
-      'the default export must be a config object, e.g. export default defineConfig({ app: "com.example.shop" }).',
+      'the default export must be a config object, e.g. export default { app: "com.example.shop" } satisfies PraguConfig.',
     );
   }
   const config = value as Record<string, unknown>;
