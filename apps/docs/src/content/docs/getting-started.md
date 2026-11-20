@@ -44,7 +44,7 @@ npx pragu scan --app com.example.shop
 
 Pragu installs its small agent (no network permission, ever), launches the app, waits for the screen to settle, and writes `pragu-report/pragu-report.html` and `pragu-report/pragu-result.json`. Open the report in any browser; it works offline.
 
-The command exits 1 when it finds errors, so a CI step fails. Warnings and info do not fail it unless you ask with `--fail-on warning`.
+The command exits 1 when it finds errors, so a CI step fails. Warnings and info do not fail it unless you ask with `--fail-on warning`. `pragu init --github` writes a GitHub workflow pinned to your Pragu version that fails pull requests on errors, never pushes to your default branch (see [Pull requests on GitHub](/Pragu/guides/ci/)).
 
 ## Several screens
 

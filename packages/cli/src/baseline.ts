@@ -69,7 +69,17 @@ export async function runBaseline(args: string[], io: Io, now: () => Date = () =
   if (action === 'create' && existsSync(out)) {
     throw new PraguError(EXIT.usage, `${out} already exists.`, 'Use "pragu baseline update" to replace it on purpose.');
   }
-  const baseline = createBaseline(await readResult(values.from), now().toISOString());
+  const result = await readResult(values.from);
+  // A baseline is committed and reviewed: redacted screen names and messages would make its
+  // entries unreadable, and fixed issues on a renamed screen would never be counted.
+  if (result.redacted) {
+    throw new PraguError(
+      EXIT.usage,
+      `${values.from} is a redacted result, so it cannot become a baseline.`,
+      'Scan without --redact, then run this again with that result.',
+    );
+  }
+  const baseline = createBaseline(result, now().toISOString());
   await writeFile(out, `${JSON.stringify(baseline, null, 2)}\n`);
   const count = baseline.issues.length;
   io.out(

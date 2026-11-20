@@ -13,8 +13,8 @@ inputs:
     description: Folder "pragu scan --out" wrote; uploaded as the artifact.
     default: pragu-report
   pragu:
-    description: How to run Pragu, e.g. "npx --yes pragu@0.1.0".
-    default: npx --yes pragu
+    description: How to run Pragu, e.g. "npx --yes pragu@0.1.0". Empty runs the version this action was released with, so @v0.1.1 runs 0.1.1.
+    default: ''
   comment:
     description: Comment on the pull request ("false" writes only the job summary).
     default: 'true'
@@ -39,13 +39,20 @@ runs:
         WORKFLOW: ${{ github.workflow }}
         MAIN: ${{ github.event.repository.default_branch }}
         ARTIFACT: ${{ inputs.artifact-name }}
+      # A scan that found barriers fails its run, yet it is still a completed scan of main (ADR-014),
+      # so any conclusion counts. A run that stopped before the scan has no artifact and is skipped.
       run: |
-        run_id=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow "$WORKFLOW" --branch "$MAIN" --event push \
-          --status success --limit 1 --json databaseId --jq '.[0].databaseId // empty')
-        if [ -n "$run_id" ]; then
-          gh run download "$run_id" --repo "$GITHUB_REPOSITORY" --name "$ARTIFACT" --dir "$RUNNER_TEMP/pragu-main" \
-            || echo "No $ARTIFACT artifact on the main branch's latest run; comparing with the baseline."
-        fi
+        run_ids=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow "$WORKFLOW" --branch "$MAIN" --event push \
+          --status completed --limit 5 --json databaseId --jq '.[].databaseId')
+        for run_id in $run_ids; do
+          rm -rf "$RUNNER_TEMP/pragu-main"
+          if gh run download "$run_id" --repo "$GITHUB_REPOSITORY" --name "$ARTIFACT" --dir "$RUNNER_TEMP/pragu-main" > /dev/null 2>&1; then
+            echo "Comparing with the main branch's scan in run $run_id."
+            exit 0
+          fi
+        done
+        rm -rf "$RUNNER_TEMP/pragu-main"
+        echo "No $ARTIFACT artifact on the main branch's latest runs; comparing with the baseline."
 
     - name: Write the comment
       shell: bash
@@ -53,6 +60,15 @@ runs:
         PRAGU: ${{ inputs.pragu }}
         REPORT_DIR: ${{ inputs.report-dir }}
       run: |
+        if [ -z "$PRAGU" ]; then
+          version=$(jq -r .version "$GITHUB_ACTION_PATH/packages/cli/package.json")
+          # The version ends up in a command line, so accept only a plain SemVer.
+          if ! [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$ ]]; then
+            echo "::error::Could not read Pragu's version from this action; set the pragu input, e.g. npx --yes pragu@0.1.0."
+            exit 1
+          fi
+          PRAGU="npx --yes pragu@$version"
+        fi
         $PRAGU comment "$REPORT_DIR/pragu-result.json" --base "$RUNNER_TEMP/pragu-main/pragu-result.json" \
           --report-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" --out "$RUNNER_TEMP/pragu-comment.md"
         cat "$RUNNER_TEMP/pragu-comment.md" >> "$GITHUB_STEP_SUMMARY"

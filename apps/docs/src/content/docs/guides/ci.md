@@ -11,9 +11,15 @@ The action is `FlorentLatifi/Pragu@v0`.
 2. starts an emulator with `reactivecircus/android-emulator-runner` and runs `pragu scan`;
 3. runs Pragu's action, which comments on the pull request and keeps the report as an artifact.
 
+Both are pinned: the workflow runs the Pragu version that wrote it (`npx --yes pragu@0.1.0`), and the action runs the version it was released with. Change the version in the workflow when you upgrade, or set the action's `pragu` input to run something else.
+
 ## What the comment shows
 
-Only what the pull request adds: barriers that are not in the latest scan of your default branch. The workflow also runs on pushes to that branch, so there is always something to compare with; until there is, the baseline decides what is known. Each new barrier has its screen, element, what a screen reader says, and the fixes, folded away. One comment per pull request, updated on every push.
+Only what the pull request adds: barriers that are not in the latest scan of your default branch. That is the newest completed run on a push to that branch which kept a report, even if its scan found barriers. Pushes to the default branch scan with `--fail-on never`, so they never fail on findings and always leave a report; pull requests still fail on errors. Until the first push has run, the baseline decides what is known. Each new barrier has its screen, element, what a screen reader says, and the fixes, folded away. One comment per pull request, updated on every push.
+
+## Code scanning
+
+On public repositories the workflow also writes SARIF (`--format html,json,sarif`) and the action uploads it, so barriers show up in the Security tab. Private repositories skip it, because code scanning there needs GitHub Advanced Security.
 
 ## Forks and privacy
 
@@ -22,4 +28,4 @@ Only what the pull request adds: barriers that are not in the latest scan of you
 
 ## Permissions
 
-`contents: read`, `pull-requests: write` for the comment, `actions: read` for the default branch's report, `security-events: write` for SARIF in code scanning.
+`contents: read`, `pull-requests: write` for the comment, `actions: read` for the default branch's report, `security-events: write` for SARIF in code scanning (used on public repositories).

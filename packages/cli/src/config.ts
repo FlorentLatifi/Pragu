@@ -5,6 +5,7 @@ import { pathToFileURL } from 'node:url';
 import { parseConfig } from '@pragu/core';
 import type { PraguConfig } from '@pragu/core';
 import { EXIT, PraguError } from './errors.js';
+import { toolVersion } from './version.js';
 
 export const CONFIG_FILES = ['pragu.config.ts', 'pragu.config.mts', 'pragu.config.js', 'pragu.config.mjs'] as const;
 
@@ -96,7 +97,9 @@ export default {
 } satisfies PraguConfig;
 `;
 
-const WORKFLOW = `name: Accessibility
+/** The starter workflow, pinned to this CLI's version so a new Pragu release never changes a team's CI unasked. */
+export function starterWorkflow(version: string): string {
+  return `name: Accessibility
 
 # Written by "pragu init --github". Scans the app on an emulator on every pull request and
 # on pushes to the default branch, so each pull request is compared with the latest scan of it.
@@ -109,7 +112,7 @@ permissions:
   contents: read
   pull-requests: write # the comment
   actions: read # the default branch's latest report
-  security-events: write # SARIF in code scanning
+  security-events: write # SARIF in code scanning (public repositories)
 
 jobs:
   pragu:
@@ -137,12 +140,20 @@ jobs:
           target: google_apis
           arch: x86_64
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          # Pushes to the default branch never fail on findings, so each one leaves the scan that
+          # pull requests are compared with; pull requests still fail on errors.
           # Public repositories get --redact: anyone signed in to GitHub can download their artifacts.
-          script: npx --yes pragu scan --install android/app/build/outputs/apk/release/app-release.apk --out pragu-report \${{ github.event.repository.private && ' ' || '--redact' }}
+          # They also get SARIF for code scanning, which on private repositories needs GitHub Advanced Security.
+          script: >-
+            npx --yes pragu@${version} scan --install android/app/build/outputs/apk/release/app-release.apk --out pragu-report
+            \${{ github.event_name == 'push' && '--fail-on never' || ' ' }}
+            \${{ github.event.repository.private && ' ' || '--redact' }}
+            \${{ github.event.repository.private && ' ' || '--format html,json,sarif' }}
 
       - uses: FlorentLatifi/Pragu@v0
         if: always()
 `;
+}
 
 /** Writes a starter GitHub Actions workflow (ADR-014); never overwrites one. */
 export async function initWorkflow(cwd: string): Promise<string> {
@@ -155,7 +166,7 @@ export async function initWorkflow(cwd: string): Promise<string> {
     );
   }
   await mkdir(dirname(file), { recursive: true });
-  await writeFile(file, WORKFLOW);
+  await writeFile(file, starterWorkflow(toolVersion()));
   return file;
 }
 

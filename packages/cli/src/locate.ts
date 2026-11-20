@@ -3,6 +3,7 @@ import { writeFile } from 'node:fs/promises';
 import { extname, join, relative } from 'node:path';
 import { toSarif } from '@pragu/core';
 import type { Issue, SarifPlace, ScanResult } from '@pragu/core';
+import { CONFIG_FILES } from './config.js';
 
 // Where app code lives, and what is never app code.
 const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.kt', '.java', '.xml', '.dart', '.swift']);
@@ -28,6 +29,28 @@ function firstLineWith(file: string, needle: string): number | null {
     .split('\n')
     .findIndex((line) => line.includes(needle));
   return index === -1 ? null : index + 1;
+}
+
+// Committed files that most React Native and Android projects have, in order of preference.
+const FALLBACK_FILES = [
+  'package.json',
+  'app.json',
+  'android/app/build.gradle',
+  'android/app/build.gradle.kts',
+  'settings.gradle',
+  'settings.gradle.kts',
+];
+
+/**
+ * A committed file to anchor issues that name no source line, so code scanning can show them.
+ * Never report output, which is not in the repository. When the project has none of these,
+ * it returns the config path the scan would have read: GitHub still lists the alert, but
+ * without a code snippet, since that file does not exist.
+ */
+function fallbackFile(root: string, configFile: string | null): { file: string; exists: boolean } {
+  if (configFile !== null) return { file: configFile, exists: true };
+  const found = FALLBACK_FILES.map((name) => join(root, name)).find((file) => existsSync(file));
+  return found === undefined ? { file: join(root, CONFIG_FILES[0]), exists: false } : { file: found, exists: true };
 }
 
 /**
@@ -115,23 +138,24 @@ export function makeIdLocator(
 /**
  * Finds where each issue belongs in the project, for SARIF (D-43, tier 1): the one source
  * line that names its testID or resource id, if exactly one does; otherwise the screen's line
- * in the config; otherwise the config's or package.json's first line, so GitHub can show it.
+ * in the config; otherwise the first line of a committed project file, so GitHub can show it.
  */
 export function makeLocator(root: string, configFile: string | null, result: ScanResult): (issue: Issue) => SarifPlace {
   const byId = makeIdLocator(root);
   const toUri = (file: string) => relative(root, file).replaceAll('\\', '/');
-  const fallbackFile = configFile ?? (existsSync(join(root, 'package.json')) ? join(root, 'package.json') : null);
+  const fallback = fallbackFile(root, configFile);
 
   return (issue) => {
     const exact = issue.resourceId === null ? null : byId(issue.resourceId);
     if (exact !== null) return exact;
-    if (fallbackFile === null) return { uri: 'pragu-report/pragu-result.json', line: 1 };
+    const uri = toUri(fallback.file);
+    if (!fallback.exists) return { uri, line: 1 };
     const screen = result.screens.find((candidate) => candidate.id === issue.screenId)?.name;
     const line =
       screen === undefined
         ? null
-        : (firstLineWith(fallbackFile, `'${screen}'`) ?? firstLineWith(fallbackFile, `"${screen}"`));
-    return { uri: toUri(fallbackFile), line: line ?? 1 };
+        : (firstLineWith(fallback.file, `'${screen}'`) ?? firstLineWith(fallback.file, `"${screen}"`));
+    return { uri, line: line ?? 1 };
   };
 }
 
