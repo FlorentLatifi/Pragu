@@ -9,6 +9,7 @@ import {
   defaultRules,
   normalizeAndroidCapture,
   parseAndroidCapture,
+  redactResult,
   summarize,
 } from '../src/index.js';
 import type { ScanResult } from '../src/index.js';
@@ -61,6 +62,31 @@ describe('pragu-result.schema.json', () => {
   it.each(recordings)('accepts the result of a real scan: %s', (_name, dir, screenId) => {
     const result = resultFromRecording(dir, screenId);
     expect(validate(result), JSON.stringify(validate.errors)).toBe(true);
+  });
+
+  it('accepts a redacted result with a baseline comparison and a score', () => {
+    const [, dir, screenId] = recordings[0] ?? ['', '', ''];
+    const result = resultFromRecording(dir, screenId);
+    const [first] = result.issues;
+    if (first === undefined) throw new Error('the recording has issues');
+    const fixedIssue = { ...first, screen: result.screens[0]?.name ?? '' };
+    const { fingerprint, ruleId, screen, resourceId, message } = fixedIssue;
+    const redacted = redactResult({
+      ...result,
+      summary: {
+        ...result.summary,
+        baseline: {
+          file: 'pragu-baseline.json',
+          newIssues: result.issues.length,
+          known: 0,
+          fixed: 1,
+          fixedIssues: [{ fingerprint, ruleId, screen, resourceId, message }],
+        },
+      },
+      score: { version: 1, value: 72, screens: { [screenId]: 72 } },
+    });
+    expect(redacted.redacted).toBe(true);
+    expect(validate(redacted), JSON.stringify(validate.errors)).toBe(true);
   });
 
   it('rejects a field it does not describe, and a missing one, so code and schema cannot drift', () => {

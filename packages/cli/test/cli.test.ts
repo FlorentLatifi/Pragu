@@ -393,6 +393,8 @@ describe('scan --from-capture (whole pipeline, no device)', () => {
     const result = JSON.parse(json) as ScanResult;
     expect(result.redacted).toBe(true);
     expect(result.issues).toHaveLength(3);
+    // The fixture's screen is named after its window title, which is app text.
+    expect(result.screens[0]?.name).toBe('Screen 1');
     const html = await readFile(join(out, 'pragu-report.html'), 'utf8');
     for (const text of ['Free shipping', 'Apply code', 'Dismiss promotion']) {
       expect(json).not.toContain(text);
@@ -409,6 +411,14 @@ describe('scan --from-capture (whole pipeline, no device)', () => {
     const again = capturingIo();
     expect(await main(['report', join(out, 'pragu-result.json')], again.sink)).toBe(0);
     expect(await readFile(join(out, 'pragu-report.html'), 'utf8')).toBe(html);
+
+    // A baseline is committed and reviewed, so it needs the real screen names and messages.
+    const baselineFile = join(dir, 'from-redacted.json');
+    expect(
+      await main(['baseline', 'create', '--from', join(out, 'pragu-result.json'), '--out', baselineFile], again.sink),
+    ).toBe(2);
+    expect(again.io.stderr).toContain('without --redact');
+    expect(existsSync(baselineFile)).toBe(false);
   });
 
   it('writes the pull-request comment: only new barriers, against main or else the baseline', async () => {
